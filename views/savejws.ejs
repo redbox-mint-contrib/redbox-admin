@@ -1,0 +1,16 @@
+<span>Redirecting to main page... <a href="/">click here to redirect manually</a>.</span>
+<script>
+'use strict';
+
+// Declare app level module which depends on filters, and services
+angular.module('loginApp', [
+  'redboxAdmin.services'
+]);
+var SaveLoginCtrl = function($scope, $window, authService) {
+    var jws = '<%- jws %>';
+    var payload = '<%- payload %>';
+    authService.saveAuth(jws, payload);
+    // redirect to main page... replace with the current context path
+    $window.location.replace("/redbox-admin/");
+};
+</script>

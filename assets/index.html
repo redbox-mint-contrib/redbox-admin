@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="redboxAdmin">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>ReDBox PaaS Admin</title>
+    <!--STYLES-->
+    <!--STYLES END-->
+  </head>
+  
+  <body>
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#/">ReDBox/Mint Instance Administrator</a>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="#/">Dashboard</a></li>
+              <li><a href="#/logout">Logout</a></li>
+            </ul>
+        </div>
+      </div>
+    </div>
+    <!-- Partials Start -->
+    <div class="container-fluid" ng-view>
+    </div>
+    <!-- Partials End -->
+    <!--SCRIPTS-->
+    <!--SCRIPTS END-->
+  </body>
+</html>
