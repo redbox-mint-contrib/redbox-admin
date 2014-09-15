@@ -19,4 +19,6 @@ angular.module('redboxAdmin', [
 }])
 .config(['$httpProvider', function($httpProvider) {
     $httpProvider.interceptors.push('authInterceptor');
+}]).config(['$compileProvider', function($compileProvider) {
+  $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|blob):/);
 }]);

@@ -48,7 +48,12 @@ module.exports.routes = {
   ***************************************************************************/
   'GET /redbox-admin/fileHarvest/:sysType/:fileName': 'fileHarvestController.get',
   'GET /redbox-admin/fileHarvest/:sysType': 'fileHarvestController.get',
-  'POST /redbox-admin/fileHarvest/:sysType/:fileName': 'fileHarvestController.create',
+  'PUT /redbox-admin/fileHarvest/:sysType/:fileName': 'fileHarvestController.create',
+  'POST /redbox-admin/fileHarvest/:sysType/:fileName': 'fileHarvestController.get',
   'DELETE /redbox-admin/fileHarvest/:sysType/:fileName': 'fileHarvestController.delete',
-  'POST /redbox-admin/security/login':'securityController.login'
+  'POST /redbox-admin/security/login':'securityController.login',
+  'GET /redbox-admin/instance/:sysType': 'instanceController.get',
+  'POST /redbox-admin/instance/:sysType': 'instanceController.start',
+  'PUT /redbox-admin/instance/:sysType': 'instanceController.restart',
+  'DELETE /redbox-admin/instance/:sysType': 'instanceController.stop',
 };

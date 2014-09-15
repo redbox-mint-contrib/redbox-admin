@@ -7,10 +7,11 @@
   </div>
   <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
     <h1 class="page-header">Mint CSV File Harvest</h1>
+     
     <h2>Upload CSVs for harvest</h2>
     <p class="bg-warning">Files selected will be placed in the Harvester pick-up directory, therefore, select with care.</p>
     <p>
-      <input type="file" ng-file-select="onMintFileSelect($files)" multiple accept="text/csv">
+      <input class="btn" type="file" ng-file-select="onMintFileSelect($files)" multiple accept="*" aaccept="text/csv">
     </p>
     <div class="progress" ng-repeat="fileUpload in fileUploads">
       <div ng-show="fileUpload != null" class="{{fileUpload.cl}}"  role="progressbar" aria-valuenow="{{fileUpload.prog}}" aria-valuemin="0" aria-valuemax="100" style="width: {{fileUpload.prog}}%">
@@ -21,13 +22,18 @@
       {{alert.msg}}
     </div>
     <h2>CSVs waiting to be harvested</h2>
-    <p class="bg-warning">These files might be harvested at any time, deleting might not always guarantee that the Harvester won't pick it up.</p>
+    <p class="bg-warning">These files might be harvested at any time, deleting might not always guarantee that the Harvester won't pick it up, and downloading large files might interrupt the Harvesting process.</p>
     <div ng-init="getMintPendingFileList()">
-      <ul class="list-group">
-        <li class="list-group-item" ng-repeat="fileName in mintPendingFiles" ng-animate="{enter: 'animate-enter', leave: 'animate-leave'}">
-           <a ng-click="deleteFile(fileName)" class="glyphicon glyphicon-trash"></a> - <a href="/fileHarvest/mint/{{fileName}}">{{ fileName }}</a>
-        </li>
-      </ul>
+      <form method="POST" action="">
+        <ul class="list-group">
+          <li class="list-group-item" ng-repeat="fileName in mintPendingFiles">
+            <form-downloader file-name="{{fileName}}" base-url="/redbox-admin/fileHarvest/mint/" form-search-depth-str="100"/>
+            &nbsp;
+            <button class="btn btn-danger glyphicon glyphicon-trash" ng-click="deleteFile(fileName)"></button>
+          </li>
+        </ul>
+        <input type="hidden" name="jws" value="{{jws}}" />
+      </form>
     </div>
   </div>
 </div>

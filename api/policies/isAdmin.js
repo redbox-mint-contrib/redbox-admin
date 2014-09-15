@@ -8,6 +8,9 @@
  */
  module.exports = function(req, res, next) {
   var jwsStr = req.get('JWS');
+  if (jwsStr == null) {
+    jwsStr = req.param('jws');
+  }
   var payload = JSON.parse(jwsService.getPayload(jwsStr));
   var roles = payload.typ;
   if (roles.indexOf("admin") >= 0) {

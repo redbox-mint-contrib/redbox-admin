@@ -28,11 +28,5 @@
   content: "";
   padding: 0;
 }
-.animate-enter {
-    -webkit-transition: 1s linear all; /* Chrome */
-    transition: 1s linear all;
-    opacity: 0;
-}
-.animate-enter.animate-enter-active {
-    opacity: 1;
-}
+.nav, .pagination, .carousel, .panel-title a { cursor: pointer; } 
+.pointy {cursor:pointer;}

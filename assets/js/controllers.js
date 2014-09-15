@@ -3,17 +3,66 @@
 /* Controllers */
 
 angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','redboxAdmin.config'])
-  .controller('IndexCtrl', ['$scope', '$routeParams', '$location', 'authService', '$http', function($scope, $routeParams, $location, authService, $http) {
+  .controller('IndexCtrl', ['$scope', '$routeParams', '$location', 'authService', '$http', '$resource', function($scope, $routeParams, $location, authService, $http, $resource) {
     $scope.$http = $http;
-    $scope.getStat = function($event) {
-        console.log("Getting Instance status:");
+    var Instance = $resource('/redbox-admin/instance/:sysType', {sysType:'@sysType'}, {
+      get: {method:'GET'},
+      restart: {method: 'PUT'},
+      start: {method: 'POST'},
+      stop: {method: 'DELETE'}
+    });
+    $scope.redbox = {sysType:'redbox',stat:5, lastChecked:'n/a', cmdDisabled:false, 
+                     STAT_UP:0, STAT_STOPPING:1, STAT_DOWN:2, STAT_STARTING:3, STAT_RESTARTING:4, STAT_REFRESHING:5};
+    $scope.mint = {sysType:'mint', stat:5, lastChecked:'n/a', refreshDisabled:false, 
+                  STAT_UP:0, STAT_STOPPING:1, STAT_DOWN:2, STAT_STARTING:3, STAT_RESTARTING:4, STAT_REFRESHING:5};
+    var statWatcher = function(sys) {
+      return function() {
+        switch(sys.stat) {
+            case sys.STAT_DOWN:
+              sys.panelCl = 'panel-danger';
+              sys.titleSfx = 'is stopped';
+              break;
+            case sys.STAT_UP:
+              sys.panelCl = 'panel-success';
+              sys.titleSfx = 'is running';
+              break;
+            case sys.STAT_STOPPING:
+              sys.panelCl = 'panel-warning';
+              sys.titleSfx = 'is stopping...hold on.';
+              break;
+            case sys.STAT_STARTING:
+              sys.panelCl = 'panel-warning';
+              sys.titleSfx = 'is starting...hold on.';
+              break;
+            case sys.STAT_RESTARTING:
+              sys.panelCl = 'panel-warning';
+              sys.titleSfx = 'is restarting...hold on.';
+              break;
+            default:
+              sys.panelCl = 'panel-warning';
+              sys.titleSfx = 'status is unknown.';
+              break;
+        }
+      };
     };
-  }])
-    .controller('LogoutCtrl', ['$scope', '$routeParams', '$location', 'authService','$http','redboxConfig', function($scope, $routeParams, $location, authService, $http, redboxConfig)   {
+    $scope.$watch('redbox.stat', statWatcher($scope.redbox));
+    $scope.$watch('mint.stat', statWatcher($scope.mint));
+    $scope.runCmd = function (sysType, cmd, interimStat) {
+      // TODO: when restarting RB, make sure token does not expire 'soon'...
+      $scope[sysType].cmdDisabled = true;
+      $scope[sysType].stat = interimStat;
+      var stat = Instance[cmd]({sysType:sysType}, function() {
+        $scope[sysType].stat = stat.status;
+        $scope[sysType].lastChecked = new Date();
+        $scope[sysType].cmdDisabled = false;
+      });
+    };
+  }]).controller('LogoutCtrl', ['$scope', '$routeParams', '$location', 'authService','$http','redboxConfig', function($scope, $routeParams, $location, authService, $http, redboxConfig)   {
   	authService.deleteAuth();
     $http.post(redboxConfig.authOutUrl, 'verb=logout', {headers:{'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8'}}).success(function() {console.log("Logged out."); $location.path("/").replace();});
   }])
-    .controller('MintCsvCtrl',  [ '$scope', '$upload', '$resource', function($scope, $upload, $resource) {
+    .controller('MintCsvCtrl',  [ '$scope', '$upload', '$resource', 'redboxConfig','authService', function($scope, $upload, $resource, redboxConfig, authService) {
+      $scope.jws = authService.getJws();
       $scope.mintPendingFiles = [];
       var FileHarvest = $resource('/redbox-admin/fileHarvest/:sysType/:fileName', {sysType:'@sysType', fileName:'@fileName'});
       // -----------------------------------------------------------
@@ -92,7 +141,7 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
           var nokHdlr = $scope.nokCbHdlr(progTracker);
           $scope.upload = $upload.upload({
             url: '/redbox-admin/fileHarvest/mint/'+file.name,
-            method: 'POST',
+            method: 'PUT',
             headers: {'file-size': file.size},
             //withCredentials: true,
             data: {},

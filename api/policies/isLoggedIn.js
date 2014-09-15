@@ -9,6 +9,9 @@
 module.exports = function(req, res, next) {
     // read the JWS from the header
     var jwsStr = req.get('JWS');
+    if (jwsStr == null) {
+      jwsStr = req.param('jws');
+    }
     // verify the signature
     var errMsg = jwsService.isInvalid(jwsStr);
     if (errMsg != "") {

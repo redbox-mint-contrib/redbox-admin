@@ -38,7 +38,21 @@ module.exports = {
     // Configuration for the FileharvestController, must have absolute paths
     fileHarvest : {
         mint: {
-          targetDir: "",
+          targetDir: "/mnt/ephemeral/tmp-web-admin/uploads/",
         }
+    },
+    instance: {
+      redbox: {
+        statusCmd:"/opt/redbox/server/tf.sh status", 
+        restartCmd:"/opt/redbox/server/tf.sh restart", 
+        stopCmd:"/opt/redbox/server/tf.sh stop", 
+        startCmd:"/opt/redbox/server/tf.sh start"
+      },
+      mint: {
+        statusCmd:"/opt/mint/server/tf.sh status", 
+        restartCmd:"/opt/mint/server/tf.sh restart", 
+        stopCmd:"/opt/mint/server/tf.sh stop", 
+        startCmd:"/opt/mint/server/tf.sh start"
+      }
     }
 };
