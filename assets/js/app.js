@@ -13,8 +13,12 @@ angular.module('redboxAdmin', [
 ])
 .config(['$routeProvider', function($routeProvider) {
   $routeProvider.when('/', {templateUrl: 'partials/index.html', controller: 'IndexCtrl'});
+  $routeProvider.when('/instance', {templateUrl: 'partials/instance.html', controller: 'InstanceCtrl'});
+  $routeProvider.when('/instance/:sysType/restart', {templateUrl: 'partials/instance.html', controller: 'InstanceCtrl'});
   $routeProvider.when('/logout', {templateUrl: 'partials/logout.html', controller: 'LogoutCtrl'});
   $routeProvider.when('/mintCsvs', {templateUrl: 'partials/mintCsvs.html', controller: 'MintCsvCtrl'});
+  $routeProvider.when('/config', {templateUrl: 'partials/config.html', controller: 'ConfigCtrl'});
+  $routeProvider.when('/config/:sysType/:id', {templateUrl: 'partials/config.html', controller: 'ConfigCtrl'});
   $routeProvider.otherwise({redirectTo: '/'});
 }])
 .config(['$httpProvider', function($httpProvider) {

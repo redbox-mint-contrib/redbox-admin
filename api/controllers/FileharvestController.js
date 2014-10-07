@@ -58,6 +58,7 @@ module.exports = {
                 try {
                   sails.controllers.fileharvest.runFilter(config);
                   fs.renameSync(files[i].fd, config.targetDir + "/" + config.fileName);
+                  fs.chmod(config.targetDir + "/" + config.fileName, 0775);
                 } catch (err) {
                   fs.unlink(config.targetDir + "/" + config.fileName, function(err) {
                     if (err) {

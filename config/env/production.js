@@ -38,21 +38,61 @@ module.exports = {
     // Configuration for the FileharvestController, must have absolute paths
     fileHarvest : {
         mint: {
-          targetDir: "/mnt/ephemeral/tmp-web-admin/uploads/",
+          targetDir: "/opt/harvester/.json-harvester-manager-production/harvest/mint-csvjdbc/input",
+          owner: "tomcat",
+          group: "tomcat",
         }
     },
     instance: {
       redbox: {
-        statusCmd:"/opt/redbox/server/tf.sh status", 
-        restartCmd:"/opt/redbox/server/tf.sh restart", 
-        stopCmd:"/opt/redbox/server/tf.sh stop", 
-        startCmd:"/opt/redbox/server/tf.sh start"
+        installPath:"/opt/redbox/",
+        statusCmd:"server/tf.sh status", 
+        restartCmd:"server/tf.sh restart", 
+        stopCmd:"server/tf.sh stop", 
+        startCmd:"server/tf.sh start",
+        urlCheck:"http://localhost:9000/redbox/default/home",
       },
       mint: {
-        statusCmd:"/opt/mint/server/tf.sh status", 
-        restartCmd:"/opt/mint/server/tf.sh restart", 
-        stopCmd:"/opt/mint/server/tf.sh stop", 
-        startCmd:"/opt/mint/server/tf.sh start"
+        installPath:"/opt/mint/",
+        statusCmd:"server/tf.sh status", 
+        restartCmd:"server/tf.sh restart", 
+        stopCmd:"server/tf.sh stop", 
+        startCmd:"server/tf.sh start",
+        urlCheck:"http://localhost:9001/mint/default/home",
+      }
+    },
+    sysconfig: {
+      redbox: {
+        source: {
+          system:"home/system-config.json",
+          identity:{path: "home/config-include/1-main-modules/identity_work.json", schema:"home/config-schema/identity.schema.json"},
+          authentication:{path: "home/config-include/1-main-modules/authentication.json", schema:"home/config-schema/authentication.schema.json"},
+          sso: {path:"home/config-include/2-misc-modules/sso.json", schema:"home/config-schema/sso.schema.json"},
+          rapidaaf: {path:"home/config-include/plugins/rapidaaf.json", schema:"home/config-schema/rapidaaf.schema.json"},
+          siteDetails: {path:"home/config-include/1-main-modules/siteDetails.json", schema:"home/config-schema/siteDetails.schema.json"},
+          env:"server/tf_env_work.sh",
+        },
+        field: {
+          server_url: {
+            source: "env",
+            key: "export SERVER_URL="
+          } 
+        },
+        section: {
+          siteDetails: {
+            title:"Site Details",
+            subsections: [{source:"siteDetails"}]
+          },
+          identity: {
+            title:"Identity",
+            subsections: [{source:"identity"}],
+          },
+          authentication: {
+            title:"Authentication",
+            subsections: [{source:"authentication"}, {source:"sso"}, {source:"rapidaaf"}]
+          }
+        }
       }
     }
+
 };

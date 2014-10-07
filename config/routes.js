@@ -56,4 +56,9 @@ module.exports.routes = {
   'POST /redbox-admin/instance/:sysType': 'instanceController.start',
   'PUT /redbox-admin/instance/:sysType': 'instanceController.restart',
   'DELETE /redbox-admin/instance/:sysType': 'instanceController.stop',
+  'GET /redbox-admin/config/field/:sysType/:key': 'configController.read',
+  'POST /redbox-admin/config/field/:sysType/:key': 'configController.write',
+  'GET /redbox-admin/config/section/:sysType': 'configController.getSection',
+  'GET /redbox-admin/config/section/:sysType/:key': 'configController.getSection',
+  'POST /redbox-admin/config/section/:sysType/:key': 'configController.setSection',
 };

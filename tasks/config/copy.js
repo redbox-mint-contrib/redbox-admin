@@ -26,7 +26,10 @@ module.exports = function(grunt) {
                  cwd: './bower_components',
                  src: [
                  // add js and other dependencies
-                 'angular/angular.js', 'angular-route/angular-route.js','angular-mocks/angular-mocks.js', 'angular-loader/angular-loader.js','angular-resource/angular-resource.js','jquery/dist/jquery.js', 'ng-file-upload/angular-file*', 'ng-file-upload/FileAPI*','angular-bootstrap/ui-bootstrap-tpls.min.js'
+                 'angular/angular.js', 'angular-route/angular-route.js','angular-mocks/angular-mocks.js', 'angular-loader/angular-loader.js','angular-resource/angular-resource.js','jquery/dist/jquery.js', 'ng-file-upload/angular-file*', 'ng-file-upload/FileAPI*','angular-bootstrap/ui-bootstrap-tpls.min.js',
+                   'angular-sanitize/angular-sanitize.js', 'tv4/tv4.js','objectpath/lib/ObjectPath.js', 'angular-schema-form/dist/schema-form.min.js', 'angular-schema-form/dist/bootstrap-decorator.min.js',
+                   'angular-modal-service/dst/angular-modal-service.min.js',
+                   'bootstrap/dist/js/bootstrap.min.js',
                  ],
                  flatten: true,
                  dest: '.tmp/public/redbox-admin/js/dependencies'

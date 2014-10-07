@@ -15,10 +15,7 @@ module.exports = function(req, res, next) {
     // verify the signature
     var errMsg = jwsService.isInvalid(jwsStr);
     if (errMsg != "") {
-        return res.forbidden(errMsg);
+        return res.forbidden({error:errMsg});
     }
     return next();
-    // User is not allowed
-    // (default res.forbidden() behavior can be overridden in `config/403.js`)
-    return res.forbidden('Please login before doing this action.');
 };

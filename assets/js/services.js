@@ -18,7 +18,7 @@ angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap', 'r
 					errMsg = "Token expired.";
 				} else
 				// iat must be in the past
-				if (admin_jws_payload.iat >= nowInSecs) {
+				if (admin_jws_payload.iat > nowInSecs) {
 					errMsg = "IAT Invalid.";
 				} else 
 				// nbf must be in the past

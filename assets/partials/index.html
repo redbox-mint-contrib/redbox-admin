@@ -1,38 +1,18 @@
 <div class="row">
   <div class="col-sm-3 col-md-2 sidebar">
     <ul class="nav nav-sidebar">
-      <li class="active"><a href="#/">Instance</a></li>
-      <li><a href="#/mintCsvs">Mint CSVs</a></li>
+      <li class="active"><a href="#/">Home</a></li>
+      <li><a href="#/instance">Instance</a></li>
+      <li><a href="#/config">Configuration</a></li>
+      <li><a href="#/mintCsvs">Upload</a></li>
     </ul>
   </div>
   <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-    <h1 class="page-header">ReDBox/Mint Instance</h1>
-    <!-- Status of instances, as well as links to restarting -->
-    <div ng-init="runCmd('mint', 'get');runCmd('redbox','get');">
-      <div class="panel {{redbox.panelCl}}">
-        <div class="panel-heading">
-          <h3 class="panel-title">ReDBox {{redbox.titleSfx}}
-            <small class="pull-right">Last checked on: <span ng-bind="redbox.lastChecked | date:'dd/MM/yyyy HH:mm:ss'"></span></small>
-          </h3>
-        </div>
-        <div class="panel-body">
-          <button type="button" ng-click="runCmd('redbox','restart', redbox.STAT_RESTARTING)" ng-disabled="redbox.cmdDisabled" class="btn btn-warning">Restart</button>
-          <button type="button" ng-click="runCmd('redbox','start', redbox.STAT_STARTING)" ng-disabled="redbox.cmdDisabled" class="btn btn-warning">Start</button>
-          <button type="button" ng-click="runCmd('redbox','stop', redbox.STAT_STOPPING)" ng-disabled="redbox.cmdDisabled" class="btn btn-danger">Stop</button>
-          <button type="button" ng-click="runCmd('redbox','get', redbox.STAT_REFRESHING)" ng-disabled="redbox.cmdDisabled" class="btn btn-info pull-right">Refresh Status</button>
-        </div>
-      </div>
-      <div class="panel {{mint.panelCl}}">
-        <div class="panel-heading">
-          <h3 class="panel-title">Mint {{mint.titleSfx}}<small class="pull-right">Last checked on: <span ng-bind="mint.lastChecked | date:'dd/MM/yyyy HH:mm:ss'"></span></small></h3>
-        </div>
-        <div class="panel-body">
-          <button type="button" ng-click="runCmd('mint','restart', mint.STAT_RESTARTING)" ng-disabled="mint.cmdDisabled" class="btn btn-warning">Restart</button>
-          <button type="button" ng-click="runCmd('mint','start', mint.STAT_STARTING)" ng-disabled="mint.cmdDisabled" class="btn btn-warning">Start</button>
-          <button type="button" ng-click="runCmd('mint','stop', mint.STAT_STOPPING)" ng-disabled="mint.cmdDisabled" class="btn btn-danger">Stop</button>
-          <button type="button" ng-click="runCmd('mint','get', mint.STAT_REFRESHING)" ng-disabled="mint.cmdDisabled" class="btn btn-info pull-right">Refresh Status</button>
-        </div>
-      </div>
+    <div class="jumbotron">
+      <h2>ReDBox/Mint Administration</h2>
+      <p>
+          This application allows you to configure and control ReDBox and Mint. 
+      </p>
     </div>
   </div>
 </div>

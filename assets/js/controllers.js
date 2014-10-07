@@ -1,9 +1,23 @@
 'use strict';
 
-/* Controllers */
+// -----------------------------------------------------------
+// ReDBox / Mint administration app AngularJS Controllers
+// 
+// author: Shilo Banihit
+// -----------------------------------------------------------
 
-angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','redboxAdmin.config'])
-  .controller('IndexCtrl', ['$scope', '$routeParams', '$location', 'authService', '$http', '$resource', function($scope, $routeParams, $location, authService, $http, $resource) {
+angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','redboxAdmin.config','schemaForm', 'ngRoute', 'angularModalService'])
+// -----------------------------------------------------------
+// IndexCtrl 
+//  - does nothing but an index, for now
+// -----------------------------------------------------------
+.controller('IndexCtrl', ['$scope', '$routeParams', '$location', 'authService', '$http', '$resource', function($scope, $routeParams, $location, authService, $http, $resource) {
+  }])
+// -----------------------------------------------------------
+// InstanceCtrl 
+//  - controls RB/Mint instance
+// -----------------------------------------------------------
+  .controller('InstanceCtrl', ['$scope', '$routeParams', '$location', 'authService', '$http', '$resource', 'ModalService', '$route','$interval','redboxConfig', function($scope, $routeParams, $location, authService, $http, $resource, ModalService, $route, $interval, redboxConfig) {
     $scope.$http = $http;
     var Instance = $resource('/redbox-admin/instance/:sysType', {sysType:'@sysType'}, {
       get: {method:'GET'},
@@ -11,9 +25,9 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
       start: {method: 'POST'},
       stop: {method: 'DELETE'}
     });
-    $scope.redbox = {sysType:'redbox',stat:5, lastChecked:'n/a', cmdDisabled:false, 
+    $scope.redbox = {sysType:'redbox',pending:false, stat:5, lastChecked:'n/a', cmdDisabled:false, 
                      STAT_UP:0, STAT_STOPPING:1, STAT_DOWN:2, STAT_STARTING:3, STAT_RESTARTING:4, STAT_REFRESHING:5};
-    $scope.mint = {sysType:'mint', stat:5, lastChecked:'n/a', refreshDisabled:false, 
+    $scope.mint = {sysType:'mint', pending:false, stat:5, lastChecked:'n/a', refreshDisabled:false, 
                   STAT_UP:0, STAT_STOPPING:1, STAT_DOWN:2, STAT_STARTING:3, STAT_RESTARTING:4, STAT_REFRESHING:5};
     var statWatcher = function(sys) {
       return function() {
@@ -47,21 +61,82 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
     };
     $scope.$watch('redbox.stat', statWatcher($scope.redbox));
     $scope.$watch('mint.stat', statWatcher($scope.mint));
-    $scope.runCmd = function (sysType, cmd, interimStat) {
-      // TODO: when restarting RB, make sure token does not expire 'soon'...
-      $scope[sysType].cmdDisabled = true;
-      $scope[sysType].stat = interimStat;
-      var stat = Instance[cmd]({sysType:sysType}, function() {
-        $scope[sysType].stat = stat.status;
-        $scope[sysType].lastChecked = new Date();
-        $scope[sysType].cmdDisabled = false;
-      });
+    $scope.showModal = function(templateUrl, backdrop, cb) {
+        ModalService.showModal({
+            templateUrl: templateUrl,
+            controller: "ModalCtrl"
+        }).then(function(modal) {
+            modal.element.modal({backdrop:backdrop});
+            modal.close.then(function(result) {
+                $scope.modalResult = result;
+                if (cb) cb(result);
+            });
+        });
     };
-  }]).controller('LogoutCtrl', ['$scope', '$routeParams', '$location', 'authService','$http','redboxConfig', function($scope, $routeParams, $location, authService, $http, redboxConfig)   {
+    $scope.runCmd = function (sysType, cmd, interimStat, runCmdCb) {
+      // TODO: when restarting RB, make sure token does not expire 'soon'...
+      var cb = function(sysType, cmd) {
+        return function(confirm) {
+          if (confirm == 'Yes') {
+            if ($scope[sysType].pending == true) {
+              console.log("Command canceled:" + sysType +"."+cmd+", there is a pending command.");
+              return;
+            }
+            $scope[sysType].cmdDisabled = true;
+            $scope[sysType].stat = interimStat;
+            var stat = Instance[cmd]({sysType:sysType}, function() {
+              $scope[sysType].stat = stat.status;
+              $scope[sysType].lastChecked = new Date();
+              $scope[sysType].cmdDisabled = false;
+              $scope[sysType].pending = false;
+              if (runCmdCb) runCmdCb();
+            });
+          } 
+        };
+      };
+      if (cmd != 'get') {
+        $scope.showModal('confirm.html', 'static', cb(sysType, cmd));
+      } else {
+        cb(sysType, cmd)('Yes');
+      }
+    };
+    $scope.currentSysType = $route.current.params.sysType;
+    if ($scope.currentSysType!=null) {
+      $scope.runCmd($scope.currentSysType, 'restart', $scope[$scope.currentSysType].STAT_RESTARTING, function() {$location.path("/instance").replace();});
+    }
+    $scope.refreshPromise = undefined;
+    var statRefresh = function() {
+      if (angular.isDefined($scope.refreshPromise)) {
+        console.log("Not refreshing status, there is a pending request.");
+        return;
+      }
+      $scope.refreshPromise = $interval(function() {
+        $scope.runCmd('redbox','get');
+        $scope.runCmd('mint', 'get');
+      }, redboxConfig.instance.refreshInterval);
+    };
+    console.log("Starting refresh timeout...");
+    statRefresh();
+    $scope.$on('$destory', function() {
+      if (angular.isDefined($scope.refreshPromise)) {
+        $interval.cancel($scope.refreshPromise);
+        $scope.refreshPromise = undefined;
+      }
+    });
+  }])
+// -----------------------------------------------------------
+// LogutCtrl 
+//  - logs out the user: deletes the local token and logs out the user in RB
+// -----------------------------------------------------------
+.controller('LogoutCtrl', ['$scope', '$routeParams', '$location', 'authService','$http','redboxConfig', function($scope, $routeParams, $location, authService, $http, redboxConfig)   {
   	authService.deleteAuth();
     $http.post(redboxConfig.authOutUrl, 'verb=logout', {headers:{'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8'}}).success(function() {console.log("Logged out."); $location.path("/").replace();});
   }])
-    .controller('MintCsvCtrl',  [ '$scope', '$upload', '$resource', 'redboxConfig','authService', function($scope, $upload, $resource, redboxConfig, authService) {
+// -----------------------------------------------------------
+// MintCsvCtrl
+// - allows access, deletion and uploading of MInt CSV files
+// -----------------------------------------------------------
+.controller('MintCsvCtrl',  [ '$scope', '$upload', '$resource', 'redboxConfig','authService', function($scope, $upload, $resource, redboxConfig, authService) {
       $scope.jws = authService.getJws();
       $scope.mintPendingFiles = [];
       var FileHarvest = $resource('/redbox-admin/fileHarvest/:sysType/:fileName', {sysType:'@sysType', fileName:'@fileName'});
@@ -172,4 +247,87 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
             $scope.getMintPendingFileList();
         });
       };
-    }]);
+    }])
+// -----------------------------------------------------------
+// ConfigCtrl 
+// - gets and sets RB/Mint configuration 
+//
+// -----------------------------------------------------------
+.controller('ConfigCtrl',  [ '$scope', '$upload', '$resource', 'redboxConfig','authService', '$route', 'ModalService','$location', function($scope, $upload, $resource, redboxConfig, authService, $route, ModalService, $location ) {
+    var Config = $resource('/redbox-admin/config/section/:sysType/:sectionName', {sysType:'@sysType', sectionName:'@id'});
+    $scope.rbSectionList = [];
+    $scope.secDetails = {redbox:null, mint:null};
+    $scope.currentSysType = $route.current.params.sysType;
+    $scope.currentSecId = $route.current.params.id;
+    $scope.currentTitle = "";
+    $scope.getRbSection = function() {
+    Config.get({sysType:'redbox'}, function(rbSection) {
+        for (var i=0; i<rbSection.sections.length; i++) {
+          $scope.rbSectionList.push(rbSection.sections[i]);
+          var id = rbSection.sections[i].id;
+          if ($scope.currentSecId == id) {
+            $scope.currentTitle = rbSection.sections[i].title;
+          }
+        }
+      });
+    };
+    
+    if ($scope.currentSecId != null) {
+      Config.get({sysType:$scope.currentSysType, sectionName:$scope.currentSecId}, function(sectionDetails) {
+        sectionDetails.sysType = $scope.currentSysType;
+        $scope.secDetails[$scope.currentSysType] = sectionDetails;
+      });
+    }
+    $scope.showModal = function(templateUrl, backdrop, cb) {
+        ModalService.showModal({
+            templateUrl: templateUrl,
+            controller: "ModalCtrl"
+        }).then(function(modal) {
+            modal.element.modal({backdrop:backdrop});
+            modal.close.then(function(result) {
+                $scope.modalResult = result;
+                if (cb) cb(result);
+            });
+        });
+    };
+    $scope.saveSection = function(rbSection) {
+      var valList = [];
+      for (var i=0; i<rbSection.subsections.length; i++) {
+        valList.push(tv4.validateMultiple(rbSection.subsections[i].model,rbSection.subsections[i].schema));
+      }
+      var valid = true;
+      for (var i=0; i<valList.length; i++) {
+        if (!valList[i].valid) {
+          valid = false;
+          break;
+        }
+      }
+      if (!valid) {
+        console.log("Failed validation.");
+        $scope.showModal('failedVal.html', 'static');
+        return;
+      }
+      var status = rbSection.$save().then(function() {
+        console.log("Saved");
+        $scope.showModal('restart.html', 'static', function(result) {
+          if (result == 'restart') {
+            $location.path("/instance/"+$scope.currentSysType+"/restart");
+          }
+        });
+      }, function() {
+        console.log("Error saving");
+      }, function() {
+        console.log("Saving...");
+      });
+    };
+  }])
+// -----------------------------------------------------------
+// ModalCtrl
+// - Simple controller for modal dialog in the application.
+// -----------------------------------------------------------
+  .controller('ModalCtrl',  [ '$scope','close', function($scope, close) {
+   $scope.currentSysType = "ReDBox";
+   $scope.close = function(result) {
+      close(result, 500); // close, but give 500ms for bootstrap to animate
+   };
+  }]);

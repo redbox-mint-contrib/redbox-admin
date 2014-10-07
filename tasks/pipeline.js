@@ -25,17 +25,24 @@ var cssFilesToInject = [
 // Client-side javascript files to inject in order
 // (uses Grunt-style wildcard/glob/splat expressions)
 var jsFilesToInject = [  
+  'redbox-admin/js/dependencies/jquery.js',
+  'redbox-admin/js/dependencies/bootstrap.min.js',
   'redbox-admin/js/dependencies/sails.io.js',
   'redbox-admin/js/dependencies/angular-file-upload-shim.min.js',    
+  'redbox-admin/js/dependencies/tv4.js', // angular-schema-form
   'redbox-admin/js/dependencies/angular.js',
   'redbox-admin/js/dependencies/angular-route.js',
   'redbox-admin/js/dependencies/angular-resource.js',
-  'redbox-admin/js/dependencies/jquery.js',
   'redbox-admin/js/dependencies/FileAPI.min.js',
   'redbox-admin/js/dependencies/angular-file-upload.min.js',
   'redbox-admin/js/dependencies/angular-loader.js',
   'redbox-admin/js/dependencies/angular-mocks.js',
+  'redbox-admin/js/dependencies/angular-sanitize.js', // angular-schema-form
   'redbox-admin/js/dependencies/ui-bootstrap-tpls.min.js',
+  'redbox-admin/js/dependencies/ObjectPath.js',
+  'redbox-admin/js/dependencies/schema-form.min.js',
+  'redbox-admin/js/dependencies/bootstrap-decorator.min.js', // angular-schema-form
+  'redbox-admin/js/dependencies/angular-modal-service.min.js',
   'redbox-admin/js/angular-local-storage.js',
   'redbox-admin/js/app.js',
   'redbox-admin/js/config.js',

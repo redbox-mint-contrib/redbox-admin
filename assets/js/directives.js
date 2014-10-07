@@ -2,14 +2,13 @@
 
 /* Directives */
 
-
 angular.module('redboxAdmin.directives', []).
   directive('appVersion', ['version', function(version) {
     return function(scope, elm, attrs) {
       elm.text(version);
     };
   }]).
-  directive('formDownloader', function ($compile) {
+  directive('formDownloader', ['$compile', function ($compile) {
       return {
           restrict:'E',
           scope:{fileName:'@', baseUrl:'@', formSearchDepthStr:'@'},
@@ -38,4 +37,4 @@ angular.module('redboxAdmin.directives', []).
               )(scope));
           }
       };
-  });
+  }]);
