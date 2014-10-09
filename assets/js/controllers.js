@@ -17,7 +17,7 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
 // InstanceCtrl 
 //  - controls RB/Mint instance
 // -----------------------------------------------------------
-  .controller('InstanceCtrl', ['$scope', '$routeParams', '$location', 'authService', '$http', '$resource', 'ModalService', '$route','$interval','redboxConfig', function($scope, $routeParams, $location, authService, $http, $resource, ModalService, $route, $interval, redboxConfig) {
+  .controller('InstanceCtrl', ['$scope', '$routeParams', '$location', 'authService', '$http', '$resource',  '$route','$interval','redboxConfig', 'modalDiag', function($scope, $routeParams, $location, authService, $http, $resource, $route, $interval, redboxConfig, modalDiag) {
     $scope.$http = $http;
     var Instance = $resource('/redbox-admin/instance/:sysType', {sysType:'@sysType'}, {
       get: {method:'GET'},
@@ -61,18 +61,6 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
     };
     $scope.$watch('redbox.stat', statWatcher($scope.redbox));
     $scope.$watch('mint.stat', statWatcher($scope.mint));
-    $scope.showModal = function(templateUrl, backdrop, cb) {
-        ModalService.showModal({
-            templateUrl: templateUrl,
-            controller: "ModalCtrl"
-        }).then(function(modal) {
-            modal.element.modal({backdrop:backdrop});
-            modal.close.then(function(result) {
-                $scope.modalResult = result;
-                if (cb) cb(result);
-            });
-        });
-    };
     $scope.runCmd = function (sysType, cmd, interimStat, runCmdCb) {
       // TODO: when restarting RB, make sure token does not expire 'soon'...
       var cb = function(sysType, cmd) {
@@ -95,7 +83,7 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
         };
       };
       if (cmd != 'get') {
-        $scope.showModal('confirm.html', 'static', cb(sysType, cmd));
+        modalDiag.showModal('confirm.html', 'static', cb(sysType, cmd));
       } else {
         cb(sysType, cmd)('Yes');
       }
@@ -253,7 +241,7 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
 // - gets and sets RB/Mint configuration 
 //
 // -----------------------------------------------------------
-.controller('ConfigCtrl',  [ '$scope', '$upload', '$resource', 'redboxConfig','authService', '$route', 'ModalService','$location', function($scope, $upload, $resource, redboxConfig, authService, $route, ModalService, $location ) {
+.controller('ConfigCtrl',  [ '$scope', '$upload', '$resource', 'redboxConfig','authService', '$route', 'modalDiag','$location', function($scope, $upload, $resource, redboxConfig, authService, $route, modalDiag, $location ) {
     var Config = $resource('/redbox-admin/config/section/:sysType/:sectionName', {sysType:'@sysType', sectionName:'@id'});
     $scope.rbSectionList = [];
     $scope.secDetails = {redbox:null, mint:null};
@@ -275,21 +263,16 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
     if ($scope.currentSecId != null) {
       Config.get({sysType:$scope.currentSysType, sectionName:$scope.currentSecId}, function(sectionDetails) {
         sectionDetails.sysType = $scope.currentSysType;
+        // inject subsection headers
+        for (var i=0; i<sectionDetails.subsections.length; i++) {
+          sectionDetails.subsections[i].form.splice(0, 0, {type:"help", helpvalue:"<div class='alert alert-info'>"+
+                                                           sectionDetails.subsections[i].title+
+                                                           "</div>"});
+        }
         $scope.secDetails[$scope.currentSysType] = sectionDetails;
+        
       });
     }
-    $scope.showModal = function(templateUrl, backdrop, cb) {
-        ModalService.showModal({
-            templateUrl: templateUrl,
-            controller: "ModalCtrl"
-        }).then(function(modal) {
-            modal.element.modal({backdrop:backdrop});
-            modal.close.then(function(result) {
-                $scope.modalResult = result;
-                if (cb) cb(result);
-            });
-        });
-    };
     $scope.saveSection = function(rbSection) {
       var valList = [];
       for (var i=0; i<rbSection.subsections.length; i++) {
@@ -304,12 +287,12 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
       }
       if (!valid) {
         console.log("Failed validation.");
-        $scope.showModal('failedVal.html', 'static');
+        modalDiag.showModal('failedVal.html', 'static');
         return;
       }
       var status = rbSection.$save().then(function() {
         console.log("Saved");
-        $scope.showModal('restart.html', 'static', function(result) {
+        modalDiag.showModal('restart.html', 'static', function(result) {
           if (result == 'restart') {
             $location.path("/instance/"+$scope.currentSysType+"/restart");
           }

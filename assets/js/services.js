@@ -2,10 +2,10 @@
 
 /* Services */
 
-angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap', 'redboxAdmin.config'])
+angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap', 'redboxAdmin.config','angularModalService'])
 .factory('authService', ['localStorageService','redboxConfig', function(localStorageService, redboxConfig) {
 	var AuthService = {
-		isLoggedIn: function() {
+		isLoggedIn: function(expiryThreshold) {
             var admin_jws_payload = localStorageService.get('admin_jws_payload');
 			console.log("Checking locally if authenticated...");
 			var errMsg = "";
@@ -13,8 +13,9 @@ angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap', 'r
 				// check the times...
 				var now = new Date();
 				var nowInSecs = now.getTime() / 1000;
+                expiryThreshold = expiryThreshold ? expiryThreshold : 0;
                 // exp must be in the future
-                if (admin_jws_payload.exp <= nowInSecs) {
+                if (admin_jws_payload.exp <= nowInSecs+expiryThreshold) {
 					errMsg = "Token expired.";
 				} else
 				// iat must be in the past
@@ -54,7 +55,7 @@ angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap', 'r
 .factory('authInterceptor', ['$q', 'authService', function($q, authService) {
   return {
     request: function(config) {
-      var loginStat = authService.isLoggedIn();
+      var loginStat = authService.isLoggedIn(10); // service shoudln't expire in the next 10 seconds...
       if (!loginStat) {
           authService.deleteAuth();
           authService.login();
@@ -72,4 +73,20 @@ angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap', 'r
       return $q.reject(response);
     }
   };
-}]);
+}])
+.factory('modalDiag', [ 'ModalService','$rootScope', function(ModalService, $rootScope) {
+  return {
+    showModal: function(templateUrl, backdrop, cb) {
+        ModalService.showModal({
+            templateUrl: templateUrl,
+            controller: "ModalCtrl"
+        }).then(function(modal) {
+            modal.element.modal({backdrop:backdrop});
+            modal.close.then(function(result) {
+                if (cb) cb(result);
+            });
+        });
+    }
+  };
+}])
+;

@@ -5,12 +5,12 @@
 // Declare app level module which depends on filters, and services
 angular.module('loginApp', [
   'redboxAdmin.services'
-]);
-var SaveLoginCtrl = function($scope, $window, authService) {
+])
+.controller('SaveLoginCtrl', ['$scope', '$window', 'authService', function($scope, $window, authService) {
     var jws = '<%- jws %>';
     var payload = '<%- payload %>';
     authService.saveAuth(jws, payload);
     // redirect to main page... replace with the current context path
     $window.location.replace("/redbox-admin/");
-};
+}]);
 </script>
