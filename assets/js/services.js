@@ -6,6 +6,9 @@ angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap', 'r
 .factory('authService', ['localStorageService','redboxConfig', function(localStorageService, redboxConfig) {
 	var AuthService = {
 		isLoggedIn: function(expiryThreshold) {
+            if(redboxConfig.authMethod != 'jws') {
+              return true;
+            }
             var admin_jws_payload = localStorageService.get('admin_jws_payload');
 			console.log("Checking locally if authenticated...");
 			var errMsg = "";
@@ -61,6 +64,9 @@ angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap', 'r
           authService.login();
       }
       var jws = authService.getJws();
+      if(redboxConfig.authMethod != 'jws') {
+        jws =  "DUMMYVALUE";
+      }
       if (jws) {
         config.headers.JWS = jws;
       }
