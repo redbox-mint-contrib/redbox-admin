@@ -44,7 +44,7 @@ module.exports = {
       return jws.sign({header:{alg:'HS256'}, payload:JSON.stringify(payload), secret:secret});
     },
     genPayload: function(nowInSecs, roles) {
-      var payload = {iss:"htp://127.0.0.1:9000/redbox",  sub:"admin", aud:"http://127.0.0.1:1337/redbox-admin/security/login", iat:nowInSecs, nbf:nowInSecs-1, exp:nowInSecs+60, jti:nowInSecs+"_-1035754475", "typ":roles}
+      var payload = {iss:"http://127.0.0.1:9000/redbox",  sub:"admin", aud:"http://127.0.0.1:1337/redbox-admin/security/login", iat:nowInSecs, nbf:nowInSecs-1, exp:nowInSecs+60, jti:nowInSecs+"_-1035754475", "typ":roles}
       return payload;
     }
 };
