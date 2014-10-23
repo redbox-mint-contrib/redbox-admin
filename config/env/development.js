@@ -20,6 +20,7 @@ module.exports = {
   // models: {
   //   connection: 'someMongodbServer'
   // }
+    authMethod: "None",
     jwsSecret: "Please Change Key - This is very insecure.",
     // Configuration for the FileharvestController, must have absolute paths
     fileHarvest : {

@@ -55,7 +55,7 @@ angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap', 'r
     };
     return AuthService;
 }])
-.factory('authInterceptor', ['$q', 'authService', function($q, authService) {
+.factory('authInterceptor', ['$q', 'authService', 'redboxConfig',function($q, authService, redboxConfig) {
   return {
     request: function(config) {
       var loginStat = authService.isLoggedIn(10); // service shoudln't expire in the next 10 seconds...
@@ -64,9 +64,7 @@ angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap', 'r
           authService.login();
       }
       var jws = authService.getJws();
-      if(redboxConfig.authMethod != 'jws') {
-        jws =  "DUMMYVALUE";
-      }
+     
       if (jws) {
         config.headers.JWS = jws;
       }

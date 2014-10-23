@@ -34,6 +34,7 @@ module.exports = {
   // log: {
   //   level: "silent"
   // }
+    authMethod: "jws",
     jwsSecret: "Please Change Key - This is very insecure.",
     // Configuration for the FileharvestController, must have absolute paths
     fileHarvest : {
