@@ -76,6 +76,7 @@ module.exports = {
           env:"server/tf_env_work.sh",
           languageFiles:  {path: "home/language-files/", schema:""},
           lookupData:  {path: "portal/default/redbox/workflows/forms/data/", schema:""},
+          apiSecurity: {path:"home/config-include/2-misc-modules/apiSecurity.json", schema:"home/config-schema/apiSecurity.schema.json"}
         },
         field: {
           server_url: {
@@ -94,7 +95,7 @@ module.exports = {
           },
           identity: {
             title:"Identity",
-            subsections: [{source:"identity", title:"identity.json"}],
+            subsections: [{source:"identity", title:"identity.json"}]
           },
           authentication: {
             title:"Authentication",
@@ -107,6 +108,10 @@ module.exports = {
           "lookupData": {
             title:"Lookup Data",
             subsections: [{source:"lookupData"}]
+          },
+          "apiSecurity": {
+            title:"API Security",
+            subsections: [{source:"apiSecurity", title:"Manage ReDBox API users and their associated keys"}]
           }
         }
       }
