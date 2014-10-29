@@ -21,8 +21,11 @@ log_function() {
 stop_server() {
     log_function $FUNCNAME
     if ! type -t forever > /dev/null; then
-      cd ${ADMIN_INSTALL_HOME} || exit_install "failed to change into install directory."
-      sudo -Hu redbox forever stop app.js --prod || exit_install "failed to stop server."
+      ## Added a directory check since in fresh installs, this directory doesn't exist.
+      if [ -d ${ADMIN_INSTALL_HOME} ]; then
+        cd ${ADMIN_INSTALL_HOME} || exit_install "failed to change into install directory."
+        sudo -Hu redbox forever stop app.js --prod || exit_install "failed to stop server."
+      fi
     fi
 }
 
