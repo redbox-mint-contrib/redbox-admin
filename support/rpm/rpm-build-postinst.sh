@@ -4,7 +4,7 @@ if [ `whoami` != 'root' ];
         then echo "this script must be executed as root" && exit 1;
 fi
 
-ADMIN_INSTALL_HOME="/opt/redbox/redbox-admin"
+ADMIN_INSTALL_HOME="/opt/redbox-admin"
 RB_ADMIN_SERVER_ARGS='start'
 
 exit_install() {
@@ -32,6 +32,8 @@ install_server() {
     ## as nobody under /usr/lib/node_modules
     npm -g install sails || exit_install "failed to install sails."
     npm -g install forever || exit_install "failed to install forever."
+    ## Add redbox to tomcat, required for write access to harvester input directories
+    usermod -a -G tomcat -g tomcat redbox
 }
 
 getServerArgs() {

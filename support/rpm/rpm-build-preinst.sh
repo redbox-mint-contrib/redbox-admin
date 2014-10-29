@@ -4,7 +4,7 @@ if [ `whoami` != 'root' ];
         then echo "this script must be executed as root" && exit 1;
 fi
 
-ADMIN_INSTALL_HOME="/opt/redbox/redbox-admin"
+ADMIN_INSTALL_HOME="/opt/redbox-admin"
 
 exit_install() {
 	if [ $# -gt 0 ]; then

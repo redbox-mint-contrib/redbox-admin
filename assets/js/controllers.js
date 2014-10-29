@@ -105,7 +105,7 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
     };
     console.log("Starting refresh timeout...");
     statRefresh();
-    $scope.$on('$destory', function() {
+    $scope.$on('$destroy', function() {
       if (angular.isDefined($scope.refreshPromise)) {
         $interval.cancel($scope.refreshPromise);
         $scope.refreshPromise = undefined;

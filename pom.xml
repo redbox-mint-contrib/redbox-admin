@@ -31,7 +31,7 @@
                     <name>redbox-admin</name>
                     <mappings>
                         <mapping>
-                            <directory>/opt/redbox/redbox-admin</directory>
+                            <directory>/opt/redbox-admin</directory>
                             <filemode>744</filemode>
                             <username>redbox</username>
                             <groupname>redbox</groupname>
