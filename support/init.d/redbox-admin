@@ -1,0 +1,65 @@
+#!/bin/bash
+#
+# Control script for redbox-admin
+#
+# chkconfig: 2345 20 80
+# description: 	Control the redbox-admin application
+
+# Source function library.
+. /etc/init.d/functions
+
+
+RETVAL=$?
+ADMIN_HOME="/opt/redbox-admin"
+ADMIN_USER="redbox"
+ADMIN_UID="redbox-admin"
+ADMIN_PID="/home/$ADMIN_USER/.forever/pids/$ADMIN_UID.pid"
+
+NAME=`basename $0`
+
+start() {
+    if [ -f $ADMIN_PID ]; then
+      failure "Admin app already started."
+    else 
+      echo "Starting redbox-admin"
+      cd $ADMIN_HOME
+      sudo -u $ADMIN_USER /bin/bash -c "cd $ADMIN_HOME && forever start --uid '$ADMIN_UID' -a app.js --prod"
+      RETVAL=$?
+      success "redbox-admin started."
+    fi
+}
+
+stop() {
+	if [ -f $ADMIN_PID ]; then
+		echo $"Stopping redbox-admin"
+        sudo -u $ADMIN_USER forever stop "$ADMIN_UID"
+        RETVAL=$?
+	    success "redbox-admin stopped."
+    else
+      echo "redbox-admin not running."
+	fi
+}
+
+case "$1" in
+ 	start)
+       start
+	;;
+ 	stop)
+       stop
+ 	;;
+ 	restart)
+        stop
+        sleep 10
+        start
+        ;;
+	status)
+	    status -p $ADMIN_PID redbox-admin
+	    RETVAL=$?   
+	    ;;
+	 *)
+        echo $"Usage: $0 {start|stop|restart|status}"
+		exit 1
+		;;
+esac
+
+exit $RETVAL
