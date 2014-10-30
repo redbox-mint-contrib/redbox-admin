@@ -21,6 +21,7 @@ log_function() {
 
 install_server() {
     log_function $FUNCNAME
+    chown -R redbox:redbox ${ADMIN_INSTALL_HOME}
     cd ${ADMIN_INSTALL_HOME} || exit_install "failed to change to install directory."
     ## install of sails and forever must happen as root as these are created
     ## as nobody under /usr/lib/node_modules
@@ -31,7 +32,6 @@ install_server() {
     sudo -u redbox npm install
     cp ${ADMIN_INSTALL_HOME}/support/init.d/redbox-admin /etc/init.d/ && chmod 755 /etc/init.d/redbox-admin
     chkconfig --level 2345 redbox-admin on
-    chown -R redbox:redbox ${ADMIN_INSTALL_HOME}
 }
 
 getServerArgs() {
