@@ -36,6 +36,7 @@ install_server() {
     ## Add redbox to tomcat, required for write access to harvester input directories
     usermod -a -G tomcat -g tomcat redbox
     sudo -u redbox npm install
+    cp ${ADMIN_INSTALL_HOME}/support/init.d/redbox-admin /etc/init.d/ && chmod 755 /etc/init.d/redbox-admin
     chkconfig --level 2345 redbox-admin on
 }
 

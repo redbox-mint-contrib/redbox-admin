@@ -48,25 +48,11 @@
                                         <include>config/**</include>
                                         <include>tasks/**</include>
                                         <include>views/**</include>
+                                        <include>support/init.d/**</include>
                                     </includes>
                                     <excludes>
                                         <exclude>.git**</exclude>
                                     </excludes>
-                                </source>
-                            </sources>
-                        </mapping>
-                        <mapping>
-                            <directory>/etc/init.d</directory>
-                            <filemode>755</filemode>
-                            <username>root</username>
-                            <groupname>root</groupname>
-                            <sources>
-                                <source>
-                                    <location>${basedir}/support/init.d/</location>
-                                    <noDefaultExcludes>true</noDefaultExcludes>
-                                    <includes>
-                                        <include>redbox-admin</include>
-                                    </includes>
                                 </source>
                             </sources>
                         </mapping>
