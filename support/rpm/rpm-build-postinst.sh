@@ -19,13 +19,6 @@ log_function() {
  printf  -- "At function: %s...\n" $1
 }
 
-install_npm() {
-    log_function $FUNCNAME
-    ## install must happen as non-root user within redbox-admin directory
-    cd ${ADMIN_INSTALL_HOME} || exit_install "failed to change to install directory."
-    sudo -Hu redbox npm install  || exit_install "failed to install npm."
-}
-
 install_server() {
     log_function $FUNCNAME
     cd ${ADMIN_INSTALL_HOME} || exit_install "failed to change to install directory."
@@ -35,8 +28,10 @@ install_server() {
     npm -g install forever || exit_install "failed to install forever."
     ## Add redbox to tomcat, required for write access to harvester input directories
     usermod -a -G tomcat -g tomcat redbox
+    sudo -u redbox npm install
     cp ${ADMIN_INSTALL_HOME}/support/init.d/redbox-admin /etc/init.d/ && chmod 755 /etc/init.d/redbox-admin
     chkconfig --level 2345 redbox-admin on
+    chown -R redbox:redbox ${ADMIN_INSTALL_HOME}
 }
 
 getServerArgs() {
@@ -52,6 +47,5 @@ start_server() {
     service redbox-admin start
 }
 
-install_npm
 install_server
 start_server
