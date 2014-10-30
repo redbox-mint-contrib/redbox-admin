@@ -62,10 +62,10 @@
                             <groupname>root</groupname>
                             <sources>
                                 <source>
-                                    <location>${basedir}</location>
+                                    <location>${basedir}/support/init.d/</location>
                                     <noDefaultExcludes>true</noDefaultExcludes>
                                     <includes>
-                                        <include>support/init.d/redbox-admin</include>
+                                        <include>redbox-admin</include>
                                     </includes>
                                 </source>
                             </sources>
