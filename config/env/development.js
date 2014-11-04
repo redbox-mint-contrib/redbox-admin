@@ -60,7 +60,8 @@ module.exports = {
           env:"server/tf_env_work.sh",
           languageFiles:  {path: "home/language-files/", schema:""},
           lookupData:  {path: "portal/default/redbox/workflows/forms/data/", schema:""},
-          apiSecurity: {path:"home/config-include/2-misc-modules/apiSecurity.json", schema:"home/config-schema/apiSecurity.schema.json"}
+          apiSecurity: {path:"home/config-include/2-misc-modules/apiSecurity.json", schema:"home/config-schema/apiSecurity.schema.json"},
+          form: {path:"home/form-configuration/arms_form.json", schema:"home/form-configuration/arms_form-schema.json"}
         },
         field: {
           server_url: {
@@ -76,6 +77,10 @@ module.exports = {
           siteDetails: {
             title:"Site Details",
             subsections: [{source:"siteDetails", title:"siteDetails.json"}]
+          },
+          form: {
+            title:"Form builder",
+            subsections: [{source:"form", title:"Build a form in a way you like"}]
           },
           identity: {
             title:"Identity",
