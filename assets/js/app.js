@@ -19,6 +19,7 @@ angular.module('redboxAdmin', [
   $routeProvider.when('/mintCsvs', {templateUrl: 'partials/mintCsvs.html', controller: 'MintCsvCtrl'});
   $routeProvider.when('/config', {templateUrl: 'partials/config.html', controller: 'ConfigCtrl'});
   $routeProvider.when('/config/:sysType/:id', {templateUrl: 'partials/config.html', controller: 'ConfigCtrl'});
+  $routeProvider.when('/formBuilder', {templateUrl: 'partials/formBuilder.html', controller: 'FormBuilderCtrl'});
   $routeProvider.otherwise({redirectTo: '/'});
 }])
 .config(['$httpProvider', function($httpProvider) {

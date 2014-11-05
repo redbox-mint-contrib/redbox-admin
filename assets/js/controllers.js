@@ -13,6 +13,13 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
 // -----------------------------------------------------------
 .controller('IndexCtrl', ['$scope', '$routeParams', '$location', 'authService', '$http', '$resource', function($scope, $routeParams, $location, authService, $http, $resource) {
   }])
+.controller('FormBuilderCtrl', ['$scope', '$routeParams', '$location', 'authService', '$http', '$resource', function($scope, $routeParams, $location, authService, $http, $resource) {
+    var formBuilderController = $resource('/redbox-admin/formBuilder');
+    var list = formBuilderController.get({}, function(){
+            //~ console.log(list);
+            $scope.confs = list.flist;
+    });
+  }])
 // -----------------------------------------------------------
 // InstanceCtrl 
 //  - controls RB/Mint instance
