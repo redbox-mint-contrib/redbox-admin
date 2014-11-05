@@ -61,7 +61,9 @@ module.exports = {
           languageFiles:  {path: "home/language-files/", schema:""},
           lookupData:  {path: "portal/default/redbox/workflows/forms/data/", schema:""},
           apiSecurity: {path:"home/config-include/2-misc-modules/apiSecurity.json", schema:"home/config-schema/apiSecurity.schema.json"},
-          form: {path:"home/form-configuration/arms_form.json", schema:"home/form-configuration/arms_form-schema.json"}
+          form: {path:"home/form-configuration/arms_form.json", schema:"home/form-configuration/arms_form-schema.json"},
+          formSection: {path:"home/form-configuration/arms_form_section.json", schema:"home/form-configuration/arms_form-schema.json"},
+          stage: {path:"home/form-configuration/arms_form_astage.json", schema:"home/form-configuration/arms_form-schema_stage.json"}
         },
         field: {
           server_url: {
@@ -78,13 +80,77 @@ module.exports = {
             title:"Site Details",
             subsections: [{source:"siteDetails", title:"siteDetails.json"}]
           },
+          divs_tabarry: {
+            title:"Form builder as tab array",
+            subsections: [
+                {
+                    source:"stage",
+                    title:"Create div when needed. Cannot do now yet.",
+                    form:[
+                        {
+                            type:"tabarray",
+                            tabType: "top",
+                            title: "value.nick || ('Tab '+$index)",
+                            key:"divs",
+                            add: "Add a tab",
+                            items:[
+                                {
+                                    "key":"divs",
+                                    "items":["divs[][heading]","divs[][fields]"]
+                                }
+                            ]
+                        },
+                        "form-footer",
+                        "form-layout"
+                    ]
+                }
+            ]
+          },
+          divs: {
+            title:"Form builder in tabs with real strcutre",
+            subsections: [
+                {
+                    source:"stage",
+                    title:"Create div when needed. Cannot do now yet.",
+                    form:[
+                        {
+                            type:"tabs",
+                            tabs:[
+                                {
+                                    title:"div1",
+                                    items:[
+                                        {
+                                            "key":"divs",
+                                            "items":["[divs][][heading]","[divs][][fields]"]
+                                        }
+                                    ]
+                                },
+                                {
+                                    title:"div2",
+                                    items:[
+                                        {
+                                            "key":"divs",
+                                            "items":["[divs][][heading]","[divs][][fields]"]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+          },
+          form2: {
+            title:"Form builder in tabs as a demo",
+            subsections: [{source:"formSection", title:"Let it split", form:[{type:"tabs",tabs:[{title:"tab0",items:[{"key":"stages", "items":["[stages][][stagename]"]}]},{title:"tab1", items:[{ "type": "help",    "helpvalue": "Make a comment"  }]}, {title:"tab2",items:[ {"type": "submit",    "style": "btn-info",    "title": "OK"  }]}]}]}]
+          },
           form: {
             title:"Form builder",
-            subsections: [{source:"form", title:"Build a form in a way you like"}]
+            subsections: [{source:"formSection", title:"Let it split", form:[{"key":"stages", "items":["[stages][][stagename]","[stages][][validation]","[stages][]['form-footer']","[stages][][configuration][keyvalue]","[stages][][configuration][divs][][heading]"]}]}, {source:"form", title:"Build a form in a way you like"}]
           },
           identity: {
             title:"Identity",
-            subsections: [{source:"identity", title:"identity.json"}]
+            subsections: [{source:"identity", title:"identity.json",form:[ "*", { "key": "identity", "items": [ "identity.institution","identity.RIF_CSGroup"] },{"type": "help","helpvalue": "help please"}]}]
           },
           authentication: {
             title:"Authentication",
@@ -100,7 +166,7 @@ module.exports = {
           },
           "apiSecurity": {
             title:"API Security",
-            subsections: [{source:"apiSecurity", title:"Manage ReDBox API users and their associated keys"}]
+            subsections: [{source:"apiSecurity", form:["*", { key: "comment", type: "textarea", placeholder: "Make a comment" }, { type: 'submit', title: 'Save' } ],title:"Manage ReDBox API users and their associated keys"}]
           }
         }
       }
