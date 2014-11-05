@@ -6,26 +6,54 @@
  */
 
 module.exports = {
-	
-
-
+  formConfsPath : "/opt/redbox/home/form-configuration/",
+  getStageList:function (req, res) {
+    var confName = req.param("fileName");
+    if (confName) {
+        var fs = require('fs');
+        //~ confName = "/opt/redbox/home/form-configuration/arms_form.json";
+        //~ var obj = JSON.parse(fs.readFileSync("/opt/redbox/home/form-configuration/" + confName));
+        console.log(module.exports.formConfsPath);
+        var obj = JSON.parse(fs.readFileSync(module.exports.formConfsPath + confName));
+        var stageArray = [];
+        for(stage in obj.stages) {
+            stageArray.push(stage);
+        }
+        //res.send(obj);
+        stageArray.sort();
+        res.json({
+                stages: stageArray
+        });
+    } else {
+        res.json({
+                    name: req.param("fileName")
+                });
+            }
+    },
   /**
-   * `FormBuilderController.get()`
+   * `FormBuilderController.get()` 
    */
   get: function (req, res) {
     // TODO: configure where to find the installation of ReDBox
-    var path = "/opt/redbox/home/form-configuration/";
-    sails.log.info("Fixed path is used: " + path);  
-    var fl = null;
-    if (path) { 
-      var fs = require('fs'); 
-        fl = fs.readdirSync(path);
+    sails.log.info("Fixed path is used: " + module.exports.formConfsPath);
+
+    var fileName = req.param('formConf');
+    if (fileName) {
+        sails.log.debug("Scan stage names from file: " + fileName);
     } else {
-      sails.log.debug("No path is specified.");
-    };
-    res.json({
-            flist: fl
-        });
+        sails.log.debug("Default behaviour: load form list");
+        var fl = null;
+        if (module.exports.formConfsPath) { 
+          var fs = require('fs'); 
+            fl = fs.readdirSync(module.exports.formConfsPath);
+        } else {
+          sails.log.debug("No path is specified.");
+        };
+        res.json({
+                flist: fl
+            });
+    }
+
   }
 };
 

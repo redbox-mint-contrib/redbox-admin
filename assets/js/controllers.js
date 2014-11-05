@@ -14,11 +14,38 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
 .controller('IndexCtrl', ['$scope', '$routeParams', '$location', 'authService', '$http', '$resource', function($scope, $routeParams, $location, authService, $http, $resource) {
   }])
 .controller('FormBuilderCtrl', ['$scope', '$routeParams', '$location', 'authService', '$http', '$resource', function($scope, $routeParams, $location, authService, $http, $resource) {
+    //~ var formBuilderController = $resource('/redbox-admin/formBuilder');
     var formBuilderController = $resource('/redbox-admin/formBuilder');
     var list = formBuilderController.get({}, function(){
             //~ console.log(list);
             $scope.confs = list.flist;
     });
+    console.log("HIIIII");
+  }])
+.controller('FormBuilderStagesCtrl', ['$scope', '$routeParams', '$location', 'authService', '$http', '$resource', function($scope, $routeParams, $location, authService, $http, $resource) {
+    console.log("What do we know?");
+    console.log($scope);
+    console.log($routeParams);
+    console.log($location);
+    console.log(authService);
+    console.log($http);
+    console.log($resource);
+    $scope.showAddStage = function() {
+        alert("Below form will be shown");
+    };
+    $scope.addStage = function(stage) {
+        alert(stage.name);
+        alert($scope.stages);
+    };
+
+    $scope.fileName= $routeParams.formConf;
+    //~ var formBuilderController = $resource('/redbox-admin/formBuilder');
+    var formBuilderController = $resource('/redbox-admin/formBuilder/:formConf', {formConf:$routeParams.formConf});
+    var list = formBuilderController.get({}, function(){
+            //~ console.log(list);
+            $scope.stages = list.stages;
+    });
+    console.log("HIIIII");
   }])
 // -----------------------------------------------------------
 // InstanceCtrl 

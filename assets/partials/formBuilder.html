@@ -10,12 +10,23 @@
   </div>
   <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
     <div class="jumbotron">
-      <h2>List of form configuration files</h2>
+      <h2>Please select a stage to view/edit</h2>
+      <pre>{{stages}}</pre>
       <ul class="list-group">
-        <li class="list-group-item" ng-repeat="conf in confs">
-            {{ conf }}
+        <li class="list-group-item" ng-repeat="stage in stages">
+           <a ng-href="#/formBuilder/{{fileName}}/{{stage}}">{{ stage }}</a>
+           <button class="btn" onclick="alert('If you are sure? t remove?');">Remove</button>
         </li>
       </ul>
+
+      
+      <button class="btn" ng-click="addStage(stage)">Add a new stage</button>
+      <div>
+            <div>Enter a name for the stage</div>
+            <label>Stage Name</label><input ng-model="stage.name">
+            <button class="btn" ng-click="addStage(stage)">Add</button>
+      </div>
+  
     </div>
   </div>
 </div>
