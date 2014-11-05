@@ -48,9 +48,9 @@ module.exports.policies = {
 		// before letting any users feed our rabbits
 		// feed : ['isNiceToAnimals', 'hasRabbitFood']
 	// }
-//  ConfigController: {
-//    '*': ['isLoggedIn', 'isAdmin']
-//  },
+  ConfigController: {
+    '*': ['isLoggedIn', 'isAdmin']
+  },
   FileharvestController: {
     '*': ['isLoggedIn', 'isAdmin']
   },
