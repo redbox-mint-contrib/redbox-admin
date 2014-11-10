@@ -31,7 +31,7 @@ module.exports = {
             }
     },
   /**
-   * `FormBuilderController.get()` 
+   * `FormBuilderController.get()`
    */
   get: function (req, res) {
     // TODO: configure where to find the installation of ReDBox
@@ -43,8 +43,8 @@ module.exports = {
     } else {
         sails.log.debug("Default behaviour: load form list");
         var fl = null;
-        if (module.exports.formConfsPath) { 
-          var fs = require('fs'); 
+        if (module.exports.formConfsPath) {
+          var fs = require('fs');
             fl = fs.readdirSync(module.exports.formConfsPath);
         } else {
           sails.log.debug("No path is specified.");
@@ -53,7 +53,64 @@ module.exports = {
                 flist: fl
             });
     }
+  },
+  addStage:function (req, res) {
+    var confName = req.param("fileName");
+    var stageName = req.param("stage");
+    //~ console.log(confName);
+    //~ console.log(stageName);
 
-  }
+    if (confName) {
+        var fs = require('fs');
+        console.log(module.exports.formConfsPath);
+        var obj = JSON.parse(fs.readFileSync(module.exports.formConfsPath + confName));
+        if (!(stageName in obj.stages)) {
+            obj.stages[stageName] = {};
+        }
+        var stageArray = [];
+        for(stage in obj.stages) {
+            stageArray.push(stage);
+        }
+        stageArray.push("File is not saved");
+        //res.send(obj);
+        stageArray.sort();
+        res.json({
+                stages: stageArray
+        });
+    } else {
+        res.json({
+                    stages: []
+                });
+            }
+    },
+  removeStage:function (req, res) {
+    var confName = req.param("fileName");
+    var stageName = req.param("stage");
+    //~ console.log(confName);
+    //~ console.log(stageName);
+
+    if (confName) {
+        var fs = require('fs');
+        console.log(module.exports.formConfsPath);
+        var obj = JSON.parse(fs.readFileSync(module.exports.formConfsPath + confName));
+        if (stageName in obj.stages) {
+            console.log("Find " + stageName + ", going to remove it");
+            delete obj.stages[stageName];
+        }
+        var stageArray = [];
+        for(stage in obj.stages) {
+            stageArray.push(stage);
+        }
+        stageArray.push("File is not saved");
+        stageArray.sort();
+        res.json({
+                stages: stageArray
+        });
+    } else {
+        res.json({
+                    stages: []
+                });
+            }
+    }
 };
 

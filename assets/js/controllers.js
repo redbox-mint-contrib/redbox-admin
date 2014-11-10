@@ -2,13 +2,13 @@
 
 // -----------------------------------------------------------
 // ReDBox / Mint administration app AngularJS Controllers
-// 
+//
 // author: Shilo Banihit
 // -----------------------------------------------------------
 
 angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','redboxAdmin.config','schemaForm', 'ngRoute', 'angularModalService'])
 // -----------------------------------------------------------
-// IndexCtrl 
+// IndexCtrl
 //  - does nothing but an index, for now
 // -----------------------------------------------------------
 .controller('IndexCtrl', ['$scope', '$routeParams', '$location', 'authService', '$http', '$resource', function($scope, $routeParams, $location, authService, $http, $resource) {
@@ -20,7 +20,6 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
             //~ console.log(list);
             $scope.confs = list.flist;
     });
-    console.log("HIIIII");
   }])
 .controller('FormBuilderStagesCtrl', ['$scope', '$routeParams', '$location', 'authService', '$http', '$resource', function($scope, $routeParams, $location, authService, $http, $resource) {
     console.log("What do we know?");
@@ -30,25 +29,42 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
     console.log(authService);
     console.log($http);
     console.log($resource);
+    var conf = $routeParams.formConf;
     $scope.showAddStage = function() {
         alert("Below form will be shown");
     };
     $scope.addStage = function(stage) {
-        alert(stage.name);
-        alert($scope.stages);
+        console.debug("Adding " + stage.newEntry);
+        //~ var controller = $resource('/redbox-admin/formBuilder/:file/:stage');
+        //~ controller.get({file:'xxx',stage:'sss'},function(updated) { console.log("We are back"); console.log(updated)});
+        //~ controller.save({file:'xxx',stage:'sss'},{some:"value"},function(updated) { console.log("We are back"); console.log(updated)});
+        var controller = $resource('/redbox-admin/formBuilder/:file/:stage',null,{addStage:{method: 'PUT'}});
+        controller.addStage({file:conf,stage:stage.newEntry},null,function(updated) {
+            console.log("We are back");
+            console.log(updated.stages);
+            $scope.stages = updated.stages;
+            });
+    };
+    $scope.removeStage = function(stage) {
+        console.log(stage);
+        alert(stage);
+        var controller = $resource('/redbox-admin/formBuilder/:file/:stage');
+        controller.delete({file:conf,stage:stage},null,function(updated) {
+            console.log("Deteleted");
+            $scope.stages = updated.stages;
+            });
     };
 
     $scope.fileName= $routeParams.formConf;
     //~ var formBuilderController = $resource('/redbox-admin/formBuilder');
-    var formBuilderController = $resource('/redbox-admin/formBuilder/:formConf', {formConf:$routeParams.formConf});
-    var list = formBuilderController.get({}, function(){
+    var formBuilderController = $resource('/redbox-admin/formBuilder/:formConf');
+    var list = formBuilderController.get({formConf:$routeParams.formConf}, function(){
             //~ console.log(list);
             $scope.stages = list.stages;
     });
-    console.log("HIIIII");
   }])
 // -----------------------------------------------------------
-// InstanceCtrl 
+// InstanceCtrl
 //  - controls RB/Mint instance
 // -----------------------------------------------------------
   .controller('InstanceCtrl', ['$scope', '$routeParams', '$location', 'authService', '$http', '$resource',  '$route','$interval','redboxConfig', 'modalDiag', function($scope, $routeParams, $location, authService, $http, $resource, $route, $interval, redboxConfig, modalDiag) {
@@ -59,9 +75,9 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
       start: {method: 'POST'},
       stop: {method: 'DELETE'}
     });
-    $scope.redbox = {sysType:'redbox',pending:false, stat:5, lastChecked:'n/a', cmdDisabled:false, 
+    $scope.redbox = {sysType:'redbox',pending:false, stat:5, lastChecked:'n/a', cmdDisabled:false,
                      STAT_UP:0, STAT_STOPPING:1, STAT_DOWN:2, STAT_STARTING:3, STAT_RESTARTING:4, STAT_REFRESHING:5};
-    $scope.mint = {sysType:'mint', pending:false, stat:5, lastChecked:'n/a', refreshDisabled:false, 
+    $scope.mint = {sysType:'mint', pending:false, stat:5, lastChecked:'n/a', refreshDisabled:false,
                   STAT_UP:0, STAT_STOPPING:1, STAT_DOWN:2, STAT_STARTING:3, STAT_RESTARTING:4, STAT_REFRESHING:5};
     var statWatcher = function(sys) {
       return function() {
@@ -113,7 +129,7 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
               $scope[sysType].pending = false;
               if (runCmdCb) runCmdCb();
             });
-          } 
+          }
         };
       };
       if (cmd != 'get') {
@@ -147,7 +163,7 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
     });
   }])
 // -----------------------------------------------------------
-// LogutCtrl 
+// LogutCtrl
 //  - logs out the user: deletes the local token and logs out the user in RB
 // -----------------------------------------------------------
 .controller('LogoutCtrl', ['$scope', '$routeParams', '$location', 'authService','$http','redboxConfig', function($scope, $routeParams, $location, authService, $http, redboxConfig)   {
@@ -164,7 +180,7 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
       var FileHarvest = $resource('/redbox-admin/fileHarvest/:sysType/:fileName', {sysType:'@sysType', fileName:'@fileName'});
       // -----------------------------------------------------------
       // Getting Mint File list
-      // -----------------------------------------------------------  
+      // -----------------------------------------------------------
       $scope.getMintPendingFileList = function() {
           var list = FileHarvest.get({sysType:'mint'}, function(){
             $scope.mintPendingFiles = list.files;
@@ -244,20 +260,20 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
             data: {},
             file: file, // or list of files ($files) for html5 only
             fileName: file.name,
-            // customize file formData name ('Content-Disposition'), server side file variable name. 
-            //fileFormDataName: myFile, //or a list of names for multiple files (html5). Default is 'file' 
+            // customize file formData name ('Content-Disposition'), server side file variable name.
+            //fileFormDataName: myFile, //or a list of names for multiple files (html5). Default is 'file'
             // customize how data is added to formData. See #40#issuecomment-28612000 for sample code
             //formDataAppender: function(formData, key, val){}
           })
           .progress(progHdlr)
           .success($scope.checkUploads)
           .error(nokHdlr);
-          //.then(success, error, progress); 
+          //.then(success, error, progress);
           // access or attach event listeners to the underlying XMLHttpRequest.
           //.xhr(function(xhr){xhr.upload.addEventListener(...)})
         }
         /* alternative way of uploading, send the file binary with the file's content-type.
-           Could be used to upload files to CouchDB, imgur, etc... html5 FileReader is needed. 
+           Could be used to upload files to CouchDB, imgur, etc... html5 FileReader is needed.
            It could also be used to monitor the progress of a normal http post/put request with large data*/
         // $scope.upload = $upload.http({...})  see 88#issuecomment-31366487 for sample code.
       };
@@ -271,8 +287,8 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
       };
     }])
 // -----------------------------------------------------------
-// ConfigCtrl 
-// - gets and sets RB/Mint configuration 
+// ConfigCtrl
+// - gets and sets RB/Mint configuration
 //
 // -----------------------------------------------------------
 .controller('ConfigCtrl',  [ '$scope', '$upload', '$resource', 'redboxConfig','authService', '$route', 'modalDiag','$location', function($scope, $upload, $resource, redboxConfig, authService, $route, modalDiag, $location ) {
@@ -293,7 +309,7 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
         }
       });
     };
-    
+
     if ($scope.currentSecId != null) {
       Config.get({sysType:$scope.currentSysType, sectionName:$scope.currentSecId}, function(sectionDetails) {
         sectionDetails.sysType = $scope.currentSysType;
@@ -304,7 +320,7 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
                                                            "</div>"});
         }
         $scope.secDetails[$scope.currentSysType] = sectionDetails;
-        
+
       });
     }
     $scope.saveSection = function(rbSection) {

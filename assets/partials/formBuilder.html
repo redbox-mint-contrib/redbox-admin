@@ -13,18 +13,18 @@
       <h2>Please select a stage to view/edit</h2>
       <pre>{{stages}}</pre>
       <ul class="list-group">
-        <li class="list-group-item" ng-repeat="stage in stages">
+        <li class="list-group-item" ng-repeat="stage in stages" ng-model="q" >
            <a ng-href="#/formBuilder/{{fileName}}/{{stage}}">{{ stage }}</a>
-           <button class="btn" onclick="alert('If you are sure? t remove?');">Remove</button>
+           &nbsp;<button ng-click="removeStage(stage);">X</button>
         </li>
       </ul>
 
       
-      <button class="btn" ng-click="addStage(stage)">Add a new stage</button>
+      <button class="btn" ng-click="showAddStage()">Add a new stage</button>
       <div>
             <div>Enter a name for the stage</div>
-            <label>Stage Name</label><input ng-model="stage.name">
-            <button class="btn" ng-click="addStage(stage)">Add</button>
+            <label>Stage Name</label><input ng-model="stage.newEntry">
+            <button ng-click="addStage(stage);">Add</button>
       </div>
   
     </div>
