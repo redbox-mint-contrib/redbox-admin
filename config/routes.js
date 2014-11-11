@@ -61,4 +61,5 @@ module.exports.routes = {
   'GET /redbox-admin/config/section/:sysType': 'configController.getSection',
   'GET /redbox-admin/config/section/:sysType/:key': 'configController.getSection',
   'POST /redbox-admin/config/section/:sysType/:key': 'configController.setSection',
+  'GET /redbox-admin/logview/get/:logFile/:from' : 'logviewController.get',
 };
