@@ -56,5 +56,8 @@ module.exports.policies = {
   },
   InstanceController: {
     '*': ['isLoggedIn', 'isAdmin']
+  },
+  LogviewController: {
+	'*': ['isLoggedIn', 'isAdmin']
   }
 };
