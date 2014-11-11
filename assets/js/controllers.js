@@ -305,10 +305,28 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
     };
   }])
   .controller('LogviewCtrl',  [ '$scope', '$http', '$upload', '$resource', 'redboxConfig','authService', '$route', 'modalDiag','$location', function($scope, $http, $upload, $resource, redboxConfig, authService, $route, modalDiag, $location ) {
+	  var LOG_SIZE = 20;
 	  $scope.logViewData = {};
 	  $scope.logCount = 0;
-	  var getData = function(){
-		  return $http.get('/redbox-admin/logview/get/test/0').then(
+	  $scope.logFrom = 0;
+	  $scope.getData = function(action){
+		  action = action || "first";
+		  switch(action){
+		   case "first":
+			   $scope.logFrom = 0;
+			   break;
+		   case "next":
+			   incrFrom();
+			   break;
+		   case "prev":
+			   decrFrom();
+			   break;
+		   case "last":
+			   lastFrom();
+			   break;
+		  }
+		  
+		  return $http.get('/redbox-admin/logview/get/test/' + $scope.logFrom).then(
 			 function(response){
 				 $scope.logViewData = response.data.logData;
 				 $scope.logCount = response.data.count;
@@ -316,7 +334,24 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
 		  );
 	  };
 	  
-	  getData();
+	  var incrFrom = function(){
+		  if($scope.logFrom < ($scope.logCount - LOG_SIZE)){
+			  $scope.logFrom += LOG_SIZE;
+		  }
+	  };
+	  
+	  var decrFrom = function(){
+		  if($scope.logFrom >= LOG_SIZE){
+			  $scope.logFrom -= LOG_SIZE;
+		  }
+	  };
+	  
+	  var lastFrom = function(){
+		 $scope.logFrom = $scope.logCount - LOG_SIZE; 
+	  };
+	  
+	  
+	  $scope.getData();
   }])
 // -----------------------------------------------------------
 // ModalCtrl

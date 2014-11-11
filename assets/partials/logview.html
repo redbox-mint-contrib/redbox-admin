@@ -4,13 +4,19 @@
       <li><a href="#/">Home</a></li>
       <li><a href="#/instance">Instance</a></li>
       <li><a href="#/config">Configuration</a></li>
-      <li class="active"><a href="#/mintCsvs">Upload</a></li>
-      <li><a href="#/logview">View Logs</a></li>
+      <li><a href="#/mintCsvs">Upload</a></li>
+      <li class="active"><a href="#/logview">View Logs</a></li>
     </ul>
   </div>
   <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
     <h1>View Logs</h1>
     <strong>Available log entries: <span ng-bind="logCount"></span></strong>
+    <div>
+    	<button ng-click="getData('first')">First</button>
+    	<button ng-click="getData('next')">Next</button>
+    	<button ng-click="getData('prev')">Previous</button>
+    	<button ng-click="getData('last')">Last</button>
+    </div>
     <table>
     	<tr>
     		<th width="20%">Timestamp</th>
