@@ -304,6 +304,20 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
       });
     };
   }])
+  .controller('LogviewCtrl',  [ '$scope', '$http', '$upload', '$resource', 'redboxConfig','authService', '$route', 'modalDiag','$location', function($scope, $http, $upload, $resource, redboxConfig, authService, $route, modalDiag, $location ) {
+	  $scope.logViewData = {};
+	  $scope.logCount = 0;
+	  var getData = function(){
+		  return $http.get('/redbox-admin/logview/get/test/0').then(
+			 function(response){
+				 $scope.logViewData = response.data.logData;
+				 $scope.logCount = response.data.count;
+			 } 
+		  );
+	  };
+	  
+	  getData();
+  }])
 // -----------------------------------------------------------
 // ModalCtrl
 // - Simple controller for modal dialog in the application.
