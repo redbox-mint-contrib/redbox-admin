@@ -8,8 +8,26 @@
       <li class="active"><a href="#/logview">View Logs</a></li>
     </ul>
   </div>
-  <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+  <div ng-controller="LogviewCtrl as logctrl" class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
     <h1>View Logs</h1>
+    <form ng-submit="logctrl.submit()">
+    	<div>
+    		<select ng-model="logctrl.logtype">
+    			<option value="redbox-main">Redbox Main</option>
+    			<option value="redbox-trans">Redbox Transaction</option>
+    		</select>
+    	</div>
+    	<div>
+    		<select ng-model="logctrl.logevt">
+    			<option value="*">All</option>
+    			<option value="WARN">WARN</option>
+    			<option value="ERROR">ERROR</option>
+    			<option value="INFO">INFO</option>
+    			<option value="DEBUG">DEBUG</option>
+    		</select>
+    	</div>
+    	<input type="submit" value="Submit" />
+    </form>
     <strong>Available log entries: <span ng-bind="logCount"></span></strong>
     <div>
     	<button ng-click="getData('first')">First</button>

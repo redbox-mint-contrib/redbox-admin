@@ -15,6 +15,8 @@ module.exports = {
    */
   get: function (req, res) {
 	var searchFrom = req.param('from');
+	var searchLogType = req.param('logFile');
+	var searchEvt = req.param('evt');
 	var self = this;
 //	self.logData;
 //	self.count;
@@ -25,8 +27,9 @@ module.exports = {
 	});
 	client.search({
 	//  index: 'twitter',
-	type: 'logs',
+	type: searchLogType,
 	from: searchFrom,
+	q: 'evt:' + searchEvt,
 	size: 20,
 	_source: ["message", "logts", "evt"]
 	  
