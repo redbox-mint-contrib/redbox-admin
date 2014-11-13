@@ -30,6 +30,17 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
     console.log($http);
     console.log($resource);
     var conf = $routeParams.formConf;
+    var stage = $routeParams.stage;
+//    if (stage != null) {
+//        console.log("We should show editing UI for a stage");
+//        var Config = $resource('/redbox-admin/config/section/:sysType/:sectionName');
+//        Config.get({sysType:'arms',sectionName:'divs_tabarry'}, function(rbSection) {
+//            console.log("See what have hajacked?");
+//            console.log(rbSection);
+//          });
+//    } else {
+//        console.log("Waiting for pickup a stage");
+//    }
     $scope.addStage = function(stage) {
         console.debug("Adding " + stage.newEntry);
         //~ var controller = $resource('/redbox-admin/formBuilder/:file/:stage');
@@ -57,6 +68,7 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
     var formBuilderController = $resource('/redbox-admin/formBuilder/:formConf');
     var list = formBuilderController.get({formConf:$routeParams.formConf}, function(){
             //~ console.log(list);
+            $scope.formConf = conf;
             $scope.stages = list.stages;
     });
   }])
@@ -351,6 +363,24 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
       });
     };
   }])
+.controller('FormTabConfigCtrl',  [ '$resource', '$scope', '$routeParams', function($resource, $scope, $routeParams) {
+    console.log($routeParams);
+    var controller = $resource('/redbox-admin/formBuilder/:formConf/:stage');
+    controller.get({formConf:$routeParams.formConf, stage:$routeParams.stage}, function(formDetails) {
+        $scope.schema = formDetails.schema;
+        $scope.model = formDetails.model;
+        $scope.componentSchemas=formDetails.componentSchemas;}
+    );
+
+  $scope.form = [
+    "*",
+    {
+      type: "submit",
+      title: "Save"
+    }
+    ];
+  }])
+
 // -----------------------------------------------------------
 // ModalCtrl
 // - Simple controller for modal dialog in the application.

@@ -63,7 +63,8 @@ module.exports.routes = {
   'POST /redbox-admin/config/section/:sysType/:key': 'configController.setSection',
   'GET /redbox-admin/formBuilder': 'formBuilder.get',
   'GET /redbox-admin/formBuilder/:fileName': 'formBuilder.getStageList',
+  'GET /redbox-admin/formBuilder/:fileName/:stage': 'FormTabConfigController.get',
   'POST /redbox-admin/formBuilder/:fileName/:stage': 'formBuilderController.addStage',
   'PUT /redbox-admin/formBuilder/:fileName/:stage': 'formBuilderController.addStage',
-  'DELETE /redbox-admin/formBuilder/:fileName/:stage': 'formBuilderController.removeStage'
+  'DELETE /redbox-admin/formBuilder/:fileName/:stage': 'formBuilderController.removeStage',
 };

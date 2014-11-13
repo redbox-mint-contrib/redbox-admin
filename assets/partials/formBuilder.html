@@ -11,15 +11,14 @@
   <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
     <div class="jumbotron">
       <h2>Please select a stage to view/edit</h2>
-      <pre>{{stages}}</pre>
       <ul class="list-group">
         <li class="list-group-item" ng-repeat="stage in stages" ng-model="q" >
-           <a ng-href="#/formBuilder/{{fileName}}/{{stage}}">{{ stage }}</a>
-           &nbsp;<button ng-click="removeStage(stage);">X</button>
+            <a class="col-sm-5 col-md-2" ng-href="#/formBuilder/{{formConf}}/{{stage}}">{{ stage }}</a>
+           &nbsp;<button ng-click="removeStage(stage);" class="btn btn-danger active">Remove</button>
         </li>
       </ul>
 
-      <button class="btn" ng-click="showAdd = !showAdd">Add a new stage</button>
+      <button class="btn btn-primary active" ng-click="showAdd = !showAdd">Add a new stage</button>
       <div ng-show="showAdd">
             <div>Enter a name for the stage</div>
             <label>Stage Name</label><input ng-model="stage.newEntry">
