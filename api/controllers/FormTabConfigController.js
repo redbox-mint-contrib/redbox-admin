@@ -34,22 +34,17 @@ module.exports = {
         }
     },
     loadSchema: function() {
-        console.log("Sending schema");
-        return {
-            type: "object",
-            properties: {
-                name: {
-                    type: "string",
-                    minLength: 2,
-                    title: "Name",
-                    description: "Name or alias"
-                },
-                title: {
-                    type: "string",
-                    enum: ['dr', 'jr', 'sir', 'mrs', 'mr', 'what']
-                }
-            }
-        };
+        var fName = "arms_form-schema_stage.json";
+        var fs = require('fs');
+        try {
+            var obj = JSON.parse(fs.readFileSync(module.exports.formConfsPath + fName));
+            console.log("Sending schema");
+            return obj;
+        } catch (e) {
+            console.error("Failed to load schema file: " + fName + ". More:");
+            console.error(e);
+            return {};
+        }
     },
     loadComponentSchemas: function() { 
         console.log("Sending list of component shcemas");
