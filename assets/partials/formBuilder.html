@@ -19,14 +19,13 @@
         </li>
       </ul>
 
-      
-      <button class="btn" ng-click="showAddStage()">Add a new stage</button>
-      <div>
+      <button class="btn" ng-click="showAdd = !showAdd">Add a new stage</button>
+      <div ng-show="showAdd">
             <div>Enter a name for the stage</div>
             <label>Stage Name</label><input ng-model="stage.newEntry">
             <button ng-click="addStage(stage);">Add</button>
       </div>
-  
+
     </div>
   </div>
 </div>

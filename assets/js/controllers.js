@@ -30,9 +30,6 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
     console.log($http);
     console.log($resource);
     var conf = $routeParams.formConf;
-    $scope.showAddStage = function() {
-        alert("Below form will be shown");
-    };
     $scope.addStage = function(stage) {
         console.debug("Adding " + stage.newEntry);
         //~ var controller = $resource('/redbox-admin/formBuilder/:file/:stage');
@@ -167,7 +164,7 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
 //  - logs out the user: deletes the local token and logs out the user in RB
 // -----------------------------------------------------------
 .controller('LogoutCtrl', ['$scope', '$routeParams', '$location', 'authService','$http','redboxConfig', function($scope, $routeParams, $location, authService, $http, redboxConfig)   {
-  	authService.deleteAuth();
+      authService.deleteAuth();
     $http.post(redboxConfig.authOutUrl, 'verb=logout', {headers:{'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8'}}).success(function() {console.log("Logged out."); $location.path("/").replace();});
   }])
 // -----------------------------------------------------------
