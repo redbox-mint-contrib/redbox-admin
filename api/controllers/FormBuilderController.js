@@ -72,8 +72,8 @@ module.exports = {
             stageArray.push(stage);
         }
         stageArray.push("File is not saved");
-        //res.send(obj);
         stageArray.sort();
+        module.exports.saveConf(confName, obj);
         res.json({
                 stages: stageArray
         });
@@ -103,6 +103,7 @@ module.exports = {
         }
         stageArray.push("File is not saved");
         stageArray.sort();
+        module.exports.saveConf(confName, obj);
         res.json({
                 stages: stageArray
         });
@@ -111,6 +112,15 @@ module.exports = {
                     stages: []
                 });
             }
-    }
+    },
+  saveConf:function(confName, newConf) {
+      var fs = require('fs');
+      try {
+        console.warn("File path is not used, so it is saved to redbox-admin/");
+        fs.writeFileSync(confName, JSON.stringify(newConf));
+      } catch (e) {
+        console.log("File: " + confName + " has not been updated. Reason: " + e);
+      }
+  }
 };
 
