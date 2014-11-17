@@ -8,56 +8,80 @@
 
 module.exports = {
 	
-
+  /**
+   * private 
+   * `LogviewController.doSearch(qry)` 
+   */
+  doSearch: function(res, qry){
+	   var es = require('elasticsearch');
+		var client = new es.Client({
+			host: 'localhost:9200',
+			log: 'trace'
+		});
+		client.search(qry, function(error, response){
+			var jsonData = {};
+			if(error){
+				jsonData = {error: "There was a problem with your search."};
+			}else if(response){
+				jsonData = {
+				    count: response.hits.total,
+					logData: response.hits.hits
+				};
+			}else{
+				jsonData = {error: "No data returned"};
+			}
+			
+			return res.json(jsonData);
+		});
+   },
 
   /**
    * `LogviewController.get()`
    */
   get: function (req, res) {
 	var searchFrom = req.param('from');
+	searchFrom = searchFrom || 0;
 	var searchLogType = req.param('logFile');
 	var searchEvt = req.param('evt');
-	var self = this;
-//	self.logData;
-//	self.count;
-	var es = require('elasticsearch');
-	var client = new es.Client({
-		host: 'localhost:9200',
-		log: 'trace'
-	});
-	client.search({
-	//  index: 'twitter',
-	type: searchLogType,
+	searchEvt = searchEvt || "*";
+	
+	var query = {type: searchLogType,
 	from: searchFrom,
 	q: 'evt:' + searchEvt,
 	size: 20,
-	_source: ["message", "logts", "evt"]
-	  
-	}, function(error, response){
-		var jsonData = {};
-		if(error){
-			jsonData = {error: "There was a problem with your search."};
-		}else if(response){
-			jsonData = {
-			    count: response.hits.total,
-				logData: response.hits.hits
-			};
-		}else{
-			jsonData = {error: "No data returned"};
-		}
-		
-		return res.json(jsonData);
-	});
-    
+	_source: ["message", "logts", "evt"]};
+	
+	sails.controllers.logview.doSearch(res, query);
   },
-
+  
   /**
-   * `LogviewController.list()`
+   * `LogviewController.harvesterList()`
    */
-  list: function (req, res) {
-    return res.json({
-      todo: 'list() is not implemented yet!'
-    });
+  harvesterList: function (req, res) {
+	   var searchFrom = req.param('from');
+	   searchFrom = searchFrom || 0;
+	   var query = {type: 'mint-main',
+		from: searchFrom,
+		q: 'hrid_start:*',
+		size: 20,
+		_source: ["hrid_start", "harvest_data_type"]};
+	   
+	   sails.controllers.logview.doSearch(res, query);
+  },
+  
+  /**
+   * `LogviewController.harvesterSummary()`
+   */
+  harvesterSummary: function (req, res) {
+	   var searchFrom = req.param('from');
+	   searchFrom = searchFrom || 0;
+	   var hrid = req.param('hrid');
+	   var query = {type: 'mint-main',
+		from: searchFrom,
+		q: 'hrid:' + hrid,
+		size: 20};
+	   
+	   sails.controllers.logview.doSearch(res, query);
   }
 };
 

@@ -61,5 +61,11 @@ module.exports.routes = {
   'GET /redbox-admin/config/section/:sysType': 'configController.getSection',
   'GET /redbox-admin/config/section/:sysType/:key': 'configController.getSection',
   'POST /redbox-admin/config/section/:sysType/:key': 'configController.setSection',
-  'GET /redbox-admin/logview/get/:logFile/:from/:evt' : 'logviewController.get',
+  'GET /redbox-admin/logview/get/:logFile' : 'logviewController.get',
+  'GET /redbox-admin/logview/get/:logFile/:evt' : 'logviewController.get',
+  'GET /redbox-admin/logview/get/:logFile/:evt/:from' : 'logviewController.get',
+  'GET /redbox-admin/logview/harvester/list' : 'logviewController.harvesterList',
+  'GET /redbox-admin/logview/harvester/list/:from' : 'logviewController.harvesterList',
+  'GET /redbox-admin/logview/harvester/summary/:hrid' : 'logviewController.harvesterSummary',
+  'GET /redbox-admin/logview/harvester/summary/:hrid/:from' : 'logviewController.harvesterSummary',
 };

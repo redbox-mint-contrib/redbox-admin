@@ -313,6 +313,7 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
 	  $scope.logCount = 0;
 	  $scope.logFrom = 0;
 	  $scope.getData = function(action){
+		  //Call doPage() here instead
 		  action = action || "first";
 		  switch(action){
 		   case "first":
@@ -329,12 +330,39 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
 			   break;
 		  }
 		  
-		  return $http.get('/redbox-admin/logview/get/' + self.logtype + '/' + $scope.logFrom + '/' + self.logevt).then(
+		  return $http.get('/redbox-admin/logview/get/' + self.logtype + '/' + self.logevt + '/' + $scope.logFrom).then(
 			 function(response){
 				 $scope.logViewData = response.data.logData;
 				 $scope.logCount = response.data.count;
 			 } 
 		  );
+	  };
+	  
+	  $scope.getHarvesterSummary = function(action){
+		  
+	  };
+	  
+	  $scope.getHarvesterStatus = function(action){
+		  
+	  };
+	  
+	  var doPage = function(action){
+		  action = action || "first";
+		  switch(action){
+		   case "first":
+			   $scope.logFrom = 0;
+			   break;
+		   case "next":
+			   incrFrom();
+			   break;
+		   case "prev":
+			   decrFrom();
+			   break;
+		   case "last":
+			   lastFrom();
+			   break;
+		   default: $scope.logFrom = 0;
+		  }
 	  };
 	  
 	  var incrFrom = function(){
