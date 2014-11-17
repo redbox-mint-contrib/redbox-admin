@@ -76,7 +76,9 @@ module.exports = {
           env:"server/tf_env_work.sh",
           languageFiles:  {path: "home/language-files/", schema:""},
           lookupData:  {path: "portal/default/redbox/workflows/forms/data/", schema:""},
-          apiSecurity: {path:"home/config-include/2-misc-modules/apiSecurity.json", schema:"home/config-schema/apiSecurity.schema.json"}
+          apiSecurity: {path:"home/config-include/2-misc-modules/apiSecurity.json", schema:"home/config-schema/apiSecurity.schema.json"},
+          mainColours: {path:"home/less/variables.less", schema:"home/config-schema/variables.less.schema.json", compileIncludePath:"/Volumes/Data/Work/Projects/redbox-mint/redbox-build-distro/home/less/main.less:/Volumes/Data/Work/Projects/redbox-mint/redbox-build-distro/home/less/variables.less", compileSource: "/Volumes/Data/Work/Projects/redbox-mint/redbox-build-distro/home/less/redbox.less", compileTarget:"/Volumes/Data/Work/Projects/redbox-mint/redbox-build-distro/portal/default/redbox/css/redbox.css", onWriteSuccess:"compileLess"},
+          mainLogo: {path:"portal/default/redbox/images/RedBox_Logo_Text.png", schema:"home/config-schema/portalImage.schema.json"}
         },
         field: {
           server_url: {
@@ -89,6 +91,10 @@ module.exports = {
         // The value of the subsection's 'source' key must match an entry in the ReDBox's sources. 
         // An optional 'form' subsection property controls what the 'angular-schema-form' form definition.
         section: {
+          branding: {
+            title:"Branding",
+            subsections:[{source:"mainColours", title:"Main Colours"}, {source:"mainLogo", title:"Main Logo", form:[{type:"img",modelVar:"imgPath"}]}]
+          },
           siteDetails: {
             title:"Site Details",
             subsections: [{source:"siteDetails", title:"siteDetails.json"}]

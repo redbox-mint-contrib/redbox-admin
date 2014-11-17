@@ -248,6 +248,9 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
     $scope.currentSysType = $route.current.params.sysType;
     $scope.currentSecId = $route.current.params.id;
     $scope.currentTitle = "";
+    $scope.fileUploadObj = null;
+  
+    
     $scope.getRbSection = function() {
     Config.get({sysType:'redbox'}, function(rbSection) {
         for (var i=0; i<rbSection.sections.length; i++) {
@@ -265,6 +268,21 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
         sectionDetails.sysType = $scope.currentSysType;
         // inject subsection headers
         for (var i=0; i<sectionDetails.subsections.length; i++) {
+          for (var x=0; x<sectionDetails.subsections[i].form.length; x++) {
+            // custom form elements inserted here due to dev time constraints
+            if (sectionDetails.subsections[i].form[x].type == "img") {
+              sectionDetails.subsections[i].form[x].type = "help";
+              var imgPath = sectionDetails.subsections[i].model[sectionDetails.subsections[i].form[x].modelVar];
+              sectionDetails.subsections[i].form[x].helpvalue = "<img src='"+imgPath+"'>";
+              $scope.fileUploadObj = {
+                field: sectionDetails.subsections[i].form[x].modelVar,
+                model: sectionDetails.subsections[i].model,
+                form: sectionDetails.subsections[i].form[x],
+                subsection: sectionDetails.subsections[i],
+                imgPath: imgPath
+              };
+            }
+          }
           sectionDetails.subsections[i].form.splice(0, 0, {type:"help", helpvalue:"<div class='alert alert-info'>"+
                                                            sectionDetails.subsections[i].title+
                                                            "</div>"});
@@ -273,7 +291,16 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
         
       });
     }
+  
+    $scope.onFileSelect = function($files) {
+      console.log("File selected:" + $files[0].name);
+      $scope.fileUploadObj.file = $files[0];
+    };
+  
+    $scope.isSaving = false;
+  
     $scope.saveSection = function(rbSection) {
+      $scope.isSaving = true;
       var valList = [];
       for (var i=0; i<rbSection.subsections.length; i++) {
         valList.push(tv4.validateMultiple(rbSection.subsections[i].model,rbSection.subsections[i].schema));
@@ -290,19 +317,55 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
         modalDiag.showModal('failedVal.html', 'static');
         return;
       }
-      var status = rbSection.$save().then(function() {
-        console.log("Saved");
+      var restartDiagFn = function() {
+        $scope.isSaving = false;
         modalDiag.showModal('restart.html', 'static', function(result) {
           if (result == 'restart') {
             $location.path("/instance/"+$scope.currentSysType+"/restart");
           }
         });
+      };
+      var status = rbSection.$save().then(function() {
+        console.log("Saved");
+        // check if we should upload...
+        var progHdlr = function(evt) {
+        };
+        var nokHdlr = function(evt) {
+        };
+        if ($scope.fileUploadObj) {
+          var file = $scope.fileUploadObj.file;
+          if (file) {
+            console.log("Uploading file..");
+            var basename = $scope.fileUploadObj.imgPath.split(/[\\/]/).pop();
+            $scope.upload = $upload.upload({
+              url: $scope.fileUploadObj.imgPath,
+              method: 'PUT',
+              headers: {'file-size': file.size},
+              //withCredentials: true,
+              data: {},
+              file: file, // or list of files ($files) for html5 only
+              fileName: basename,
+              // customize file formData name ('Content-Disposition'), server side file variable name. 
+              //fileFormDataName: myFile, //or a list of names for multiple files (html5). Default is 'file' 
+              // customize how data is added to formData. See #40#issuecomment-28612000 for sample code
+              //formDataAppender: function(formData, key, val){}
+            })
+            .progress(progHdlr)
+            .success(function() {
+              restartDiagFn();
+            })
+            .error(nokHdlr);
+          } else {
+            restartDiagFn();
+          }
+        }
       }, function() {
         console.log("Error saving");
       }, function() {
         console.log("Saving...");
       });
     };
+  
   }])
   .controller('LogviewCtrl',  [ '$scope', '$http', '$upload', '$resource', 'redboxConfig','authService', '$route', 'modalDiag','$location', function($scope, $http, $upload, $resource, redboxConfig, authService, $route, modalDiag, $location ) {
 	  var LOG_SIZE = 20;
