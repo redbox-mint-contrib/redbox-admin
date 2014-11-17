@@ -367,17 +367,47 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
     console.log($routeParams);
     var controller = $resource('/redbox-admin/formBuilder/:formConf/:stage');
     controller.get({formConf:$routeParams.formConf, stage:$routeParams.stage}, function(formDetails) {
+        $scope.formConf = $routeParams.formConf;
         $scope.schema = formDetails.schema;
         $scope.model = formDetails.model;
         $scope.componentSchemas=formDetails.componentSchemas;}
     );
 
-  $scope.form = [
-    "*",
-    {
-      type: "submit",
-      title: "Save"
-    }
+    $scope.form = [
+        {
+            type:"tabarray",
+            tabType: "top",
+            title: "value.heading || ('div '+ $index)",
+            key:"divs",
+            add: "Add a div",
+            onChange: function(form, modelValue) { console.log("value changed"); console.log(form); console.log(modelValue);},
+            items:[
+                "divs[][heading]",
+//                "divs[][fields]"
+                {
+                    key: "divs[][fields]",
+                    type: "array",
+                    items: [
+                        "divs[][fields][][field-name]",
+                        {
+                            key:"divs[][fields][][component-type]",
+                            onChange: function(modelValue, form) { console.log("value changed"); console.log(form.key); console.log(modelValue);}
+                        }
+
+                    ]
+                }
+            ]
+        },
+//        "form-footer",
+        {
+            key: "[form-footer]",
+            onChange: function(modelValue, form) { console.log("value changed"); console.log(form.key); console.log(modelValue);}
+        },
+        "form-layout",
+        {
+          type: "submit",
+          title: "Save"
+        }
     ];
   }])
 
