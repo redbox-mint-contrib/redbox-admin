@@ -524,7 +524,7 @@ module.exports = {
           var sysConfigData = {};
           var sysConfigPath = sails.config.instance[cmd.sysType].installPath+'home/system-config.json';
           sails.controllers.config.readFile(sysConfigPath, true, sysConfigData, 'json', function(){
-            var curVer = sysConfigData.json['redbox.version.string'];
+            var curVer = sysConfigData.json['version.string'];
             if (curVer) {
               var subVers = curVer.split("_");
               if (subVers.length > 1 && subVers[1] !== null) {
@@ -533,7 +533,7 @@ module.exports = {
                 curVer = subVers[0] + "_1";
               }
               sails.log.debug("New version:" + curVer);
-              sysConfigData.json['redbox.version.string'] = curVer;
+              sysConfigData.json['version.string'] = curVer;
               sails.controllers.config.writeFile(sysConfigPath, JSON.stringify(sysConfigData.json, null, " "), function() {
                 sails.log.debug("System config updated with new version");
                 return res.json(rbSection);      
