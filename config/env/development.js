@@ -31,17 +31,17 @@ module.exports = {
     instance: {
       redbox: {
         installPath:"/opt/redbox/",
-        statusCmd:"server/tf.sh status", 
-        restartCmd:"server/tf.sh restart", 
-        stopCmd:"server/tf.sh stop", 
+        statusCmd:"server/tf.sh status",
+        restartCmd:"server/tf.sh restart",
+        stopCmd:"server/tf.sh stop",
         startCmd:"server/tf.sh start",
         urlCheck:"http://localhost:9000/redbox/default/home",
       },
       mint: {
         installPath:"/opt/mint/",
-        statusCmd:"server/tf.sh status", 
-        restartCmd:"server/tf.sh restart", 
-        stopCmd:"server/tf.sh stop", 
+        statusCmd:"server/tf.sh status",
+        restartCmd:"server/tf.sh restart",
+        stopCmd:"server/tf.sh stop",
         startCmd:"server/tf.sh start",
         urlCheck:"http://localhost:9001/mint/default/home",
       }
@@ -69,11 +69,11 @@ module.exports = {
           server_url: {
             source: "env",
             key: "export SERVER_URL="
-          } 
+          }
         },
         // Each entry in the section will be displayed as a link in the configuration page.
         // The section is composed of subsections. A subsection is composed of a source and an optional angular-schema-form form definition.
-        // The value of the subsection's 'source' key must match an entry in the ReDBox's sources. 
+        // The value of the subsection's 'source' key must match an entry in the ReDBox's sources.
         // An optional 'form' subsection property controls what the 'angular-schema-form' form definition.
         section: {
           siteDetails: {
@@ -93,12 +93,7 @@ module.exports = {
                             title: "value.nick || ('Tab '+$index)",
                             key:"divs",
                             add: "Add a tab",
-                            items:[
-                                {
-                                    "key":"divs",
-                                    "items":["divs[][heading]","divs[][fields]"]
-                                }
-                            ]
+                            "items":["divs[][heading]","divs[][fields]"]
                         },
                         "form-footer",
                         "form-layout"
@@ -155,7 +150,7 @@ module.exports = {
           authentication: {
             title:"Authentication",
             subsections: [{source:"authentication", title:"authentication.json"}, {source:"sso", title:"sso.json"}, {source:"rapidaaf",title:"rapidaaf.json"}]
-          }, 
+          },
           languageFiles: {
             title:"Language Files",
             subsections: [{source:"languageFiles"}]
