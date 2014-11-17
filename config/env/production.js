@@ -77,7 +77,7 @@ module.exports = {
           languageFiles:  {path: "home/language-files/", schema:""},
           lookupData:  {path: "portal/default/redbox/workflows/forms/data/", schema:""},
           apiSecurity: {path:"home/config-include/2-misc-modules/apiSecurity.json", schema:"home/config-schema/apiSecurity.schema.json"},
-          mainColours: {path:"home/less/variables.less", schema:"home/config-schema/variables.less.schema.json", compileIncludePath:"/Volumes/Data/Work/Projects/redbox-mint/redbox-build-distro/home/less/main.less:/Volumes/Data/Work/Projects/redbox-mint/redbox-build-distro/home/less/variables.less", compileSource: "/Volumes/Data/Work/Projects/redbox-mint/redbox-build-distro/home/less/redbox.less", compileTarget:"/Volumes/Data/Work/Projects/redbox-mint/redbox-build-distro/portal/default/redbox/css/redbox.css", onWriteSuccess:"compileLess"},
+          mainColours: {path:"home/less/variables.less", schema:"home/config-schema/variables.less.schema.json", compileIncludePath:"/opt/redbox/home/less/main.less:/opt/redbox/home/less/variables.less", compileSource: "/opt/redbox/home/less/redbox.less", compileTarget:"/opt/redbox/portal/default/redbox/css/redbox.css", onWriteSuccess:"compileLess"},
           mainLogo: {path:"portal/default/redbox/images/RedBox_Logo_Text.png", schema:"home/config-schema/portalImage.schema.json"}
         },
         field: {
