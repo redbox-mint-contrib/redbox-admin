@@ -363,54 +363,115 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
       });
     };
   }])
-.controller('FormTabConfigCtrl',  [ '$resource', '$scope', '$routeParams', function($resource, $scope, $routeParams) {
+.controller('FormTabConfigCtrl', ['$resource', '$scope', '$routeParams',
+  function ($resource, $scope, $routeParams) {
     console.log($routeParams);
     var controller = $resource('/redbox-admin/formBuilder/:formConf/:stage');
-    controller.get({formConf:$routeParams.formConf, stage:$routeParams.stage}, function(formDetails) {
-        $scope.formConf = $routeParams.formConf;
-        $scope.schema = formDetails.schema;
-        $scope.model = formDetails.model;
-        $scope.componentSchemas=formDetails.componentSchemas;}
-    );
-
+    controller.get({
+      formConf: $routeParams.formConf,
+      stage: $routeParams.stage
+    }, function (formDetails) {
+      $scope.formConf = $routeParams.formConf;
+      $scope.schema = formDetails.schema;
+      $scope.model = formDetails.model;
+      $scope.componentSchemas = formDetails.componentSchemas;
+    });
+    $scope.fieldTypes = {};
+    $scope.showing = ['simple'];
     $scope.form = [
-        {
-            type:"tabarray",
-            tabType: "top",
-            title: "value.heading || ('div '+ $index)",
-            key:"divs",
-            add: "Add a div",
-            onChange: function(form, modelValue) { console.log("value changed"); console.log(form); console.log(modelValue);},
-            items:[
-                "divs[][heading]",
-//                "divs[][fields]"
-                {
-                    key: "divs[][fields]",
-                    type: "array",
-                    items: [
-                        "divs[][fields][][field-name]",
-                        {
-                            key:"divs[][fields][][component-type]",
-                            onChange: function(modelValue, form) { console.log("value changed"); console.log(form.key); console.log(modelValue);}
-                        }
+      {
+        type: "tabarray",
+        tabType: "top",
+        title: "value.heading || ('div '+ $index)",
+        key: "divs",
+        add: "Add a div",
+        onChange: function (form, modelValue) {
+          console.log("value changed");
+          console.log(form);
+          console.log(modelValue);
+        },
+        items: [
+          "divs[][heading]",
+ //       "divs[][fields]"
+          {
+            key: "divs[][fields]",
+            type: "array",
+            items: [
+              "divs[][fields][][field-name]",
+              {
+                key: "divs[][fields][][component-type]",
+                onChange: function (modelValue, form) {
+                  console.log("value changed");
+                  console.log(form.key);
+                  console.log(modelValue);
+                  var fieldName = $scope.model['divs'][form.key[1]]['fields'][form.key[3]]['field-name'];
+                  if (typeof fieldName === 'undefined') { return; }
 
+                  if ($scope.showing.length <= form.key[3]) {
+                    console.log("New item for showing, push  " + modelValue + " = true");
+                    $scope.showing.push(modelValue);
+                  } else {
+                    console.log("Update showing, replace  with " + modelValue + " = true");
+                    $scope.showing[form.key[3]] = [modelValue];
+                  }
+
+                  if(! fieldName in $scope.fieldTypes) {
+                    $scope.fieldTypes[fieldName] = modelValue;
+                  } else if ($scope.fieldTypes[fieldName] != modelValue) {
+                    $scope.fieldTypes[fieldName] = modelValue;
+                  } else {
+                    console.log("field has not been changed: " + $scope.fieldTypes[fieldName] + " vs " + modelValue);
+                  }
+
+
+                  //console.log($scope.model['divs'][form.key[1]]['fields'][form.key[3]]['field-name']);
+                  //                                                                   if (modelValue == 'simple') {
+                  //                                                                       $scope.fieldsType[0]['eligible'] = true;
+                  //                                                                   } else {
+                  //                                                                       $scope.fieldsType[0]['eligible'] = false;
+                  //                                                                   }
+                }
+              },
+              {
+                type: "conditional",
+                condition: "showing[arrayIndex] == 'simple'", //or "model.eligable"
+                items: [
+                  {
+                    type: "help",
+                    helpvalue: "<h4>Simple</h4>"
+                  }
+                ]
+              },
+              {
+                type: "conditional",
+                condition: "showing[arrayIndex] == 'textarea'", //or "model.eligable"
+                items: [
+                  {
+                    type: "help",
+                    helpvalue: "<h4>Text Area</h4>"
+                  }
+                ]
+              }
                     ]
                 }
             ]
         },
-//        "form-footer",
-        {
-            key: "[form-footer]",
-            onChange: function(modelValue, form) { console.log("value changed"); console.log(form.key); console.log(modelValue);}
+ //        "form-footer",
+      {
+        key: "[form-footer]",
+        onChange: function (modelValue, form) {
+          console.log("value changed");
+          console.log(form);
+          console.log(modelValue);
+        }
         },
         "form-layout",
-        {
-          type: "submit",
-          title: "Save"
+      {
+        type: "submit",
+        title: "Save"
         }
     ];
   }])
-
 // -----------------------------------------------------------
 // ModalCtrl
 // - Simple controller for modal dialog in the application.
