@@ -368,6 +368,9 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
   
   }])
   .controller('LogviewCtrl',  [ '$scope', '$http', '$upload', '$resource', 'redboxConfig','authService', '$route', 'modalDiag','$location', function($scope, $http, $upload, $resource, redboxConfig, authService, $route, modalDiag, $location ) {
+	  var self = this;
+	  self.logtype = "redbox-main";
+	  self.logevt = "*";
 	  var LOG_SIZE = 20;
 	  $scope.logViewData = {};
 	  $scope.logCount = 0;
@@ -389,7 +392,7 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
 			   break;
 		  }
 		  
-		  return $http.get('/redbox-admin/logview/get/test/' + $scope.logFrom).then(
+		  return $http.get('/redbox-admin/logview/get/' + self.logtype + '/' + $scope.logFrom + '/' + self.logevt).then(
 			 function(response){
 				 $scope.logViewData = response.data.logData;
 				 $scope.logCount = response.data.count;
@@ -411,6 +414,10 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
 	  
 	  var lastFrom = function(){
 		 $scope.logFrom = $scope.logCount - LOG_SIZE; 
+	  };
+	  
+	  self.submit = function(){
+		  $scope.getData();
 	  };
 	  
 	  
