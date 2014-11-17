@@ -94,7 +94,11 @@ module.exports = {
         section: {
           branding: {
             title:"Branding",
-            subsections:[{source:"mainColours", title:"Main Colours"}, {source:"mainLogo", title:"Main Logo", form:[{type:"img",modelVar:"imgPath"}]}]
+            subsections:[{source:"mainColours", title:"Main Colours", form:[
+              {key:"@banner-background-colour", title:"Banner Background Colour"},
+              {key:"@title-background-colour", title:"Title Bar Background Colour"},
+              {key:"@menu-background-colour", title:"Dropdown Menu Background Colour"},
+            ]},{source:"mainLogo", title:"Main Logo", form:[{type:"img",modelVar:"imgPath"}]}]
           },
           siteDetails: {
             title:"Site Details",
