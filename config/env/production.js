@@ -36,6 +36,7 @@ module.exports = {
   // }
     authMethod: "none",
     jwsSecret: "Please Change Key - This is very insecure.",
+    contextName:"/redbox-admin/",
     // Configuration for the FileharvestController, must have absolute paths
     fileHarvest : {
         mint: {
