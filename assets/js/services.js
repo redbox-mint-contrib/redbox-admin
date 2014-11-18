@@ -93,4 +93,67 @@ angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap', 'r
     }
   };
 }])
+.factory('paginator', [function(){
+	
+	var counts = {
+	logCount: 0,
+	logFrom: 0,
+	LOG_SIZE: 20};
+	
+	return {
+		doPage: function(action){
+		  action = action || "first";
+		  switch(action){
+		   case "first":
+			   counts.logFrom = 0;
+			   break;
+		   case "next":
+			   this.incrFrom();
+			   break;
+		   case "prev":
+			   this.decrFrom();
+			   break;
+		   case "last":
+			   this.lastFrom();
+			   break;
+		   default: counts.logFrom = 0;
+		  }
+	  },
+	  
+	  getLogFrom: function(){
+		  return counts.logFrom;
+	  },
+	  
+	  setLogFrom: function(lf){
+		  counts.logFrom = lf;
+	  },
+	  
+	  getLogCount: function(){
+		  return counts.logCount;
+	  },
+	  
+	  setLogCount: function(lc){
+		  counts.logCount = lc;
+	  },
+	  
+	  incrFrom: function(){
+	console.log("INCR");
+		  if(counts.logFrom < (counts.logCount - counts.LOG_SIZE)){
+			  counts.logFrom += counts.LOG_SIZE;
+		  }
+	  },
+	  
+	  decrFrom: function(){
+	console.log("DECR");
+		  if(counts.logFrom >= counts.LOG_SIZE){
+			  counts.logFrom -= counts.LOG_SIZE;
+		  }
+	  },
+	  
+	  lastFrom: function(){
+		  //TODO - if to ensure pager does not spill past the end of the recordset.
+		  counts.logFrom = counts.logCount - counts.LOG_SIZE; 
+	  }
+	}
+}])
 ;

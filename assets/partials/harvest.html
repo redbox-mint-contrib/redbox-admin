@@ -1,0 +1,29 @@
+<div class="row">
+  <div class="col-sm-3 col-md-2 sidebar">
+    <ul class="nav nav-sidebar">
+      <li><a href="#/">Home</a></li>
+      <li><a href="#/instance">Instance</a></li>
+      <li><a href="#/config">Configuration</a></li>
+      <li><a href="#/mintCsvs">Upload</a></li>
+      <li><a href="#/logview">View Logs</a></li>
+      <li class="active"><a href="#/harvester/list">Harvester</a></li>
+    </ul>
+  </div>
+  <div ng-controller="HarvesterListCtrl as hrvLstctrl" class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+    <h1>Harvester Jobs</h1>
+    <div>
+    	<button ng-click="hrvLstctrl.getHarvesterSummary('first')">First</button>
+    	<button ng-click="hrvLstctrl.getHarvesterSummary('next')">Next</button>
+    	<button ng-click="hrvLstctrl.getHarvesterSummary('prev')">Previous</button>
+    	<button ng-click="hrvLstctrl.getHarvesterSummary('last')">Last</button>
+    </div>
+    <table>
+    	<tr ng-repeat-start="harvestRun in hrvLstctrl.harvestRuns">
+    		<td><span>{{harvestRun._source.logts}}</span> with id <span>{{harvestRun._source.hrid_start}}</span></td>
+    	</tr>
+    	<tr ng-repeat-end>
+    		<td>&nbsp;</td>
+    	</tr>
+    </table>
+</div>
+
