@@ -18,6 +18,7 @@ module.exports = {
 			host: 'localhost:9200',
 			log: 'trace'
 		});
+		//TODO - if to ensure pager does not spill past the end of the recordset.sss
 		client.search(qry, function(error, response){
 			var jsonData = {};
 			if(error){
@@ -64,7 +65,7 @@ module.exports = {
 		from: searchFrom,
 		q: 'hrid_start:*',
 		size: 20,
-		_source: ["hrid_start", "harvest_data_type"]};
+		_source: ["logts","hrid_start", "harvest_data_type"]};
 	   
 	   sails.controllers.logview.doSearch(res, query);
   },
