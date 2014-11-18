@@ -30,6 +30,10 @@ module.exports = function(grunt) {
                    'angular-sanitize/angular-sanitize.js', 'tv4/tv4.js','objectpath/lib/ObjectPath.js', 'angular-schema-form/dist/schema-form.min.js', 'angular-schema-form/dist/bootstrap-decorator.min.js',
                    'angular-modal-service/dst/angular-modal-service.min.js',
                    'bootstrap/dist/js/bootstrap.min.js',
+                   'spectrum/spectrum.js', // angular-schema-form-colorpicker - begin
+                   'angular-spectrum-colorpicker/dist/angular-spectrum-colorpicker.min.js', 
+                   'angular-schema-form-colorpicker/bootstrap-colorpicker.min.js',
+                   'spectrum/i18n/jquery.spectrum-sv.js'// angular-schema-form-colorpicker - end
                  ],
                  flatten: true,
                  dest: '.tmp/public/redbox-admin/js/dependencies'
@@ -38,7 +42,8 @@ module.exports = function(grunt) {
                  cwd: './bower_components',
                  src: [
                  'bootstrap/dist/css/bootstrap.css',
-                 'bootstrap/dist/css/bootstrap-theme.css'
+                 'bootstrap/dist/css/bootstrap-theme.css',
+                 'spectrum/spectrum.css' // angular-schema-form-colorpicker
                  ],
                  flatten: true,
                  dest: '.tmp/public/redbox-admin/styles'

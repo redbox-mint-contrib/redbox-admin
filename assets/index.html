@@ -37,5 +37,39 @@
     <!-- Partials End -->
     <!--SCRIPTS-->
     <!--SCRIPTS END-->
+    <script type="text/ng-template" id="loginExpiry.html">
+       <div class="modal fade">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" ng-click="close('Login')" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <h4 class="modal-title">Session Expiry</h4>
+            </div>
+            <div class="modal-body">
+              <p>Unfortunately, you session has expired. Clicking the 'Login' button or closing the dialog will take you to the login screen again.</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" ng-click="close('Login')" class="btn btn-primary" data-dismiss="modal">Login</button>
+            </div>
+          </div>
+        </div>
+      </div>
+   </script>
+    <script type="text/ng-template" id="rbUnavailable.html">
+       <div class="modal fade">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">ReDBox is unavailable</h4>
+            </div>
+            <div class="modal-body">
+              <p>Unfortunately, ReDBox is unavailable for authentication. This Admin instance is configured to authenticate with ReDBox. If ReDBox has been restarted, please wait for it to start then try refreshing this page.
+              If ReDBox is still unavailable, please contact ReDBox Support.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+   </script>
+
   </body>
 </html>

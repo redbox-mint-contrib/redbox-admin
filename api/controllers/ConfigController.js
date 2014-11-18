@@ -159,7 +159,7 @@ module.exports = {
           sails.log.debug("getDataFn - Less");
           var lessData = "";
           for (fld in model) {
-            lessData += fld + ": " + model[fld] + "\r\n";
+            lessData += fld + ": " + model[fld] + ";\r\n";
           }
           dataObj = {str:lessData, path:srcPath};
         } else if (ext == ".png") {
@@ -314,7 +314,7 @@ module.exports = {
             var jsonData = {};
             for (var j=0; j<lessLines.length; j++) {
               var lessData = lessLines[j].split(":");
-              jsonData[lessData[0].replace(" ","")] = lessData[1].replace(" ", "");
+              jsonData[lessData[0].replace(" ","")] = lessData[1].replace(" ", "").replace(";","");
             }
             parse = false;
             setData(jsonData, data);
