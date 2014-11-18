@@ -140,14 +140,12 @@ angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap', 'r
 	  },
 	  
 	  incrFrom: function(){
-	console.log("INCR");
 		  if(counts.logFrom < (counts.logCount - counts.LOG_SIZE)){
 			  counts.logFrom += counts.LOG_SIZE;
 		  }
 	  },
 	  
 	  decrFrom: function(){
-	console.log("DECR");
 		  if(counts.logFrom >= counts.LOG_SIZE){
 			  counts.logFrom -= counts.LOG_SIZE;
 		  }
