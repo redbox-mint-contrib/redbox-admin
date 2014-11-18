@@ -95,9 +95,43 @@ module.exports = {
           branding: {
             title:"Branding",
             subsections:[{source:"mainColours", title:"Main Colours", form:[
-              {key:"@banner-background-colour", title:"Banner Background Colour"},
-              {key:"@title-background-colour", title:"Title Bar Background Colour"},
-              {key:"@menu-background-colour", title:"Dropdown Menu Background Colour"},
+              {
+                key:"@banner-background-colour", 
+                title:"Banner Background Colour",
+                colorFormat:'hex', 
+                spectrumOptions:{
+                chooseText:"Select", 
+                cancelText:"Cancel",  
+                showAlpha: true, 
+                showInitial: true,
+                showPalette: true,
+                showSelectionPalette: true,
+               }
+              },
+              { key:"@title-background-colour", 
+                title:"Title Bar Background Colour",
+                colorFormat:'hex', 
+                spectrumOptions:{
+                chooseText:"Select", 
+                cancelText:"Cancel",  
+                showAlpha: true, 
+                showInitial: true,
+                showPalette: true,
+                showSelectionPalette: true,
+               }
+              },
+              { key:"@menu-background-colour", 
+                title:"Dropdown Menu Background Colour",
+                colorFormat:'hex', 
+                spectrumOptions:{
+                chooseText:"Select", 
+                cancelText:"Cancel",  
+                showAlpha: true, 
+                showInitial: true,
+                showPalette: true,
+                showSelectionPalette: true,
+               }
+              },
             ]},{source:"mainLogo", title:"Main Logo", form:[{type:"img",modelVar:"imgPath"}]}]
           },
           siteDetails: {

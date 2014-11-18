@@ -17,6 +17,7 @@
 var cssFilesToInject = [  
   'redbox-admin/styles/bootstrap.css',
   'redbox-admin/styles/bootstrap-theme.css',
+  'redbox-admin/styles/spectrum.css',
   'redbox-admin/styles/**/*.css',
   'redbox-admin/css/dashboard.css'
 ];
@@ -40,9 +41,13 @@ var jsFilesToInject = [
   'redbox-admin/js/dependencies/angular-sanitize.js', // angular-schema-form
   'redbox-admin/js/dependencies/ui-bootstrap-tpls.min.js',
   'redbox-admin/js/dependencies/ObjectPath.js',
+  'redbox-admin/js/dependencies/spectrum.js', // color picker
+  'redbox-admin/js/dependencies/angular-spectrum-colorpicker.min.js',   // color picker
   'redbox-admin/js/dependencies/schema-form.min.js',
   'redbox-admin/js/dependencies/bootstrap-decorator.min.js', // angular-schema-form
   'redbox-admin/js/dependencies/angular-modal-service.min.js',
+  'redbox-admin/js/dependencies/bootstrap-colorpicker.min.js', // color picker
+  'redbox-admin/js/dependencies/jquery.spectrum-sv.js', // color picker
   'redbox-admin/js/angular-local-storage.js',
   'redbox-admin/js/app.js',
   'redbox-admin/js/config.js',
