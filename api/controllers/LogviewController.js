@@ -77,10 +77,56 @@ module.exports = {
 	   var searchFrom = req.param('from');
 	   searchFrom = searchFrom || 0;
 	   var hrid = req.param('hrid');
+	   var procEvt = 'proc_fail';
+	   var qryType = 'count';
+	   
+	   switch(req.param('procEvt')){
+	   	case 'fail':
+	   		procEvt = 'proc_fail';
+	   		break;
+	   	case 'success':
+	   		procEvt = 'proc_harvested';
+	   		break;
+	   }
+	   
+	   switch(req.param('qryType')){
+	   	case 'count':
+	   		qryType = 'count';
+	   		break;
+	   	case 'data':
+	   		qryType = 'query_and_fetch';
+	   		break;
+	   }
+
 	   var query = {type: 'mint-main',
 		from: searchFrom,
-		q: 'hrid:' + hrid,
+		searchType: qryType,
+		    body:{query: {
+		        filtered: {
+		            query: {
+		                query_string: {
+		                    query: hrid,
+		                    fields: ["hrid"]
+		                }
+		            },
+		            filter: {
+		                term: {event: procEvt}
+		            }
+		        }
+		    }},
 		size: 20};
+	   
+	   sails.controllers.logview.doSearch(res, query);
+  },
+   
+  /**
+   * `LogviewController.harvesterTotalRecords()`
+   */
+  harvesterTotalRecords: function (req, res) {
+	   var hrid = req.param('hrid');
+	   var query = {type: 'mint-main',
+	    searchType: "count",
+		q: 'hrid:' + hrid};
 	   
 	   sails.controllers.logview.doSearch(res, query);
   }
