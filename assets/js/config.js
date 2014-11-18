@@ -7,7 +7,9 @@ angular.module('redboxAdmin.config',[]).provider('redboxConfig', function() {
     authMethod:"none",
     instance: {
       refreshInterval:30000
-    }
+    },
+    authExpiryCheckInterval:10000,
+    authExpiryThreshold:10
   };
   return {
     set: function (constants) {

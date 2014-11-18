@@ -11,13 +11,15 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
 // IndexCtrl 
 //  - does nothing but an index, for now
 // -----------------------------------------------------------
-.controller('IndexCtrl', ['$scope', '$routeParams', '$location', 'authService', '$http', '$resource', function($scope, $routeParams, $location, authService, $http, $resource) {
+.controller('IndexCtrl', ['$scope', '$routeParams', '$location', 'authService', '$http', '$resource', 'authWatcher', function($scope, $routeParams, $location, authService, $http, $resource, authWatcher) {
+    authWatcher.addExpiryChecker($scope);
   }])
 // -----------------------------------------------------------
 // InstanceCtrl 
 //  - controls RB/Mint instance
 // -----------------------------------------------------------
-  .controller('InstanceCtrl', ['$scope', '$routeParams', '$location', 'authService', '$http', '$resource',  '$route','$interval','redboxConfig', 'modalDiag', function($scope, $routeParams, $location, authService, $http, $resource, $route, $interval, redboxConfig, modalDiag) {
+  .controller('InstanceCtrl', ['$scope', '$routeParams', '$location', 'authService', '$http', '$resource',  '$route','$interval','redboxConfig', 'modalDiag', 'authWatcher', function($scope, $routeParams, $location, authService, $http, $resource, $route, $interval, redboxConfig, modalDiag, authWatcher) {
+    authWatcher.addExpiryChecker($scope);
     $scope.$http = $http;
     var Instance = $resource('/redbox-admin/instance/:sysType', {sysType:'@sysType'}, {
       get: {method:'GET'},
@@ -124,7 +126,8 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
 // MintCsvCtrl
 // - allows access, deletion and uploading of MInt CSV files
 // -----------------------------------------------------------
-.controller('MintCsvCtrl',  [ '$scope', '$upload', '$resource', 'redboxConfig','authService', function($scope, $upload, $resource, redboxConfig, authService) {
+.controller('MintCsvCtrl',  [ '$scope', '$upload', '$resource', 'redboxConfig','authService', 'authWatcher', function($scope, $upload, $resource, redboxConfig, authService, authWatcher) {
+    authWatcher.addExpiryChecker($scope);
       $scope.jws = authService.getJws();
       $scope.mintPendingFiles = [];
       var FileHarvest = $resource('/redbox-admin/fileHarvest/:sysType/:fileName', {sysType:'@sysType', fileName:'@fileName'});
@@ -241,7 +244,8 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
 // - gets and sets RB/Mint configuration 
 //
 // -----------------------------------------------------------
-.controller('ConfigCtrl',  [ '$scope', '$upload', '$resource', 'redboxConfig','authService', '$route', 'modalDiag','$location', function($scope, $upload, $resource, redboxConfig, authService, $route, modalDiag, $location ) {
+.controller('ConfigCtrl',  [ '$scope', '$upload', '$resource', 'redboxConfig','authService', '$route', 'modalDiag','$location', 'authWatcher', function($scope, $upload, $resource, redboxConfig, authService, $route, modalDiag, $location, authWatcher ) {
+    authWatcher.addExpiryChecker($scope);
     var Config = $resource('/redbox-admin/config/section/:sysType/:sectionName', {sysType:'@sysType', sectionName:'@id'});
     $scope.rbSectionList = [];
     $scope.secDetails = {redbox:null, mint:null};
