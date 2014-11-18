@@ -11,7 +11,6 @@ angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap', 'r
               return true;
             }
             var admin_jws_payload = localStorageService.get('admin_jws_payload');
-			console.log("Checking locally if authenticated...");
 			var errMsg = "";
 			if (admin_jws_payload != null) {
               // check the times...
@@ -120,6 +119,7 @@ angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap', 'r
     responseError: function(response) {
       if (response.status === 401 || response.status === 403) {
         authService.deleteAuth();
+        authService.login();
       }
       return $q.reject(response);
     }
@@ -172,22 +172,35 @@ angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap', 'r
             authService.curDiag = null;
             authService.login();
           });
+        } else {
+          if (authWatcher.curDiag === authWatcher.diag_rbUnavailable) {
+            console.log("ReDBox is unavailable, removing login expiry watcher");
+            authWatcher.removeExpiryChecker();
+          }
         }
       }
     }
   };
   
   authWatcher.addExpiryChecker = function($scope) {
-    if (angular.isDefined($scope.sessionExpiryPromise)) {
+    authWatcher.scope = $scope;
+    if (angular.isDefined(authWatcher.scope.sessionExpiryPromise)) {
       console.log("Session Expiry checker already created.");
     } else {
-        $scope.sessionExpiryPromise = $interval(authWatcher.loginExpiryChecker, redboxConfig.authExpiryCheckInterval);
-        $scope.$on('$destroy', function() {
-          if (angular.isDefined($scope.sessionExpiryPromise)) {
-            $interval.cancel($scope.sessionExpiryPromise);
-            $scope.sessionExpiryPromise = undefined;
+        authWatcher.scope.sessionExpiryPromise = $interval(authWatcher.loginExpiryChecker, redboxConfig.authExpiryCheckInterval);
+        authWatcher.scope.$on('$destroy', function() {
+          if (angular.isDefined(authWatcher.scope.sessionExpiryPromise)) {
+            $interval.cancel(authWatcher.scope.sessionExpiryPromise);
+            authWatcher.scope.sessionExpiryPromise = undefined;
           }
         });
+    }
+  };
+  
+  authWatcher.removeExpiryChecker = function() {
+    if (angular.isDefined(authWatcher.scope.sessionExpiryPromise)) {
+      $interval.cancel(authWatcher.scope.sessionExpiryPromise);
+      authWatcher.scope.sessionExpiryPromise = undefined;
     }
   };
   
