@@ -1,5 +1,6 @@
 module.exports = {
     formConfsPath : "/opt/redbox/home/form-configuration/",
+    componentConfsPath : "/opt/redbox/portal/default/default/form-components/field-elements",
     get: function(req, res) {
         console.warn("Fix path for formConfsPath: " + module.exports.formConfsPath);
 //        // should be using this?
@@ -16,6 +17,7 @@ module.exports = {
         var stage = req.param("stage");
         loaded.model = module.exports.loadStage(confName,stage);
         loaded.schema = module.exports.loadSchema();
+        loaded.componentSchemas = module.exports.loadComponentSchemas();
         res.send(loaded);
     },
     loadStage: function(confName, stage) {
@@ -24,7 +26,7 @@ module.exports = {
         console.log("loading from " + confName);
         var fs = require('fs');
         var obj = JSON.parse(fs.readFileSync(module.exports.formConfsPath + confName));
-        
+
         if (stage in obj.stages) {
             console.log("Stage " + stage + " is going to be loaded.");
             return obj.stages[stage];
@@ -46,8 +48,35 @@ module.exports = {
             return {};
         }
     },
-    loadComponentSchemas: function() { 
+    loadComponentSchemas: function() {
         console.log("Sending list of component shcemas");
-        return []; 
+        console.warn("Fix path for formConfsPath: " + module.exports.formConfsPath);
+        var components = {}, schemas = [];
+        var fs = require('fs');
+        var schemaFiles = fs.readdirSync(module.exports.componentConfsPath);
+        schemaFiles.sort();
+        for (var i = 0; i < schemaFiles.length; i++) {
+            var filePath = schemaFiles[i];
+            var parts = filePath.split(".");
+            var l = parts.length;
+            if (parts.length >= 3 && parts[l-2] == 'schema' && parts[l-1] == 'json') {
+                console.log(parts[l-2] + "." + parts[l-1]);
+                components[parts[0]] = filePath;
+            } else if (parts[l-1] == 'vm') {
+                console.log("File: " + filePath + " is vm, does it have a schema file?");
+                if (!(parts[0] in components)) {
+                    components[parts[0]] = 'N/A';
+                }
+            }
+        }
+        console.log(components);
+        for (var k in components) {
+            console.log(k);
+            var obj = {};
+            obj[k] =components[k];
+            schemas.push(obj);
+        }
+        console.log(schemas);
+        return schemas;
     }
 };
