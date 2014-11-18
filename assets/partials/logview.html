@@ -11,16 +11,16 @@
   </div>
   <div ng-controller="LogviewCtrl as logctrl" class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
     <h1>View Logs</h1>
-    <form ng-submit="logctrl.submit()">
+    <form class="logview-form" ng-submit="logctrl.submit()">
     	<div>
-    		<select ng-model="logctrl.logtype">
+    		<select class="form-control" ng-model="logctrl.logtype">
     			<option value="redbox-main">Redbox Main</option>
     			<option value="redbox-trans">Redbox Transaction</option>
     			<option value="mint-main">Mint Main</option>
     		</select>
     	</div>
     	<div>
-    		<select ng-model="logctrl.logevt">
+    		<select class="form-control" ng-model="logctrl.logevt">
     			<option value="*">All</option>
     			<option value="WARN">WARN</option>
     			<option value="ERROR">ERROR</option>
@@ -28,7 +28,7 @@
     			<option value="DEBUG">DEBUG</option>
     		</select>
     	</div>
-    	<input type="submit" value="Submit" />
+    	<input class="btn btn-primary" type="submit" value="Submit" />
     </form>
     <strong>Available log entries: <span ng-bind="logctrl.logCount"></span></strong>
     <div>
@@ -37,19 +37,16 @@
     	<button class="btn btn-primary" ng-click="logctrl.getData('prev')">Previous</button>
     	<button class="btn btn-primary" ng-click="logctrl.getData('last')">Last</button>
     </div>
-    <table class="table table-hover">
+    <table class="table table-hover logview-data-table">
     	<tr>
     		<th width="20%">Timestamp</th>
     		<th width="20%">Event type</th>
     		<th width="60%">Message</th>
     	</tr>
-    	<tr ng-repeat-start="logdat in logctrl.logViewData">
+    	<tr ng-repeat="logdat in logctrl.logViewData">
     		<td>{{logdat._source.logts}}</td>
     		<td>{{logdat._source.evt}}</td>
     		<td>{{logdat._source.message}}</td>
-    	</tr>
-    	<tr ng-repeat-end>
-    		<td colspan="3">&nbsp;</td>
     	</tr>
     </table>
 </div>

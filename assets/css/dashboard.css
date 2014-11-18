@@ -103,3 +103,11 @@ body {
   display: inline-block;
   border-radius: 50%;
 }
+
+.logview-data-table{
+	width: 90%;
+}
+
+.logview-form{
+	width: 35%;
+}
