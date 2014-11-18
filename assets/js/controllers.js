@@ -371,62 +371,72 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
     };
   
   }])
-  .controller('LogviewCtrl',  [ '$scope', '$http', '$upload', '$resource', 'redboxConfig','authService', '$route', 'modalDiag','$location', function($scope, $http, $upload, $resource, redboxConfig, authService, $route, modalDiag, $location ) {
+  .controller('LogviewCtrl',  [ '$scope', '$http', '$upload', '$resource', 'redboxConfig','authService', '$route', 'modalDiag', 'paginator', '$location', function($scope, $http, $upload, $resource, redboxConfig, authService, $route, modalDiag, paginator, $location ) {
 	  var self = this;
 	  self.logtype = "redbox-main";
 	  self.logevt = "*";
-	  var LOG_SIZE = 20;
-	  $scope.logViewData = {};
-	  $scope.logCount = 0;
-	  $scope.logFrom = 0;
-	  $scope.getData = function(action){
-		  action = action || "first";
-		  switch(action){
-		   case "first":
-			   $scope.logFrom = 0;
-			   break;
-		   case "next":
-			   incrFrom();
-			   break;
-		   case "prev":
-			   decrFrom();
-			   break;
-		   case "last":
-			   lastFrom();
-			   break;
-		  }
+	  self.harvestRuns = {};
+	  self.logViewData = {};
+	  self.logCount = 0;
+	  self.getData = function(action){
+		  paginator.doPage(action);
 		  
-		  return $http.get('/redbox-admin/logview/get/' + self.logtype + '/' + $scope.logFrom + '/' + self.logevt).then(
+		  return $http.get('/redbox-admin/logview/get/' + self.logtype + '/' + self.logevt + '/' + paginator.getLogFrom()).then(
 			 function(response){
-				 $scope.logViewData = response.data.logData;
-				 $scope.logCount = response.data.count;
+				 self.logViewData = response.data.logData;
+				 paginator.setLogCount(response.data.count);
+				 self.logCount = response.data.count;
 			 } 
 		  );
 	  };
 	  
-	  var incrFrom = function(){
-		  if($scope.logFrom < ($scope.logCount - LOG_SIZE)){
-			  $scope.logFrom += LOG_SIZE;
-		  }
-	  };
-	  
-	  var decrFrom = function(){
-		  if($scope.logFrom >= LOG_SIZE){
-			  $scope.logFrom -= LOG_SIZE;
-		  }
-	  };
-	  
-	  var lastFrom = function(){
-		 $scope.logFrom = $scope.logCount - LOG_SIZE; 
-	  };
-	  
 	  self.submit = function(){
-		  $scope.getData();
+		  self.getData();
 	  };
 	  
+	  self.getData();
 	  
-	  $scope.getData();
   }])
+  .controller('HarvesterListCtrl',  [ '$scope', '$http', '$upload', '$resource', 'redboxConfig','authService', '$route', 'modalDiag', 'paginator', '$location', function($scope, $http, $upload, $resource, redboxConfig, authService, $route, modalDiag, paginator, $location ) {
+	  var self = this;
+	  self.harvestRuns = {};
+	  self.logCount = 0;
+	  
+	  self.getHarvesterList = function(action){
+		  paginator.doPage(action);
+		  return $http.get('/redbox-admin/logview/harvester/list/' + paginator.getLogFrom()).then(
+			 function(response){
+				 self.harvestRuns = response.data.logData;
+				 paginator.setLogCount(response.data.count);
+				 self.logCount = paginator.getLogCount();
+			 } 
+		  );
+	  };
+	  
+	  self.getHarvesterList();
+	  
+  }])
+    .controller('HarvesterSummaryCtrl',  [ '$scope', '$http', '$upload', '$resource', 'redboxConfig','authService', '$route', 'modalDiag', 'paginator', '$location', function($scope, $http, $upload, $resource, redboxConfig, authService, $route, modalDiag, paginator, $location ) {
+    	var hrid = $route.current.params.hrid;
+	  var self = this;
+	  self.harvestEvents = {};
+	  self.logCount = 0;
+	  
+	  self.getHarvesterSummary = function(action){
+		  paginator.doPage(action);
+		  return $http.get('/redbox-admin/logview/harvester/summary/' + hrid + '/' + paginator.getLogFrom()).then(
+			 function(response){
+				 self.harvestEvents = response.data.logData;
+				 paginator.setLogCount(response.data.count);
+				 self.logCount = paginator.getLogCount();
+			 } 
+		  );
+	  };
+	  
+	  self.getHarvesterSummary();
+	  
+  }])
+  
 // -----------------------------------------------------------
 // ModalCtrl
 // - Simple controller for modal dialog in the application.

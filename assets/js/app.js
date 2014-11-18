@@ -20,6 +20,8 @@ angular.module('redboxAdmin', [
   $routeProvider.when('/config', {templateUrl: 'partials/config.html', controller: 'ConfigCtrl'});
   $routeProvider.when('/config/:sysType/:id', {templateUrl: 'partials/config.html', controller: 'ConfigCtrl'});
   $routeProvider.when('/logview', {templateUrl: 'partials/logview.html', controller: 'LogviewCtrl'});
+  $routeProvider.when('/harvester/list', {templateUrl: 'partials/harvest.html', controller: 'HarvesterListCtrl'});
+  $routeProvider.when('/harvester/summary/:hrid', {templateUrl: 'partials/harvestSummary.html', controller: 'HarvesterSummaryCtrl'});
   $routeProvider.otherwise({redirectTo: '/'});
 }])
 .config(['$httpProvider', function($httpProvider) {

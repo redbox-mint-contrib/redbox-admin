@@ -6,6 +6,7 @@
       <li><a href="#/config">Configuration</a></li>
       <li><a href="#/mintCsvs">Upload</a></li>
       <li class="active"><a href="#/logview">View Logs</a></li>
+      <li><a href="#/harvester/list">Harvester</a></li>
     </ul>
   </div>
   <div ng-controller="LogviewCtrl as logctrl" class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
@@ -15,6 +16,7 @@
     		<select ng-model="logctrl.logtype">
     			<option value="redbox-main">Redbox Main</option>
     			<option value="redbox-trans">Redbox Transaction</option>
+    			<option value="mint-main">Mint Main</option>
     		</select>
     	</div>
     	<div>
@@ -28,12 +30,12 @@
     	</div>
     	<input type="submit" value="Submit" />
     </form>
-    <strong>Available log entries: <span ng-bind="logCount"></span></strong>
+    <strong>Available log entries: <span ng-bind="logctrl.logCount"></span></strong>
     <div>
-    	<button ng-click="getData('first')">First</button>
-    	<button ng-click="getData('next')">Next</button>
-    	<button ng-click="getData('prev')">Previous</button>
-    	<button ng-click="getData('last')">Last</button>
+    	<button ng-click="logctrl.getData('first')">First</button>
+    	<button ng-click="logctrl.getData('next')">Next</button>
+    	<button ng-click="logctrl.getData('prev')">Previous</button>
+    	<button ng-click="logctrl.getData('last')">Last</button>
     </div>
     <table>
     	<tr>
@@ -41,7 +43,7 @@
     		<th width="20%">Event type</th>
     		<th width="60%">Message</th>
     	</tr>
-    	<tr ng-repeat-start="logdat in logViewData">
+    	<tr ng-repeat-start="logdat in logctrl.logViewData">
     		<td>{{logdat._source.logts}}</td>
     		<td>{{logdat._source.evt}}</td>
     		<td>{{logdat._source.message}}</td>
