@@ -383,25 +383,11 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
       var activeTab = $('li.ng-scope.active')[0].innerHTML;
       $scope.divIndex = regActiveTabIndexIndex.exec(activeTab)[1];
       if (typeof $scope.divIndex === 'undefined') { $scope.divIndex = 0; }
-//      if ($scope.divIndex == $scope.showing.length) {
-////        console.log("Grow showing list with a new tab added");
-//        $scope.showing.push([]);
-//      }
       try {
         return $scope.model['divs'][$scope.divIndex]['fields'][arrayIndex]['component-type'];
       } catch (e) {}
-
-//      console.log("getComponentType - Checking " + arrayIndex);
-//      if (arrayIndex == 0) {
-//      console.log("There are " + model['divs'].length + " divs.");
-//        for(var i =0; i < model['divs'].length; i++) {
-//          console.log($scope.showing[i][arrayIndex]);
-//        }
-//      }
-//      return false;
     };
     $scope.fieldTypes = {};
-//    $scope.showing = [[''],['']];
     $scope.form = [
       {
         type: "tabarray",
@@ -424,80 +410,32 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
               "divs[][fields][][field-name]",
               {
                 key: "divs[][fields][][component-type]",
-//                onChange: function (modelValue, form) {
-//                  $scope.divIndex = form.key[1];
-//                  console.log("value changed");
-//                  console.log(form.key);
-//                  console.log(modelValue);
-//                  var fieldName = $scope.model['divs'][form.key[1]]['fields'][form.key[3]]['field-name'];
-//                  if (typeof fieldName === 'undefined') { return; }
-//
-//                  if ($scope.showing[form.key[1]].length <= form.key[3]) {
-//                    console.log("New item for showing, push  " + modelValue + " = true");
-//                    $scope.showing[form.key[1]].push(modelValue);
-//                  } else {
-//                    console.log("Update showing, replace  with " + modelValue + " = true");
-//                    $scope.showing[form.key[1]][form.key[3]] = modelValue;
-//                  }
-//
-//                  if(! fieldName in $scope.fieldTypes) {
-//                    $scope.fieldTypes[fieldName] = modelValue;
-//                  } else if ($scope.fieldTypes[fieldName] != modelValue) {
-//                    $scope.fieldTypes[fieldName] = modelValue;
-//                  } else {
-//                    console.log("field has not been changed: " + $scope.fieldTypes[fieldName] + " vs " + modelValue);
-//                  }
-//                }
               },
               {
                 type: "conditional",
-                condition: "getComponentType(model,arrayIndex) == 'simple'", //or "model.eligable"
+                condition: "getComponentType(model,arrayIndex) == 'simple'",
                 items: [
                   "divs[][fields][][component-type-fly][simple]"
                 ]
               },
               {
                 type: "conditional",
-                condition: "getComponentType(model,arrayIndex) == 'simple'", //or "model.eligable"
-                items: [
-                  {
-                    type: "help",
-                    helpvalue: "<h4>Simple widget</h4>"
-                  }
-                ]
-              },
-              {
-                type: "conditional",
-                condition: "getComponentType(model,arrayIndex) == 'textarea'", //or "model.eligable"
+                condition: "getComponentType(model,arrayIndex) == 'textarea'",
                 items: [
                   "divs[][fields][][component-type-fly][textarea]"
                 ]
               },
               {
                 type: "conditional",
-                condition: "getComponentType(model,arrayIndex) == 'textarea'", //or "model.eligable"
-                items: [
-                  {
-                    type: "help",
-                    helpvalue: "<h4>Textarea widget</h4>"
-                  }
-                ]
-              },
-              {
-                type: "conditional",
-                condition: "getComponentType(model,arrayIndex) == 'complex'", //or "model.eligable"
+                condition: "getComponentType(model,arrayIndex) == 'complex'",
                 items: [
                   "divs[][fields][][component-type-fly][complex]",
-                  {
-                    type: "help",
-                    helpvalue: "<h4>Complex widget</h4>"
-                  }
                 ]
               }
-                    ]
-                }
-            ]
-        },
+             ]
+            }
+         ]
+      },
  //        "form-footer",
       {
         key: "[form-footer]",
