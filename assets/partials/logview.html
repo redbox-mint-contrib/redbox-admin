@@ -32,12 +32,12 @@
     </form>
     <strong>Available log entries: <span ng-bind="logctrl.logCount"></span></strong>
     <div>
-    	<button ng-click="logctrl.getData('first')">First</button>
-    	<button ng-click="logctrl.getData('next')">Next</button>
-    	<button ng-click="logctrl.getData('prev')">Previous</button>
-    	<button ng-click="logctrl.getData('last')">Last</button>
+    	<button class="btn btn-primary" ng-click="logctrl.getData('first')">First</button>
+    	<button class="btn btn-primary" ng-click="logctrl.getData('next')">Next</button>
+    	<button class="btn btn-primary" ng-click="logctrl.getData('prev')">Previous</button>
+    	<button class="btn btn-primary" ng-click="logctrl.getData('last')">Last</button>
     </div>
-    <table>
+    <table class="table table-hover">
     	<tr>
     		<th width="20%">Timestamp</th>
     		<th width="20%">Event type</th>
