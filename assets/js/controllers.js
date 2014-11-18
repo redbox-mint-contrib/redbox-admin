@@ -398,13 +398,31 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
 	  self.harvestRuns = {};
 	  self.logCount = 0;
 	  
-	  self.getHarvesterSummary = function(action){
+	  self.getHarvesterList = function(action){
 		  paginator.doPage(action);
 		  return $http.get('/redbox-admin/logview/harvester/list/' + paginator.getLogFrom()).then(
 			 function(response){
 				 self.harvestRuns = response.data.logData;
-//				 console.log(response.data.logData);
-//				 console.log(response.data.count);
+				 paginator.setLogCount(response.data.count);
+				 self.logCount = paginator.getLogCount();
+			 } 
+		  );
+	  };
+	  
+	  self.getHarvesterList();
+	  
+  }])
+    .controller('HarvesterSummaryCtrl',  [ '$scope', '$http', '$upload', '$resource', 'redboxConfig','authService', '$route', 'modalDiag', 'paginator', '$location', function($scope, $http, $upload, $resource, redboxConfig, authService, $route, modalDiag, paginator, $location ) {
+    	var hrid = $route.current.params.hrid;
+	  var self = this;
+	  self.harvestEvents = {};
+	  self.logCount = 0;
+	  
+	  self.getHarvesterSummary = function(action){
+		  paginator.doPage(action);
+		  return $http.get('/redbox-admin/logview/harvester/summary/' + hrid + '/' + paginator.getLogFrom()).then(
+			 function(response){
+				 self.harvestEvents = response.data.logData;
 				 paginator.setLogCount(response.data.count);
 				 self.logCount = paginator.getLogCount();
 			 } 
