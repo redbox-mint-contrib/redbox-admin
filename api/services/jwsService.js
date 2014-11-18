@@ -1,6 +1,10 @@
 /**
- *  JWS Service.
+ * JWS Service
+ *
+ * @description :: Sails service for validating and generating(test) JWS
+ * @author      :: Shilo Banihit
  */
+
 module.exports = {
     isInvalid: function(jwsStr) {
         var jws = require('jws');

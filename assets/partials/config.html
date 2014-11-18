@@ -27,8 +27,16 @@
         <div class="panel-body" >
           <form ng-repeat="subsection in secDetails.redbox.subsections" sf-schema="subsection.schema" sf-form="subsection.form" sf-model="subsection.model"></form>
         </div>
+        <div>
+          <input ng-show="fileUploadObj" ng-file-select="onFileSelect($files)" id="fileuploader" class="btn" type="file" accept="*">
+        </div>
         <div class="panel-footer">
-          <button type="button" ng-click="saveSection(secDetails.redbox)" class="btn btn-info">Apply</button>
+          <button ng-disabled="isSaving === true" type="button" ng-click="saveSection(secDetails.redbox)" class="btn btn-info">Apply</button>
+        </div>
+        <div class="progress" ng-show="isSaving">
+          <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+            Applying changes please wait...
+          </div>
         </div>
       </div>
     </div>

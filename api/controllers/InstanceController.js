@@ -24,6 +24,7 @@ module.exports = {
         var chkUrl = url.parse(config.urlCheck);
         
         var chkReq = http.request(config.urlCheck, function(chkRes) {
+          sails.log.debug("Status Code:" + chkRes.status);
           if (chkRes.statusCode != 200) {
             code = 3;
           }

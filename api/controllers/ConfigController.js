@@ -155,6 +155,16 @@ module.exports = {
           sails.log.debug("getDataFn - Prop");
           var properties = require('properties');
           dataObj = {str:properties.stringify(model, {unicode:true}), path: srcPath};
+        } else if (ext == ".less") {
+          sails.log.debug("getDataFn - Less");
+          var lessData = "";
+          for (fld in model) {
+            lessData += fld + ": " + model[fld] + "\r\n";
+          }
+          dataObj = {str:lessData, path:srcPath};
+        } else if (ext == ".png") {
+          sails.log.debug("getDataFn - PNG");
+          dataObj = {str:null, path:srcPath};
         } else {
           // must be a directory
           var newPath = srcPath + srcId;
@@ -163,7 +173,8 @@ module.exports = {
         }
         return dataObj;
       };
-      var writeCbFn = function(sourceId, srcPath, model, schema, cmd, cb) {
+      var writeCbFn = function(sourceId, srcPath, model, schema, cmd) {
+        var ext = sails.controllers.config.getSysFileExt(srcPath);
         return function() {
           // validate section data... if there's a schema
           var result = null;
@@ -180,7 +191,17 @@ module.exports = {
             sails.log.debug("Writing to file: " + srcPath);
             sails.log.debug(model);
             var dataObj = getDataFn(sourceId, srcPath, model, cmd);
-            sails.controllers.config.writeFile(dataObj.path, dataObj.str, cb, function() { res.send(400, "Error writing to one of the files");});
+            var writeOkHdlr = cmd.keyConfigs[sourceId].srcConfig.onWriteSuccess;
+            if (writeOkHdlr) {
+              cb = sails.controllers.config[writeOkHdlr](rbSection, res, cmd.keyConfigs[sourceId].srcConfig, cmd);
+            }
+            if (dataObj.str) {
+              sails.controllers.config.writeFile(dataObj.path, dataObj.str, cb, function() { res.send(400, "Error writing to one of the files");});
+            } else {
+              // assume its binary..
+              sails.log.debug("Ignoring binary field");
+              cb();
+            }
           } else {
             sails.log.error("Failed to validate model with schema:"+srcPath);
           }
@@ -265,7 +286,6 @@ module.exports = {
     if (path) {
       var fs = require('fs'); 
       var ext = sails.controllers.config.getSysFileExt(path);
-      sails.log.debug(ext);
       if (ext == ".json") {
         fs.readFile(path, {flags:'r', encoding:'UTF-8'}, function(err, data) {setData(data)});  
       } else if (ext == ".properties") {
@@ -283,8 +303,28 @@ module.exports = {
             setData(propObj);
           });
         });  
+      } else if (ext == ".less") {
+        // TODO: due to very tight time contraints, we'll just have to use a primitive less to JSON parser
+        fs.readFile(path, {flags:'r', encoding:'UTF-8'}, function(err, data) {
+          if (err) {
+            sails.log.error("Error reading less file:"+path);
+            return;
+          } else {
+            var lessLines = data.match(/[^\r\n]+/g);
+            var jsonData = {};
+            for (var j=0; j<lessLines.length; j++) {
+              var lessData = lessLines[j].split(":");
+              jsonData[lessData[0].replace(" ","")] = lessData[1].replace(" ", "");
+            }
+            parse = false;
+            setData(jsonData, data);
+          }
+        });
+      } else if (ext == ".png") {
+        parse = false;
+        setData({imgPath:sails.config.contextName+"config/raw/"+target.sysType+"/"+path.replace(sails.config.instance[target.sysType].installPath, "")});
       } else {
-        sails.log.debug("Unsupported, unknown file extenstion");
+        sails.log.debug("Unsupported, unknown file extenstion: " + ext);
         // Unsupported file, do nothing, callers can deal with it.
         target[field+'_nosupport'] = true;
         setData(null);
@@ -411,6 +451,8 @@ module.exports = {
       keyConfig.srcPath = sails.config.instance[cmd.sysType].installPath + cmd.sysConfig.source[keyConfig.source].path;
       keyConfig.schemaPath =  sails.config.instance[cmd.sysType].installPath + cmd.sysConfig.source[keyConfig.source].schema;
       keyConfig.srcExt = sails.controllers.config.getSysFileExt(keyConfig.srcPath);
+      keyConfig.srcConfig = cmd.sysConfig.source[keyConfig.source];
+      keyConfig.sysType = cmd.sysType;
       cmd.keyConfigs[keyConfig.source] = keyConfig;
       sails.controllers.config.readFile(keyConfig.schemaPath, true, keyConfig, 'schemaData', dataCbInst(keyConfig));
       sails.controllers.config.readFile(keyConfig.srcPath, true, keyConfig, 'srcData', dataCbInst(keyConfig));
@@ -444,6 +486,110 @@ module.exports = {
       } else {
         return cmd;
       }
+  },
+  /**
+   * `ConfigController.runCmd()`
+   *
+   * Convenience method, passes the exit code to cb (if not null)
+   *
+   */
+  runCmd: function(cmd, cb) {
+    var exec = require('child_process').exec;
+    var statusProc = exec(cmd, function(error, stdout, stderr) {
+      sails.log.debug(stdout);
+      sails.log.debug(stderr);
+    });
+    statusProc.on('exit', function(code, signal) {
+      if (cb) {
+        cb(code);
+      } 
+    });
+  },
+  /**
+  * `ConfigController.compileLess()`
+  *  
+  * Callback called after saving a less file.
+  */
+  compileLess: function(rbSection, res, srcConfig, cmd) {
+    var ctr = 0;
+    return function() {
+      ctr++;
+      if (ctr == rbSection.subsections.length) {
+        sails.log.debug("Running less compiler");
+        var lesscmd = "lessc --include-path=" + srcConfig.compileIncludePath + " " + srcConfig.compileSource + " " + srcConfig.compileTarget;
+        sails.log.debug(lesscmd);
+        sails.controllers.config.runCmd(lesscmd, function(code) {
+          sails.log.debug("Less compiler exit code:" + code);
+          // changing versions...
+          var sysConfigData = {};
+          var sysConfigPath = sails.config.instance[cmd.sysType].installPath+'home/system-config.json';
+          sails.controllers.config.readFile(sysConfigPath, true, sysConfigData, 'json', function(){
+            var curVer = sysConfigData.json['version.string'];
+            if (curVer) {
+              var subVers = curVer.split("_");
+              if (subVers.length > 1 && subVers[1] !== null) {
+                curVer = subVers[0] + "_" + (parseInt(subVers[1], 10) + 1);
+              } else {
+                curVer = subVers[0] + "_1";
+              }
+              sails.log.debug("New version:" + curVer);
+              sysConfigData.json['version.string'] = curVer;
+              sails.controllers.config.writeFile(sysConfigPath, JSON.stringify(sysConfigData.json, null, " "), function() {
+                sails.log.debug("System config updated with new version");
+                return res.json(rbSection);      
+              }, function() {
+                sails.log.error("Failed to update system config with new version");
+              });
+            }
+          }); 
+          
+        });
+      }
+    }
+  },
+  
+  getRawFile: function(req, res) {
+    var sysType = req.param('sysType');
+    var filePath = req.params[0];
+    var absFilePath = sails.config.instance[sysType].installPath + filePath;
+    var options = {
+      lastModified:false
+    };
+    res.sendfile(absFilePath, options, function (err) {
+      if (err) {
+        sails.log.error("Error sending file: " + absFilePath);
+        return res.send(404, "File does not exist.");
+      }
+    });
+  },
+  
+  putRawFile: function(req, res) {
+    sails.log.debug("Putting Raw file");
+    var fs = require('fs');
+    var sysType = req.param('sysType');
+    var filePath = req.params[0];
+    var absFilePath = sails.config.instance[sysType].installPath + filePath;
+    req.file('file').upload({maxBytes:100000000}, function(err, files) {
+      if (err) {
+        sails.log.error(err);
+        return res.send(400, "Error uploading file.");
+      }
+      // copy the file(s) to the target directory...
+      sails.log.debug("Receiving files, number: " + files.length);
+      for (var i=0; i<files.length; i++) {
+          try {
+            fs.renameSync(files[i].fd, absFilePath);
+            fs.chmod(absFilePath, 0775);
+          } catch (err) {
+            sails.log.error("Error moving file to " + absFilePath + ": " + err);
+            return res.send(400, "Error moving file to target directory:" + err);
+          }
+      }
+      return res.json({
+        message: files.length + " file(s) uploaded successfully",
+        files: files
+      });
+    });
   }
 };
 

@@ -80,11 +80,14 @@ angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap', 'r
 }])
 .factory('modalDiag', [ 'ModalService','$rootScope', function(ModalService, $rootScope) {
   return {
-    showModal: function(templateUrl, backdrop, cb) {
-        ModalService.showModal({
+    showModal: function(templateUrl, backdrop, cb, trackingObj) {
+        return ModalService.showModal({
             templateUrl: templateUrl,
             controller: "ModalCtrl"
         }).then(function(modal) {
+            if (trackingObj) {
+              trackingObj.curModal = modal;
+            }
             modal.element.modal({backdrop:backdrop});
             modal.close.then(function(result) {
                 if (cb) cb(result);
