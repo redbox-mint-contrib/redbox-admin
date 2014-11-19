@@ -102,10 +102,10 @@ module.exports = {
                 spectrumOptions:{
                 chooseText:"Select", 
                 cancelText:"Cancel",  
-                showAlpha: true, 
                 showInitial: true,
                 showPalette: true,
                 showSelectionPalette: true,
+                showInput:true,
                }
               },
               { key:"@title-background-colour", 
@@ -114,10 +114,10 @@ module.exports = {
                 spectrumOptions:{
                 chooseText:"Select", 
                 cancelText:"Cancel",  
-                showAlpha: true, 
                 showInitial: true,
                 showPalette: true,
                 showSelectionPalette: true,
+                showInput:true,
                }
               },
               { key:"@menu-background-colour", 
@@ -126,10 +126,10 @@ module.exports = {
                 spectrumOptions:{
                 chooseText:"Select", 
                 cancelText:"Cancel",  
-                showAlpha: true, 
                 showInitial: true,
                 showPalette: true,
                 showSelectionPalette: true,
+                showInput:true,
                }
               },
             ]},{source:"mainLogo", title:"Main Logo", form:[{type:"img",modelVar:"imgPath"}]}]

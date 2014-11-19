@@ -280,7 +280,9 @@ module.exports = {
         target[field] = data;
       }
       if (rawdata) target[field+'_raw'] = rawdata;
-      if (cb) cb();
+      if (cb) { 
+        cb();
+      }
     };
     sails.log.debug("Attempting to load: " + path);
     if (path) {
@@ -444,6 +446,13 @@ module.exports = {
         }
       };
     };
+    var readSysFiles = function(keyConfig, cb) {
+      sails.controllers.config.readFile(keyConfig.schemaPath, true, keyConfig, 'schemaData', function() {
+        sails.controllers.config.readFile(keyConfig.srcPath, true, keyConfig, 'srcData', function() {
+          cb();
+        });
+      });
+    };
     var dataCbInst = jsonDataCb(cmd.sysConfig[cmd.configType][cmd.key].subsections.length);
     cmd.subsectionLen = cmd.sysConfig[cmd.configType][cmd.key].subsections.length;
     for (var i=0; i<cmd.subsectionLen; i++) {
@@ -454,8 +463,8 @@ module.exports = {
       keyConfig.srcConfig = cmd.sysConfig.source[keyConfig.source];
       keyConfig.sysType = cmd.sysType;
       cmd.keyConfigs[keyConfig.source] = keyConfig;
-      sails.controllers.config.readFile(keyConfig.schemaPath, true, keyConfig, 'schemaData', dataCbInst(keyConfig));
-      sails.controllers.config.readFile(keyConfig.srcPath, true, keyConfig, 'srcData', dataCbInst(keyConfig));
+      // read the schema then the data
+      readSysFiles(keyConfig, dataCbInst(keyConfig));
     }
   },
   /**
