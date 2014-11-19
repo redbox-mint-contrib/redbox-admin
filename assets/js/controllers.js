@@ -362,6 +362,8 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
           } else {
             restartDiagFn();
           }
+        } else {
+          restartDiagFn();
         }
       }, function() {
         console.log("Error saving");
