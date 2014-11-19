@@ -419,23 +419,44 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
 	  
   }])
     .controller('HarvesterSummaryCtrl',  [ '$scope', '$http', '$upload', '$resource', 'redboxConfig','authService', '$route', 'modalDiag', 'paginator', '$location', function($scope, $http, $upload, $resource, redboxConfig, authService, $route, modalDiag, paginator, $location ) {
-    	var hrid = $route.current.params.hrid;
+      var hrid = $route.current.params.hrid;
 	  var self = this;
-	  self.harvestEvents = {};
-	  self.logCount = 0;
+	  self.harvestFailedEvents = {};
+	  self.harvestRecsProcessed = 0;
+	  self.harvestRecsSucess = 0;
+	  self.harvestRecsFailed = 0;
 	  
-	  self.getHarvesterSummary = function(action){
-		  paginator.doPage(action);
-		  return $http.get('/redbox-admin/logview/harvester/summary/' + hrid + '/' + paginator.getLogFrom()).then(
+	  self.getTotalRecords = function(action){
+		  return $http.get('/redbox-admin/logview/harvester/summary/totalrecs/' + hrid).then(
 			 function(response){
-				 self.harvestEvents = response.data.logData;
-				 paginator.setLogCount(response.data.count);
-				 self.logCount = paginator.getLogCount();
+				 self.harvestRecsProcessed = response.data.count;
 			 } 
 		  );
 	  };
 	  
-	  self.getHarvesterSummary();
+	  self.getSuccessEvents = function(action){
+		  paginator.doPage(action);
+		  return $http.get('/redbox-admin/logview/harvester/summary/success/count/' + hrid).then(
+			 function(response){
+				 self.harvestRecsSucess = response.data.count;
+			 } 
+		  );
+	  };
+	  
+	  self.getFailedEvents = function(action){
+		  paginator.doPage(action);
+		  return $http.get('/redbox-admin/logview/harvester/summary/fail/data/' + hrid + '/' + paginator.getLogFrom()).then(
+			 function(response){
+				 self.harvestFailedEvents = response.data.logData;
+				 paginator.setLogCount(response.data.count);
+				 self.harvestRecsFailed = paginator.getLogCount();
+			 } 
+		  );
+	  };
+	  
+	  self.getTotalRecords();
+	  self.getSuccessEvents();
+	  self.getFailedEvents();
 	  
   }])
   

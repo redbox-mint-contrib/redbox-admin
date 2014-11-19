@@ -68,6 +68,7 @@ module.exports.routes = {
   'GET /redbox-admin/logview/get/:logFile/:evt/:from' : 'logviewController.get',
   'GET /redbox-admin/logview/harvester/list' : 'logviewController.harvesterList',
   'GET /redbox-admin/logview/harvester/list/:from' : 'logviewController.harvesterList',
-  'GET /redbox-admin/logview/harvester/summary/:hrid' : 'logviewController.harvesterSummary',
-  'GET /redbox-admin/logview/harvester/summary/:hrid/:from' : 'logviewController.harvesterSummary',
+  'GET /redbox-admin/logview/harvester/summary/:procEvt/:qryType/:hrid' : 'logviewController.harvesterSummary',
+  'GET /redbox-admin/logview/harvester/summary/:procEvt/:qryType/:hrid/:from' : 'logviewController.harvesterSummary',
+  'GET /redbox-admin/logview/harvester/summary/totalrecs/:hrid' : 'logviewController.harvesterTotalRecords',
 };
