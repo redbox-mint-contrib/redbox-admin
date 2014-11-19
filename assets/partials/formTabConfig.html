@@ -14,7 +14,7 @@
             <h1 class="page-header">Edit stages of <a ng-href="#/formBuilder/{{formConf}}">{{formConf}}</a></h1>
             <p>divs are building blocks. They can be turned into tabs or other display types.</p>
 
-            <form sf-schema="schema" sf-form="form" sf-model="model"></form>
+            <form name="formBuilder" sf-schema="schema" sf-form="form" sf-model="model" ng-submit="onSubmit(formBuilder)"></form>
 
         </div>
     </div>
