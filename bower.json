@@ -18,7 +18,8 @@
     "angular-bootstrap": "~0.11.0",
     "angular-schema-form": "~0.7.3",
     "angular-modal-service": "~0.3.0",
-    "angular-schema-form-colorpicker": "~0.1.0"
+    "angular-schema-form-colorpicker": "~0.1.0",
+    "elasticsearch": "~2.4.0"
   },
   "resolutions": {
     "angular": "1.3.0-rc.4"
