@@ -363,18 +363,30 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
       });
     };
   }])
-.controller('FormTabConfigCtrl', ['$resource', '$scope', '$routeParams',
-  function ($resource, $scope, $routeParams) {
+.controller('FormTabConfigCtrl', ['$resource', '$scope', '$routeParams', function ($resource, $scope, $routeParams) {
     console.log($routeParams);
+
+    var supportedComponents; //Used for conditional display
+    function prepareCTypes(field) {
+      // prepare configs for component types in form
+      for (var i=0, l=supportedComponents.length; i < l; i++) {
+        field.push({"type":"conditional",
+                    "condition":"getComponentType(model,arrayIndex) == '" + supportedComponents[i] + "'",
+                    "items":["divs[][fields][][component-confs][" + supportedComponents[i] + "]"]
+                   });
+      }
+      return field;
+    }
+
     var controller = $resource('/redbox-admin/formBuilder/:formConf/:stage');
-    controller.get({
-      formConf: $routeParams.formConf,
-      stage: $routeParams.stage
-    }, function (formDetails) {
+    controller.get({formConf: $routeParams.formConf, stage: $routeParams.stage}, function (formDetails) {
       $scope.formConf = $routeParams.formConf;
       $scope.schema = formDetails.schema;
       $scope.model = formDetails.model;
-      $scope.componentSchemas = formDetails.componentSchemas;
+      supportedComponents = formDetails.supportedComponents;
+//      console.log(JSON.stringify(supportedComponents));
+      $scope.form[0]['items'][1]['items'] = prepareCTypes($scope.form[0]['items'][1]['items']);
+//      console.log(JSON.stringify($scope.schema));
     });
     var regActiveTabIndexIndex = /.+(\d)/;
     $scope.divIndex = 0;
@@ -384,10 +396,13 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
       $scope.divIndex = regActiveTabIndexIndex.exec(activeTab)[1];
       if (typeof $scope.divIndex === 'undefined') { $scope.divIndex = 0; }
       try {
-        return $scope.model['divs'][$scope.divIndex]['fields'][arrayIndex]['component-type'];
+        if (supportedComponents.indexOf($scope.model['divs'][$scope.divIndex]['fields'][arrayIndex]['component-type']) >= 0) {
+            return $scope.model['divs'][$scope.divIndex]['fields'][arrayIndex]['component-type'];
+        } else {
+            return 'notsuppored';
+        }
       } catch (e) {}
     };
-    $scope.fieldTypes = {};
     $scope.form = [
       {
         type: "tabarray",
@@ -409,27 +424,17 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
             items: [
               "divs[][fields][][field-name]",
               {
-                key: "divs[][fields][][component-type]",
+                key: "divs[][fields][][component-type]"
               },
+// more conditions are built/appended on fly
               {
                 type: "conditional",
-                condition: "getComponentType(model,arrayIndex) == 'simple'",
+                condition: "getComponentType(model,arrayIndex) == 'notsuppored'",
                 items: [
-                  "divs[][fields][][component-type-fly][simple]"
-                ]
-              },
-              {
-                type: "conditional",
-                condition: "getComponentType(model,arrayIndex) == 'textarea'",
-                items: [
-                  "divs[][fields][][component-type-fly][textarea]"
-                ]
-              },
-              {
-                type: "conditional",
-                condition: "getComponentType(model,arrayIndex) == 'complex'",
-                items: [
-                  "divs[][fields][][component-type-fly][complex]",
+                  {
+                    type: "help",
+                    helpvalue: "<h4>No config is availabe at this time. Please ask Andrew if you need it.</h4>"
+                  }
                 ]
               }
              ]
