@@ -102,7 +102,6 @@ module.exports = {
                 spectrumOptions:{
                 chooseText:"Select", 
                 cancelText:"Cancel",  
-                showAlpha: true, 
                 showInitial: true,
                 showPalette: true,
                 showSelectionPalette: true,
@@ -115,7 +114,6 @@ module.exports = {
                 spectrumOptions:{
                 chooseText:"Select", 
                 cancelText:"Cancel",  
-                showAlpha: true, 
                 showInitial: true,
                 showPalette: true,
                 showSelectionPalette: true,
@@ -128,7 +126,6 @@ module.exports = {
                 spectrumOptions:{
                 chooseText:"Select", 
                 cancelText:"Cancel",  
-                showAlpha: true, 
                 showInitial: true,
                 showPalette: true,
                 showSelectionPalette: true,
