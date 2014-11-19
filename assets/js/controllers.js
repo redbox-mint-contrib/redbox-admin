@@ -382,7 +382,29 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
     controller.get({formConf: $routeParams.formConf, stage: $routeParams.stage}, function (formDetails) {
       $scope.formConf = $routeParams.formConf;
       $scope.schema = formDetails.schema;
-      $scope.model = formDetails.model;
+      var model = formDetails.model;
+     // transformModelForForm
+        for(var divIndex=0; divIndex < model.divs.length; divIndex++) {
+            var div = model.divs[divIndex];
+            for(var fieldIndex = 0; fieldIndex < div.fields.length; fieldIndex++) {
+                var field = div.fields[fieldIndex];
+                var componentType = field['component-type'];
+                var componentTypeProperties = {};
+                for(var fieldKey in field) {
+                    if(fieldKey != 'component-type' && fieldKey !='field-name') {
+                        componentTypeProperties[fieldKey] = field[fieldKey];
+                    }
+                }
+//                componentTypeProperties['label'] = 'See its working Li';
+                field['component-confs'] = {};
+                field['component-confs'][componentType] = componentTypeProperties;
+                model.divs[divIndex].fields[fieldIndex] = field;
+            }
+
+        }
+
+      $scope.model = model;
+
       supportedComponents = formDetails.supportedComponents;
 //      console.log(JSON.stringify(supportedComponents));
       $scope.form[0]['items'][1]['items'] = prepareCTypes($scope.form[0]['items'][1]['items']);
@@ -393,7 +415,11 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
     $scope.getComponentType = function(model, arrayIndex) {
       //Get the current component type for conditonal display
       var activeTab = $('li.ng-scope.active')[0].innerHTML;
-      $scope.divIndex = regActiveTabIndexIndex.exec(activeTab)[1];
+      try {
+        $scope.divIndex = regActiveTabIndexIndex.exec(activeTab)[1];
+      } catch (e) { // might by sily updating causing problem
+      }
+
       if (typeof $scope.divIndex === 'undefined') { $scope.divIndex = 0; }
       try {
         if (supportedComponents.indexOf($scope.model['divs'][$scope.divIndex]['fields'][arrayIndex]['component-type']) >= 0) {
@@ -403,11 +429,44 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
         }
       } catch (e) {}
     };
+     $scope.onSubmit = function(form) {
+//        // First we broadcast an event so all fields validate themselves
+        $scope.$broadcast('schemaFormValidate');
+//
+//        // Then we check if the form is valid
+        if (form.$valid) {
+//          // ... do whatever you need to do with your data.
+            var r = confirm("Existing form configuration will be overwritten. Do you want to continue?");
+            if (r) {
+                alert("The file will be saved to somewhere.")
+                        //************************************TODO: Move this into save
+//                        var newModel = model;
+//    for(var divIndex=0; divIndex < model.divs.length; divIndex++) {
+//            var div = model.divs[divIndex];
+//            for(var fieldIndex = 0; fieldIndex < div.fields.length; fieldIndex++) {
+//                var field = div.fields[fieldIndex];
+//                var componentType = field['component-type'];
+//                var configuration = field['component-confs'][componentType];
+//                for(var fieldKey in configuration) {
+//                    field[fieldKey] = configuration[fieldKey];
+//                }
+//                delete field['component-confs'];
+//                newModel.divs[divIndex].fields[fieldIndex] = field;
+//
+//            }
+//
+//        }
+//        console.log(newModel);
+        //************************************TODO: Move this into save
+
+            }
+        }
+    };
     $scope.form = [
       {
         type: "tabarray",
         tabType: "top",
-        title: "value.heading || ('div '+ $index)",
+        title: "($index +', ' + value.heading)",
         key: "divs",
         add: "Add a div",
         onChange: function (form, modelValue) {
