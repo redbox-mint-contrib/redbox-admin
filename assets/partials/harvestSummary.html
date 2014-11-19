@@ -29,20 +29,21 @@
     	<button class="btn btn-primary" ng-click="hrvSumryctrl.getFailedEvents('prev')">Previous</button>
     	<button class="btn btn-primary" ng-click="hrvSumryctrl.getFailedEvents('last')">Last</button>
     </div>
+    <h4>Failed Records</h4>
     <table class="table table-hover">
     	<tr>
     		<th>Timestamp</th>
-    		<th>hid</th>
-    		<th>hrid</th>
-    		<th>oid</th>
-    		<th>harvesterId</th>
+    		<th>Record Id</th>
+    		<th>Harvested</th>
+    		<th>Validated</th>
+    		<th>Transformed</th>
     	</tr>
     	<tr ng-repeat="harvestEvent in hrvSumryctrl.harvestFailedEvents">
     		<td>{{harvestEvent._source.logts}}</td>
-    		<td>{{harvestEvent._source.hid}}</td>
-    		<td>{{harvestEvent._source.hrid}}</td>
     		<td>{{harvestEvent._source.oid}}</td>
-    		<td>{{harvestEvent._source.harvesterId}}</td>
+    		<td>{{harvestEvent._source.harvested | prettyBool}}</td>
+    		<td>{{harvestEvent._source.valid | prettyBool}}</td>
+    		<td>{{harvestEvent._source.transformed | prettyBool}}</td>
     	</tr>
 
     </table>
