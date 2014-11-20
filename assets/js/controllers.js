@@ -364,7 +364,9 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
     };
   }])
 .controller('FormTabConfigCtrl', ['$resource', '$scope', '$routeParams', function ($resource, $scope, $routeParams) {
-    console.log($routeParams);
+//    console.log($routeParams);
+    var conf = $routeParams.formConf;
+    var stage = $routeParams.stage;
 
     var supportedComponents; //Used for conditional display
     function prepareCTypes(field) {
@@ -379,7 +381,7 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
     }
 
     var controller = $resource('/redbox-admin/formBuilder/:formConf/:stage');
-    controller.get({formConf: $routeParams.formConf, stage: $routeParams.stage}, function (formDetails) {
+    controller.get({formConf: conf, stage: stage}, function (formDetails) {
       $scope.formConf = $routeParams.formConf;
       $scope.schema = formDetails.schema;
       var model = formDetails.model;
@@ -430,37 +432,40 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
       } catch (e) {}
     };
      $scope.onSubmit = function(form) {
-//        // First we broadcast an event so all fields validate themselves
-        $scope.$broadcast('schemaFormValidate');
-//
-//        // Then we check if the form is valid
-        if (form.$valid) {
-//          // ... do whatever you need to do with your data.
-            var r = confirm("Existing form configuration will be overwritten. Do you want to continue?");
-            if (r) {
-                alert("The file will be saved to somewhere.")
-                        //************************************TODO: Move this into save
-//                        var newModel = model;
-//    for(var divIndex=0; divIndex < model.divs.length; divIndex++) {
-//            var div = model.divs[divIndex];
-//            for(var fieldIndex = 0; fieldIndex < div.fields.length; fieldIndex++) {
-//                var field = div.fields[fieldIndex];
-//                var componentType = field['component-type'];
-//                var configuration = field['component-confs'][componentType];
-//                for(var fieldKey in configuration) {
-//                    field[fieldKey] = configuration[fieldKey];
-//                }
-//                delete field['component-confs'];
-//                newModel.divs[divIndex].fields[fieldIndex] = field;
+       var model = JSON.parse(JSON.stringify($scope.model));
+       for(var divIndex=0; divIndex < model.divs.length; divIndex++) {
+         var div = model.divs[divIndex];
+         for(var fieldIndex = 0; fieldIndex < div.fields.length; fieldIndex++) {
+           var field = div.fields[fieldIndex];
+           var componentType = field['component-type'];
+           var configuration = field['component-confs'][componentType];
+           for(var fieldKey in configuration) {
+             field[fieldKey] = configuration[fieldKey];
+           }
+           delete field['component-confs'];
+           model.divs[divIndex].fields[fieldIndex] = field;
+         }
+       }
+
+       console.log(model);
+       var controller = $resource('/redbox-admin/formBuilder/:fileName/:stage');
+       controller.save({fileName: conf, stage: stage}, model, function (res) { alert(JSON.stringify(res)); });
+       return;
+
+       //        // First we broadcast an event so all fields validate themselves
+//        $scope.$broadcast('schemaFormValidate');
+////
+////        // Then we check if the form is valid
+//        if (form.$valid) {
+////          // ... do whatever you need to do with your data.
+//            var r = confirm("Existing form configuration will be overwritten. Do you want to continue?");
+//            if (r) {
+//                alert("The file will be saved to somewhere.")
+//        //************************************TODO: Move above save to here
+//        //************************************TODO: End of Move
 //
 //            }
-//
 //        }
-//        console.log(newModel);
-        //************************************TODO: Move this into save
-
-            }
-        }
     };
     $scope.form = [
       {

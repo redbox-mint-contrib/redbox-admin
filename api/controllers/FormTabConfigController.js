@@ -82,5 +82,23 @@ module.exports = {
             components['debug'] = {"type": "object", "properties": { content: { type: 'string'} } };
         }
         return {confs: components, types: types};
-    }
+    },
+  write:function(req, res) {
+//    posted req.body is a stage
+      console.log(req.params);
+      var confName = req.param("fileName");
+      var stage = req.param("stage");
+//      console.log("Saving to " + req.body + " to " + confName);
+
+      var fs = require('fs');
+//      // TODO: need to load conf, then replace this stage.
+//      conf[stage] = req.body;
+//      fs.writeFile(confName, JSON.stringify(req.body), function (err) {
+      fs.writeFile(confName, JSON.stringify(req.body), function (err) {
+          if (err) {
+              console.error("Faile to save form definition file");
+              res.send(400, "Failed to save.");
+          } else { res.send(200); }
+      });
+  }
 };
