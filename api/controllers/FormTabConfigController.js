@@ -2,10 +2,6 @@ module.exports = {
     formConfsPath : sails.config.instance['redbox'].installPath + "home/form-configuration/",
     componentConfsPath : sails.config.instance['redbox'].installPath + '/portal/default/default/form-components/field-elements/',
     get: function(req, res) {
-//        // should be using this?
-//        var sysConfig = sails.config.sysconfig;
-//        console.log("Can we see the value of sysconfig?");
-//        console.log(sysConfig);
         var loaded = {
             schema: {},
             model: {},
@@ -30,9 +26,6 @@ module.exports = {
         res.send(loaded);
     },
     loadStage: function(confName, stage) {
-        // read from config to find out what is what
-        var sysConfig = sails.config.sysconfig;
-        console.log("loading from " + confName);
         var fs = require('fs');
         var obj = JSON.parse(fs.readFileSync(module.exports.formConfsPath + confName));
 
@@ -57,7 +50,7 @@ module.exports = {
         }
     },
     loadComponentSchemas: function(componentConfsPath) {
-        console.log("Sending list of component shcemas");
+//        console.log("Sending list of component shcemas");
         var components = {}, types = ['debug'];
         var fs = require('fs');
         var schemaFiles = fs.readdirSync(componentConfsPath);
@@ -86,13 +79,11 @@ module.exports = {
       console.log(req.params);
       var confName = req.param("fileName");
       var stage = req.param("stage");
-//      console.log("Saving to " + req.body + " to " + confName);
 
       var fs = require('fs');
-//      // TODO: need to load conf, then replace this stage.
-//      conf[stage] = req.body;
-//      fs.writeFile(confName, JSON.stringify(req.body), function (err) {
-      fs.writeFile(confName, JSON.stringify(req.body), function (err) {
+      var conf = JSON.parse(fs.readFileSync(module.exports.formConfsPath + confName));
+      conf['stages'][stage] = req.body;
+      fs.writeFile(confName, JSON.stringify(conf), function (err) {
           if (err) {
               console.error("Faile to save form definition file");
               res.send(400, "Failed to save.");
