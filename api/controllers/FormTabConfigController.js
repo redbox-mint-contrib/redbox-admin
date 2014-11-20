@@ -1,8 +1,7 @@
 module.exports = {
-    formConfsPath : "/opt/redbox/home/form-configuration/",
-    componentConfsPath : "/opt/redbox/portal/default/default/form-components/field-elements/",
+    formConfsPath : sails.config.instance['redbox'].installPath + "home/form-configuration/",
+    componentConfsPath : sails.config.instance['redbox'].installPath + '/portal/default/default/form-components/field-elements/',
     get: function(req, res) {
-        console.warn("Fix path for formConfsPath: " + module.exports.formConfsPath);
 //        // should be using this?
 //        var sysConfig = sails.config.sysconfig;
 //        console.log("Can we see the value of sysconfig?");
@@ -100,5 +99,28 @@ module.exports = {
               res.send(400, "Failed to save.");
           } else { res.send(200); }
       });
+  },
+  findFormElements: function() {
+      var fs = require('fs');
+      var rootPath = sails.config.instance['redbox'].installPath + 'portal/';
+      var portalDirs = fs.readdirSync(rootPath);
+      for(var i = 0; i < portalDirs.length; i++) {
+          var dirName = rootPath + portalDirs[i];
+          if(fs.statSync(dirName).isDirectory()) {
+              var subPortalDirs = fs.readdirSync(dirName);
+              for(var j=0; j < subPortalDirs.length; j++) {
+                   var subDirName = dirName + '/' + subPortalDirs[j];
+                   if(fs.statSync(subDirName).isDirectory()) {
+                       if (fs.existsSync(subDirName + '/form-components/field-elements')) {
+                            //get listing and add it to array to return
+                           var schemaFiles = fs.readdirSync(module.exports.componentConfsPath);
+                           console.log(schemaFiles);
+                        } else {
+                            console.log(subDirName + " does not have field-elements");
+                        }
+                    }
+              }
+          }
+      }
   }
 };
