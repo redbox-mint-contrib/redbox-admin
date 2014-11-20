@@ -16,10 +16,10 @@ module.exports = {
         var stage = req.param("stage");
         loaded.model = module.exports.loadStage(confName,stage);
         loaded.schema = module.exports.loadSchema(module.exports.formConfsPath + "arms_form-schema_stage.json");
-        var components = module.exports.loadComponentSchemas();
+        var components = module.exports.findComponents();
 //        console.log(JSON.stringify(components));
         loaded.schema['properties']['divs']['items']['properties']['fields']['items']['properties']['component-confs']['properties'] = components['confs'];
-        loaded.schema['properties']['divs']['items']['properties']['fields']['items']['properties']['component-type']['enum'] = components['types'];
+        loaded.schema['properties']['divs']['items']['properties']['fields']['items']['properties']['component-type']['enum'] = components['types'].sort();
         // Use for building conditions in a convenient and light-weight way in terms of client
         for (var k in components['confs']) {
             loaded.supportedComponents.push(k);
@@ -56,12 +56,11 @@ module.exports = {
             return {};
         }
     },
-    loadComponentSchemas: function() {
+    loadComponentSchemas: function(componentConfsPath) {
         console.log("Sending list of component shcemas");
-        console.warn("Fix path for formConfsPath: " + module.exports.formConfsPath);
         var components = {}, types = ['debug'];
         var fs = require('fs');
-        var schemaFiles = fs.readdirSync(module.exports.componentConfsPath);
+        var schemaFiles = fs.readdirSync(componentConfsPath);
         schemaFiles.sort();
         for (var i = 0; i < schemaFiles.length; i++) {
             var filePath = schemaFiles[i];
@@ -100,10 +99,13 @@ module.exports = {
           } else { res.send(200); }
       });
   },
-  findFormElements: function() {
+  findComponents: function() {
       var fs = require('fs');
       var rootPath = sails.config.instance['redbox'].installPath + 'portal/';
       var portalDirs = fs.readdirSync(rootPath);
+
+      var components = {confs:{}, types: []};
+
       for(var i = 0; i < portalDirs.length; i++) {
           var dirName = rootPath + portalDirs[i];
           if(fs.statSync(dirName).isDirectory()) {
@@ -112,15 +114,22 @@ module.exports = {
                    var subDirName = dirName + '/' + subPortalDirs[j];
                    if(fs.statSync(subDirName).isDirectory()) {
                        if (fs.existsSync(subDirName + '/form-components/field-elements')) {
-                            //get listing and add it to array to return
-                           var schemaFiles = fs.readdirSync(module.exports.componentConfsPath);
-                           console.log(schemaFiles);
-                        } else {
-                            console.log(subDirName + " does not have field-elements");
+//                           var schemaFiles = fs.readdirSync(subDirName + '/form-components/field-elements');
+//                           console.log(schemaFiles);
+                           var cLists = module.exports.loadComponentSchemas(subDirName + '/form-components/field-elements');
+                           for (var k in cLists['confs']) {
+                              components['confs'][k] = cLists['confs'][k];
+                           }
+                           components['types'] = components['types'].concat(cLists['types']);
                         }
+//                        else {
+//                            console.log(subDirName + " does not have field-elements");
+//                        }
                     }
               }
           }
       }
+//      console.log(JSON.stringify(components));
+      return components;
   }
 };
