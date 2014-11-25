@@ -18,9 +18,10 @@
     	<button class="btn btn-primary" ng-click="hrvLstctrl.getharvesterList('last')">Last</button>
     </div>
     <table class="table table-hover">
+      <thead><th>Harvest Run Date</th><th>Record Type</th>
     	<tr ng-repeat="harvestRun in hrvLstctrl.harvestRuns">
     		<td><a ng-href="/redbox-admin/#/harvester/summary/{{harvestRun._source.hrid_start}}">{{harvestRun._source.logts}}</a></td>
+        <td>{{harvestRun._source.harvest_data_type}}</td>
     	</tr>
     </table>
 </div>
-
