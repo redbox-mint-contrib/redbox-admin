@@ -314,21 +314,16 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
       close(result, 500); // close, but give 500ms for bootstrap to animate
    };
   }])
-.controller('FormBuilderCtrl', ['$scope', '$routeParams', '$location', 'authService', '$http', '$resource', function($scope, $routeParams, $location, authService, $http, $resource) {
-    //~ var formBuilderController = $resource('/redbox-admin/formBuilder');
+.controller('FormBuilderCtrl', ['$scope', '$resource', function($scope, $resource) {
     var formBuilderController = $resource('/redbox-admin/formBuilder');
     var list = formBuilderController.get({}, function(){
-            //~ console.log(list);
             $scope.confs = list.flist;
     });
   }])
-.controller('FormBuilderStagesCtrl', ['$scope', '$routeParams', '$location', 'authService', '$http', '$resource', function($scope, $routeParams, $location, authService, $http, $resource) {
+.controller('FormBuilderStagesCtrl', ['$scope', '$resource', '$routeParams', function($scope, $resource, $routeParams) {
     console.log("What do we know?");
     console.log($scope);
     console.log($routeParams);
-    console.log($location);
-    console.log(authService);
-    console.log($http);
     console.log($resource);
     var conf = $routeParams.formConf;
     var stage = $routeParams.stage;
@@ -373,7 +368,7 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
             $scope.stages = list.stages;
     });
   }])
-.controller('FormTabConfigCtrl', ['$resource', '$scope', '$routeParams', 'modalDiag', function ($resource, $scope, $routeParams, modalDiag) {
+.controller('FormBuilderStageSecCtrl', ['$scope', '$resource', '$routeParams', 'modalDiag', function ($scope, $resource, $routeParams, modalDiag) {
 //    console.log($routeParams);
     var conf = $routeParams.formConf;
     var stage = $routeParams.stage;

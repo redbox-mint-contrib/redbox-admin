@@ -21,8 +21,7 @@ angular.module('redboxAdmin', [
   $routeProvider.when('/config/:sysType/:id', {templateUrl: 'partials/config.html', controller: 'ConfigCtrl'});
   $routeProvider.when('/formBuilder', {templateUrl: 'partials/formConfs.html', controller: 'FormBuilderCtrl'});
   $routeProvider.when('/formBuilder/:formConf', {templateUrl: 'partials/formBuilder.html', controller: 'FormBuilderStagesCtrl'});
-  //$routeProvider.when('/formBuilder/:formConf/:stage', {templateUrl: 'partials/formBuilder.html', controller: 'FormBuilderStagesCtrl'});
-  $routeProvider.when('/formBuilder/:formConf/:stage', {templateUrl: 'partials/formTabConfig.html', controller: 'FormTabConfigCtrl'});
+  $routeProvider.when('/formBuilder/:formConf/:stage', {templateUrl: 'partials/formTabConfig.html', controller: 'FormBuilderStageSecCtrl'});
   $routeProvider.otherwise({redirectTo: '/'});
 }])
 .config(['$httpProvider', function($httpProvider) {
