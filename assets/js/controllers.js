@@ -13,65 +13,6 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
 // -----------------------------------------------------------
 .controller('IndexCtrl', ['$scope', '$routeParams', '$location', 'authService', '$http', '$resource', function($scope, $routeParams, $location, authService, $http, $resource) {
   }])
-.controller('FormBuilderCtrl', ['$scope', '$routeParams', '$location', 'authService', '$http', '$resource', function($scope, $routeParams, $location, authService, $http, $resource) {
-    //~ var formBuilderController = $resource('/redbox-admin/formBuilder');
-    var formBuilderController = $resource('/redbox-admin/formBuilder');
-    var list = formBuilderController.get({}, function(){
-            //~ console.log(list);
-            $scope.confs = list.flist;
-    });
-  }])
-.controller('FormBuilderStagesCtrl', ['$scope', '$routeParams', '$location', 'authService', '$http', '$resource', function($scope, $routeParams, $location, authService, $http, $resource) {
-    console.log("What do we know?");
-    console.log($scope);
-    console.log($routeParams);
-    console.log($location);
-    console.log(authService);
-    console.log($http);
-    console.log($resource);
-    var conf = $routeParams.formConf;
-    var stage = $routeParams.stage;
-//    if (stage != null) {
-//        console.log("We should show editing UI for a stage");
-//        var Config = $resource('/redbox-admin/config/section/:sysType/:sectionName');
-//        Config.get({sysType:'arms',sectionName:'divs_tabarry'}, function(rbSection) {
-//            console.log("See what have hajacked?");
-//            console.log(rbSection);
-//          });
-//    } else {
-//        console.log("Waiting for pickup a stage");
-//    }
-    $scope.addStage = function(stage) {
-        console.debug("Adding " + stage.newEntry);
-        //~ var controller = $resource('/redbox-admin/formBuilder/:file/:stage');
-        //~ controller.get({file:'xxx',stage:'sss'},function(updated) { console.log("We are back"); console.log(updated)});
-        //~ controller.save({file:'xxx',stage:'sss'},{some:"value"},function(updated) { console.log("We are back"); console.log(updated)});
-        var controller = $resource('/redbox-admin/formBuilder/:file/:stage',null,{addStage:{method: 'PUT'}});
-        controller.addStage({file:conf,stage:stage.newEntry},null,function(updated) {
-            console.log("We are back");
-            console.log(updated.stages);
-            $scope.stages = updated.stages;
-            });
-    };
-    $scope.removeStage = function(stage) {
-        console.log(stage);
-        alert(stage);
-        var controller = $resource('/redbox-admin/formBuilder/:file/:stage');
-        controller.delete({file:conf,stage:stage},null,function(updated) {
-            console.log("Deteleted");
-            $scope.stages = updated.stages;
-            });
-    };
-
-    $scope.fileName= $routeParams.formConf;
-    //~ var formBuilderController = $resource('/redbox-admin/formBuilder');
-    var formBuilderController = $resource('/redbox-admin/formBuilder/:formConf');
-    var list = formBuilderController.get({formConf:$routeParams.formConf}, function(){
-            //~ console.log(list);
-            $scope.formConf = conf;
-            $scope.stages = list.stages;
-    });
-  }])
 // -----------------------------------------------------------
 // InstanceCtrl
 //  - controls RB/Mint instance
@@ -363,6 +304,75 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
       });
     };
   }])
+// -----------------------------------------------------------
+// ModalCtrl
+// - Simple controller for modal dialog in the application.
+// -----------------------------------------------------------
+  .controller('ModalCtrl',  [ '$scope','close', function($scope, close) {
+   $scope.currentSysType = "ReDBox";
+   $scope.close = function(result) {
+      close(result, 500); // close, but give 500ms for bootstrap to animate
+   };
+  }])
+.controller('FormBuilderCtrl', ['$scope', '$routeParams', '$location', 'authService', '$http', '$resource', function($scope, $routeParams, $location, authService, $http, $resource) {
+    //~ var formBuilderController = $resource('/redbox-admin/formBuilder');
+    var formBuilderController = $resource('/redbox-admin/formBuilder');
+    var list = formBuilderController.get({}, function(){
+            //~ console.log(list);
+            $scope.confs = list.flist;
+    });
+  }])
+.controller('FormBuilderStagesCtrl', ['$scope', '$routeParams', '$location', 'authService', '$http', '$resource', function($scope, $routeParams, $location, authService, $http, $resource) {
+    console.log("What do we know?");
+    console.log($scope);
+    console.log($routeParams);
+    console.log($location);
+    console.log(authService);
+    console.log($http);
+    console.log($resource);
+    var conf = $routeParams.formConf;
+    var stage = $routeParams.stage;
+//    if (stage != null) {
+//        console.log("We should show editing UI for a stage");
+//        var Config = $resource('/redbox-admin/config/section/:sysType/:sectionName');
+//        Config.get({sysType:'arms',sectionName:'divs_tabarry'}, function(rbSection) {
+//            console.log("See what have hajacked?");
+//            console.log(rbSection);
+//          });
+//    } else {
+//        console.log("Waiting for pickup a stage");
+//    }
+    $scope.addStage = function(stage) {
+        console.debug("Adding " + stage.newEntry);
+        //~ var controller = $resource('/redbox-admin/formBuilder/:file/:stage');
+        //~ controller.get({file:'xxx',stage:'sss'},function(updated) { console.log("We are back"); console.log(updated)});
+        //~ controller.save({file:'xxx',stage:'sss'},{some:"value"},function(updated) { console.log("We are back"); console.log(updated)});
+        var controller = $resource('/redbox-admin/formBuilder/:file/:stage',null,{addStage:{method: 'PUT'}});
+        controller.addStage({file:conf,stage:stage.newEntry},null,function(updated) {
+            console.log("We are back");
+            console.log(updated.stages);
+            $scope.stages = updated.stages;
+            });
+    };
+    $scope.removeStage = function(stage) {
+        console.log(stage);
+        alert(stage);
+        var controller = $resource('/redbox-admin/formBuilder/:file/:stage');
+        controller.delete({file:conf,stage:stage},null,function(updated) {
+            console.log("Deteleted");
+            $scope.stages = updated.stages;
+            });
+    };
+
+    $scope.fileName= $routeParams.formConf;
+    //~ var formBuilderController = $resource('/redbox-admin/formBuilder');
+    var formBuilderController = $resource('/redbox-admin/formBuilder/:formConf');
+    var list = formBuilderController.get({formConf:$routeParams.formConf}, function(){
+            //~ console.log(list);
+            $scope.formConf = conf;
+            $scope.stages = list.stages;
+    });
+  }])
 .controller('FormTabConfigCtrl', ['$resource', '$scope', '$routeParams', 'modalDiag', function ($resource, $scope, $routeParams, modalDiag) {
 //    console.log($routeParams);
     var conf = $routeParams.formConf;
@@ -527,14 +537,4 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
         title: "Save"
         }
     ];
-  }])
-// -----------------------------------------------------------
-// ModalCtrl
-// - Simple controller for modal dialog in the application.
-// -----------------------------------------------------------
-  .controller('ModalCtrl',  [ '$scope','close', function($scope, close) {
-   $scope.currentSysType = "ReDBox";
-   $scope.close = function(result) {
-      close(result, 500); // close, but give 500ms for bootstrap to animate
-   };
   }]);
