@@ -363,7 +363,7 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
       });
     };
   }])
-.controller('FormTabConfigCtrl', ['$resource', '$scope', '$routeParams', function ($resource, $scope, $routeParams) {
+.controller('FormTabConfigCtrl', ['$resource', '$scope', '$routeParams', 'modalDiag', function ($resource, $scope, $routeParams, modalDiag) {
 //    console.log($routeParams);
     var conf = $routeParams.formConf;
     var stage = $routeParams.stage;
@@ -395,6 +395,7 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
                 for(var fieldKey in field) {
                     if(fieldKey != 'component-type' && fieldKey !='field-name') {
                         componentTypeProperties[fieldKey] = field[fieldKey];
+                        delete model.divs[divIndex]['fields'][fieldIndex][fieldKey];
                     }
                 }
 //                componentTypeProperties['label'] = 'See its working Li';
@@ -432,25 +433,29 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
       } catch (e) {}
     };
      $scope.onSubmit = function(form) {
-       var model = JSON.parse(JSON.stringify($scope.model));
-       for(var divIndex=0; divIndex < model.divs.length; divIndex++) {
-         var div = model.divs[divIndex];
-         for(var fieldIndex = 0; fieldIndex < div.fields.length; fieldIndex++) {
-           var field = div.fields[fieldIndex];
-           var componentType = field['component-type'];
-           var configuration = field['component-confs'][componentType];
-           for(var fieldKey in configuration) {
-             field[fieldKey] = configuration[fieldKey];
-           }
-           delete field['component-confs'];
-           model.divs[divIndex].fields[fieldIndex] = field;
+       modalDiag.showModal('confirm.html', 'static', function(choice) {
+         if (choice == 'No') {
+           return;
          }
-       }
+         var model = JSON.parse(JSON.stringify($scope.model));
+         for(var divIndex=0; divIndex < model.divs.length; divIndex++) {
+           var div = model.divs[divIndex];
+           for(var fieldIndex = 0; fieldIndex < div.fields.length; fieldIndex++) {
+             var field = div.fields[fieldIndex];
+             var componentType = field['component-type'];
+             var configuration = field['component-confs'][componentType];
+             for(var fieldKey in configuration) {
+               field[fieldKey] = configuration[fieldKey];
+             }
+             delete field['component-confs'];
+             model.divs[divIndex].fields[fieldIndex] = field;
+           }
+         }
 
-       console.log(model);
-       var controller = $resource('/redbox-admin/formBuilder/:fileName/:stage');
-       controller.save({fileName: conf, stage: stage}, model, function (res) { alert(JSON.stringify(res)); });
-       return;
+         console.log(model);
+         var controller = $resource('/redbox-admin/formBuilder/:fileName/:stage');
+         controller.save({fileName: conf, stage: stage}, model, function (res) { alert(JSON.stringify(res)); });
+         return;
 
        //        // First we broadcast an event so all fields validate themselves
 //        $scope.$broadcast('schemaFormValidate');
@@ -466,6 +471,8 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
 //
 //            }
 //        }
+
+       });
     };
     $scope.form = [
       {
