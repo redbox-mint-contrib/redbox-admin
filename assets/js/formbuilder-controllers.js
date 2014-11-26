@@ -163,9 +163,15 @@ angular.module('redboxAdmin.controllers').controller('FormBuilderCtrl', ['$scope
               items: [
                 {
                   type: "help",
-                  helpvalue: "<h4>No config is availabe at this time. Please ask Andrew if you need it.</h4>"
+                  helpvalue: "<h4 class='alert alert-info' role='alert'>No configuration is availabe at this time.</h4>"
                 }
               ]
+            },
+            {
+              key: "divs[][fields][][properties]"
+            },
+            {
+              key: "divs[][fields][][validation]"
             }
           ]
         }
