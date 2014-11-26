@@ -33,100 +33,94 @@ angular.module('redboxAdmin.controllers').controller('FormBuilderCtrl', ['$scope
   };
 }])
 .controller('FormBuilderStageSecCtrl', ['$scope', '$resource', '$routeParams', 'modalDiag', function ($scope, $resource, $routeParams, modalDiag) {
-//    console.log($routeParams);
-    var conf = $routeParams.formConf;
-    var stage = $routeParams.stage;
+  var conf = $routeParams.formConf;
+  var stage = $routeParams.stage;
 
-    var supportedComponents; //Used for conditional display
-    function prepareCTypes(field) {
-      // prepare configs for component types in form
-      for (var i=0, l=supportedComponents.length; i < l; i++) {
-        field.push({"type":"conditional",
-                    "condition":"getComponentType(model,arrayIndex) == '" + supportedComponents[i] + "'",
-                    "items":["divs[][fields][][component-confs][" + supportedComponents[i] + "]"]
-                   });
+  var supportedComponents; //Used for conditional display
+  function prepareCTypes(field) {
+    // prepare configs for component types in form, called when form is being bulit
+    for (var i=0, l=supportedComponents.length; i < l; i++) {
+      field.push({"type":"conditional",
+                  "condition":"getComponentType(model,arrayIndex) == '" + supportedComponents[i] + "'",
+                  "items":["divs[][fields][][component-confs][" + supportedComponents[i] + "]"]
+                 });
+    }
+    return field;
+  }
+
+  var stageController = $resource('/redbox-admin/formBuilder/:formConf/:stage');
+
+  stageController.get({formConf: conf, stage: stage}, function (formDetails) {
+    $scope.formConf = $routeParams.formConf;
+    $scope.schema = formDetails.schema;
+    var model = formDetails.model;
+    // transformModelForForm
+    for(var divIndex=0; divIndex < model.divs.length; divIndex++) {
+      var div = model.divs[divIndex];
+      for(var fieldIndex = 0; fieldIndex < div.fields.length; fieldIndex++) {
+        var field = div.fields[fieldIndex];
+        var componentType = field['component-type'];
+        var componentTypeProperties = {};
+        for(var fieldKey in field) {
+          if(fieldKey != 'component-type' && fieldKey !='field-name') {
+            componentTypeProperties[fieldKey] = field[fieldKey];
+            delete model.divs[divIndex]['fields'][fieldIndex][fieldKey];
+          }
+        }
+        field['component-confs'] = {};
+        field['component-confs'][componentType] = componentTypeProperties;
+        model.divs[divIndex].fields[fieldIndex] = field;
       }
-      return field;
+
+    }
+    $scope.model = model;
+
+    supportedComponents = formDetails.supportedComponents;
+    $scope.form[0]['items'][1]['items'] = prepareCTypes($scope.form[0]['items'][1]['items']);
+  });
+
+  var regActiveTabIndexIndex = /.+(\d)/;
+  $scope.divIndex = 0;
+  $scope.getComponentType = function(model, arrayIndex) {
+    //Get the current component type for conditonal display
+    var activeTab = $('li.ng-scope.active')[0].innerHTML;
+    try {
+      $scope.divIndex = regActiveTabIndexIndex.exec(activeTab)[1];
+    } catch (e) { // might be the sily updating causing problem
     }
 
-    var controller = $resource('/redbox-admin/formBuilder/:formConf/:stage');
-    controller.get({formConf: conf, stage: stage}, function (formDetails) {
-      $scope.formConf = $routeParams.formConf;
-      $scope.schema = formDetails.schema;
-      var model = formDetails.model;
-     // transformModelForForm
-        for(var divIndex=0; divIndex < model.divs.length; divIndex++) {
-            var div = model.divs[divIndex];
-            for(var fieldIndex = 0; fieldIndex < div.fields.length; fieldIndex++) {
-                var field = div.fields[fieldIndex];
-                var componentType = field['component-type'];
-                var componentTypeProperties = {};
-                for(var fieldKey in field) {
-                    if(fieldKey != 'component-type' && fieldKey !='field-name') {
-                        componentTypeProperties[fieldKey] = field[fieldKey];
-                        delete model.divs[divIndex]['fields'][fieldIndex][fieldKey];
-                    }
-                }
-//                componentTypeProperties['label'] = 'See its working Li';
-                field['component-confs'] = {};
-                field['component-confs'][componentType] = componentTypeProperties;
-                model.divs[divIndex].fields[fieldIndex] = field;
-            }
-
-        }
-
-      $scope.model = model;
-
-      supportedComponents = formDetails.supportedComponents;
-//      console.log(JSON.stringify(supportedComponents));
-      $scope.form[0]['items'][1]['items'] = prepareCTypes($scope.form[0]['items'][1]['items']);
-//      console.log(JSON.stringify($scope.schema));
-    });
-    var regActiveTabIndexIndex = /.+(\d)/;
-    $scope.divIndex = 0;
-    $scope.getComponentType = function(model, arrayIndex) {
-      //Get the current component type for conditonal display
-      var activeTab = $('li.ng-scope.active')[0].innerHTML;
-      try {
-        $scope.divIndex = regActiveTabIndexIndex.exec(activeTab)[1];
-      } catch (e) { // might by sily updating causing problem
+    if (typeof $scope.divIndex === 'undefined') { $scope.divIndex = 0; }
+    try {
+      if (supportedComponents.indexOf($scope.model['divs'][$scope.divIndex]['fields'][arrayIndex]['component-type']) >= 0) {
+        return $scope.model['divs'][$scope.divIndex]['fields'][arrayIndex]['component-type'];
+      } else {
+        return 'notsuppored';
       }
+    } catch (e) {}
+  };
 
-      if (typeof $scope.divIndex === 'undefined') { $scope.divIndex = 0; }
-      try {
-        if (supportedComponents.indexOf($scope.model['divs'][$scope.divIndex]['fields'][arrayIndex]['component-type']) >= 0) {
-            return $scope.model['divs'][$scope.divIndex]['fields'][arrayIndex]['component-type'];
-        } else {
-            return 'notsuppored';
+  $scope.onSubmit = function(form) {
+    modalDiag.showModal('confirm.html', 'static', function(choice) {
+      if (choice == 'Yes') {
+        var model = JSON.parse(JSON.stringify($scope.model));
+        for(var divIndex=0; divIndex < model.divs.length; divIndex++) {
+          var div = model.divs[divIndex];
+          for(var fieldIndex = 0; fieldIndex < div.fields.length; fieldIndex++) {
+            var field = div.fields[fieldIndex];
+            var componentType = field['component-type'];
+            var configuration = field['component-confs'][componentType];
+            for(var fieldKey in configuration) {
+              field[fieldKey] = configuration[fieldKey];
+            }
+            delete field['component-confs'];
+            model.divs[divIndex].fields[fieldIndex] = field;
+          }
         }
-      } catch (e) {}
-    };
-     $scope.onSubmit = function(form) {
-       modalDiag.showModal('confirm.html', 'static', function(choice) {
-         if (choice == 'No') {
-           return;
-         }
-         var model = JSON.parse(JSON.stringify($scope.model));
-         for(var divIndex=0; divIndex < model.divs.length; divIndex++) {
-           var div = model.divs[divIndex];
-           for(var fieldIndex = 0; fieldIndex < div.fields.length; fieldIndex++) {
-             var field = div.fields[fieldIndex];
-             var componentType = field['component-type'];
-             var configuration = field['component-confs'][componentType];
-             for(var fieldKey in configuration) {
-               field[fieldKey] = configuration[fieldKey];
-             }
-             delete field['component-confs'];
-             model.divs[divIndex].fields[fieldIndex] = field;
-           }
-         }
+        var stageController = $resource('/redbox-admin/formBuilder/:fileName/:stage');
+        stageController.save({fileName: conf, stage: stage}, model, function (res) { alert("Saved successfully."); });
 
-         console.log(model);
-         var controller = $resource('/redbox-admin/formBuilder/:fileName/:stage');
-         controller.save({fileName: conf, stage: stage}, model, function (res) { alert(JSON.stringify(res)); });
-         return;
-
-       //        // First we broadcast an event so all fields validate themselves
+        //  Above code does not validate form, if it is needed,
+        // First we broadcast an event so all fields validate themselves
 //        $scope.$broadcast('schemaFormValidate');
 ////
 ////        // Then we check if the form is valid
@@ -137,63 +131,51 @@ angular.module('redboxAdmin.controllers').controller('FormBuilderCtrl', ['$scope
 //                alert("The file will be saved to somewhere.")
 //        //************************************TODO: Move above save to here
 //        //************************************TODO: End of Move
-//
 //            }
 //        }
+      }
+    });
+  };
 
-       });
-    };
-    $scope.form = [
-      {
-        type: "tabarray",
-        tabType: "top",
-        title: "($index +', ' + value.heading)",
-        key: "divs",
-        add: "Add a div",
-        onChange: function (form, modelValue) {
-          console.log("value changed");
-          console.log(form);
-          console.log(modelValue);
-        },
-        items: [
-          "divs[][heading]",
- //       "divs[][fields]"
-          {
-            key: "divs[][fields]",
-            type: "array",
-            items: [
-              "divs[][fields][][field-name]",
-              {
-                key: "divs[][fields][][component-type]"
-              },
-// more conditions are built/appended on fly
-              {
-                type: "conditional",
-                condition: "getComponentType(model,arrayIndex) == 'notsuppored'",
-                items: [
-                  {
-                    type: "help",
-                    helpvalue: "<h4>No config is availabe at this time. Please ask Andrew if you need it.</h4>"
-                  }
-                ]
-              }
-             ]
+  // Default form looking
+  $scope.form = [
+    {
+      type: "tabarray",
+      tabType: "top",
+      title: "($index +', ' + value.heading)",
+      key: "divs",
+      add: "Add a div",
+      items: [
+        "divs[][heading]",
+        // "divs[][fields]"
+        {
+          key: "divs[][fields]",
+          type: "array",
+          items: [
+            "divs[][fields][][field-name]",
+            {
+              key: "divs[][fields][][component-type]"
+            },
+            // more conditions are built/appended on fly
+            {
+              type: "conditional",
+              condition: "getComponentType(model,arrayIndex) == 'notsuppored'",
+              items: [
+                {
+                  type: "help",
+                  helpvalue: "<h4>No config is availabe at this time. Please ask Andrew if you need it.</h4>"
+                }
+              ]
             }
-         ]
-      },
- //        "form-footer",
-      {
-        key: "[form-footer]",
-        onChange: function (modelValue, form) {
-          console.log("value changed");
-          console.log(form);
-          console.log(modelValue);
+          ]
         }
-        },
-        "form-layout",
-      {
-        type: "submit",
-        title: "Save"
-        }
-    ];
-  }]);
+      ]
+    },
+    "form-footer",
+    "form-layout",
+    {
+      type: "submit",
+      title: "Save"
+    }
+  ];
+}]);
