@@ -1,59 +1,37 @@
 'use strict';
 
 angular.module('redboxAdmin.controllers').controller('FormBuilderCtrl', ['$scope', '$resource', function($scope, $resource) {
-    var formBuilderController = $resource('/redbox-admin/formBuilder');
-    var list = formBuilderController.get({}, function(){
-            $scope.confs = list.flist;
-    });
-  }])
-.controller('FormBuilderStagesCtrl', ['$scope', '$resource', '$routeParams', function($scope, $resource, $routeParams) {
-    console.log("What do we know?");
-    console.log($scope);
-    console.log($routeParams);
-    console.log($resource);
-    var conf = $routeParams.formConf;
-    var stage = $routeParams.stage;
-//    if (stage != null) {
-//        console.log("We should show editing UI for a stage");
-//        var Config = $resource('/redbox-admin/config/section/:sysType/:sectionName');
-//        Config.get({sysType:'arms',sectionName:'divs_tabarry'}, function(rbSection) {
-//            console.log("See what have hajacked?");
-//            console.log(rbSection);
-//          });
-//    } else {
-//        console.log("Waiting for pickup a stage");
-//    }
-    $scope.addStage = function(stage) {
-        console.debug("Adding " + stage.newEntry);
-        //~ var controller = $resource('/redbox-admin/formBuilder/:file/:stage');
-        //~ controller.get({file:'xxx',stage:'sss'},function(updated) { console.log("We are back"); console.log(updated)});
-        //~ controller.save({file:'xxx',stage:'sss'},{some:"value"},function(updated) { console.log("We are back"); console.log(updated)});
-        var controller = $resource('/redbox-admin/formBuilder/:file/:stage',null,{addStage:{method: 'PUT'}});
-        controller.addStage({file:conf,stage:stage.newEntry},null,function(updated) {
-            console.log("We are back");
-            console.log(updated.stages);
-            $scope.stages = updated.stages;
-            });
-    };
-    $scope.removeStage = function(stage) {
-        console.log(stage);
-        alert(stage);
-        var controller = $resource('/redbox-admin/formBuilder/:file/:stage');
-        controller.delete({file:conf,stage:stage},null,function(updated) {
-            console.log("Deteleted");
-            $scope.stages = updated.stages;
-            });
-    };
+  var formBuilderController = $resource('/redbox-admin/formBuilder');
+  var list = formBuilderController.get({}, function(){
+    $scope.confs = list.flist;
+  });
+}])
+.controller('FormBuilderStagesCtrl', ['$scope', '$resource', '$routeParams', 'modalDiag', function($scope, $resource, $routeParams, modalDiag) {
+  var conf = $routeParams.formConf;
+  var formBuilderController = $resource('/redbox-admin/formBuilder/:formConf');
+  var list = formBuilderController.get({formConf:conf}, function(){
+    $scope.formConf = conf;
+    $scope.stages = list.stages;
+  });
 
-    $scope.fileName= $routeParams.formConf;
-    //~ var formBuilderController = $resource('/redbox-admin/formBuilder');
-    var formBuilderController = $resource('/redbox-admin/formBuilder/:formConf');
-    var list = formBuilderController.get({formConf:$routeParams.formConf}, function(){
-            //~ console.log(list);
-            $scope.formConf = conf;
-            $scope.stages = list.stages;
+  var stageController = $resource('/redbox-admin/formBuilder/:file/:stage',null,{addStage:{method: 'PUT'}});
+  $scope.addStage = function(newStage) {
+    stageController.addStage({file:conf,stage:newStage},null,function(updated) {
+      $scope.stages = updated.stages;
+      $scope.showAdd = false;
+      $scope.newStage = "";
     });
-  }])
+  };
+  $scope.removeStage = function(stage) {
+    modalDiag.showModal('confirm.html', 'static', function(choice) {
+      if (choice == 'Yes') {
+        stageController.delete({file:conf,stage:stage},null,function(updated) {
+          $scope.stages = updated.stages;
+        });
+      }
+    });
+  };
+}])
 .controller('FormBuilderStageSecCtrl', ['$scope', '$resource', '$routeParams', 'modalDiag', function ($scope, $resource, $routeParams, modalDiag) {
 //    console.log($routeParams);
     var conf = $routeParams.formConf;
