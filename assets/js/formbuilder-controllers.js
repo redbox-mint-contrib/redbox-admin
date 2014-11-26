@@ -142,7 +142,7 @@ angular.module('redboxAdmin.controllers').controller('FormBuilderCtrl', ['$scope
     {
       type: "tabarray",
       tabType: "top",
-      title: "($index +', ' + value.heading)",
+      title: "($index +'. ' + value.heading)",
       key: "divs",
       add: "Add a div",
       items: [
@@ -163,7 +163,7 @@ angular.module('redboxAdmin.controllers').controller('FormBuilderCtrl', ['$scope
               items: [
                 {
                   type: "help",
-                  helpvalue: "<h4 class='alert alert-info' role='alert'>No configuration is availabe at this time.</h4>"
+                  helpvalue: "<h4 class='alert alert-info' role='alert'>No configuration is available at this time.</h4>"
                 }
               ]
             }
