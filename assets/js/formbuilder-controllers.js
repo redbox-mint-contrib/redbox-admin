@@ -108,11 +108,13 @@ angular.module('redboxAdmin.controllers').controller('FormBuilderCtrl', ['$scope
           for(var fieldIndex = 0; fieldIndex < div.fields.length; fieldIndex++) {
             var field = div.fields[fieldIndex];
             var componentType = field['component-type'];
-            var configuration = field['component-confs'][componentType];
-            for(var fieldKey in configuration) {
-              field[fieldKey] = configuration[fieldKey];
+            if ('component-confs' in field) {
+              var configuration = field['component-confs'][componentType];
+              for(var fieldKey in configuration) {
+                field[fieldKey] = configuration[fieldKey];
+              }
+              delete field['component-confs'];
             }
-            delete field['component-confs'];
             model.divs[divIndex].fields[fieldIndex] = field;
           }
         }
