@@ -1,7 +1,7 @@
 module.exports = {
   formConfsPath : sails.config.instance['redbox'].installPath + "home/form-configuration/",
   componentConfsPath : sails.config.instance['redbox'].installPath + '/portal/default/default/form-components/field-elements/',
-  formSchema : "arms_form-schema_stage.json",
+  formSchema : "form-schema_stage.json",
   get: function(req, res) {
     var loaded = {
       schema: {},
@@ -77,12 +77,16 @@ module.exports = {
     var confName = req.param("fileName");
     var stage = req.param("stage");
 
+    var backup = module.exports.formConfsPath + 'backup_' + confName;
+    confName = module.exports.formConfsPath + confName;
+
     var fs = require('fs');
-    var conf = JSON.parse(fs.readFileSync(module.exports.formConfsPath + confName));
+    // backup first
+    fs.renameSync(confName, backup);
+
+    var conf = JSON.parse(fs.readFileSync(backup));
     conf['stages'][stage] = req.body;
 
-    confName = module.exports.formConfsPath + 'new_' + confName;
-    console.warn("File is saved to a new name for testing:" + confName);
     fs.writeFile(confName, JSON.stringify(conf), function (err) {
         if (err) {
             console.error("Faile to save form definition file");

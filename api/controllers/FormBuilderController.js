@@ -73,9 +73,13 @@ module.exports = {
     }
   },
   saveConf:function(confName, newConf) {
-    confName = module.exports.formConfsPath + 't' + confName;
-    console.warn("File is saved to a new name for testing:" + confName);
+    var backup = module.exports.formConfsPath + 'backup_' + confName;
+    confName = module.exports.formConfsPath + confName
+
     var fs = require('fs');
+    // backup first
+    fs.renameSync(confName, backup);
+
     try {
       fs.writeFileSync(confName, JSON.stringify(newConf));
     } catch (e) {
