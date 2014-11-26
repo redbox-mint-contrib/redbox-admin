@@ -1,6 +1,7 @@
 module.exports = {
   formConfsPath : sails.config.instance['redbox'].installPath + "home/form-configuration/",
   componentConfsPath : sails.config.instance['redbox'].installPath + '/portal/default/default/form-components/field-elements/',
+  formSchema : "arms_form-schema_stage.json",
   get: function(req, res) {
     var loaded = {
       schema: {},
@@ -12,7 +13,8 @@ module.exports = {
     var stage = req.param("stage");
 //    console.log("loading " + confName + " " + stage);
     loaded.model = module.exports.loadStage(confName,stage);
-    loaded.schema = module.exports.loadSchema(module.exports.formConfsPath + "arms_form-schema_stage.json");
+//    console.log("schema path: " + module.exports.formConfsPath + module.exports.formSchema);
+    loaded.schema = module.exports.loadSchema(module.exports.formConfsPath + module.exports.formSchema);
     var components = module.exports.findComponents();
     loaded.schema['properties']['divs']['items']['properties']['fields']['items']['properties']['component-confs']['properties'] = components['confs'];
     loaded.schema['properties']['divs']['items']['properties']['fields']['items']['properties']['component-type']['enum'] = components['types'].sort();
