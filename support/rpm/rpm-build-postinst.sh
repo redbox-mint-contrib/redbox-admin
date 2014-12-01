@@ -23,9 +23,8 @@ install_server() {
     log_function $FUNCNAME
     chown -R redbox:redbox ${ADMIN_INSTALL_HOME}
     cd ${ADMIN_INSTALL_HOME} || exit_install "failed to change to install directory."
-    ## install of sails and forever must happen as root as these are created
+    ## install of less and forever must happen as root as these are created
     ## as nobody under /usr/lib/node_modules
-    npm -g install sails || exit_install "failed to install sails."
     npm -g install forever || exit_install "failed to install forever."
     npm -g install less || exit_install "failed to install less."
     ## Add redbox to tomcat, required for write access to harvester input directories
