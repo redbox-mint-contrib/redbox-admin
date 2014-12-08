@@ -564,12 +564,24 @@ module.exports = {
     var options = {
       lastModified:false
     };
-    res.sendfile(absFilePath, options, function (err) {
-      if (err) {
-        sails.log.error("Error sending file: " + absFilePath);
-        return res.send(404, "File does not exist.");
-      }
-    });
+    if (absFilePath.lastIndexOf('.png') > 0) {
+      var fs = require('fs');
+      fs.readFile(absFilePath, {flags:'r', encoding:'binary'}, function(err, data) {
+        if (err) {
+          sails.log.error("Error sending file in base64: " + absFilePath);
+          return res.send(404, "File does not exist/converting to base64");
+        }
+        var base64 = "data:image/png;base64,"+new Buffer(data, 'binary').toString('base64');
+        return res.send(base64);
+      });     
+    } else {
+      res.sendfile(absFilePath, options, function (err) {
+        if (err) {
+          sails.log.error("Error sending file: " + absFilePath);
+          return res.send(404, "File does not exist.");
+        }
+      });
+    }
   },
   
   putRawFile: function(req, res) {

@@ -244,7 +244,7 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
 // - gets and sets RB/Mint configuration 
 //
 // -----------------------------------------------------------
-.controller('ConfigCtrl',  [ '$scope', '$upload', '$resource', 'redboxConfig','authService', '$route', 'modalDiag','$location', 'authWatcher', function($scope, $upload, $resource, redboxConfig, authService, $route, modalDiag, $location, authWatcher ) {
+.controller('ConfigCtrl',  [ '$scope', '$upload', '$resource', 'redboxConfig','authService', '$route', 'modalDiag','$location', 'authWatcher', '$http', function($scope, $upload, $resource, redboxConfig, authService, $route, modalDiag, $location, authWatcher, $http ) {
     authWatcher.addExpiryChecker($scope);
     var Config = $resource('/redbox-admin/config/section/:sysType/:sectionName', {sysType:'@sysType', sectionName:'@id'});
     $scope.rbSectionList = [];
@@ -277,14 +277,20 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
             if (sectionDetails.subsections[i].form[x].type == "img") {
               sectionDetails.subsections[i].form[x].type = "help";
               var imgPath = sectionDetails.subsections[i].model[sectionDetails.subsections[i].form[x].modelVar];
-              sectionDetails.subsections[i].form[x].helpvalue = "<img src='"+imgPath+"'>";
-              $scope.fileUploadObj = {
-                field: sectionDetails.subsections[i].form[x].modelVar,
-                model: sectionDetails.subsections[i].model,
-                form: sectionDetails.subsections[i].form[x],
-                subsection: sectionDetails.subsections[i],
-                imgPath: imgPath
+              var successFn = function(i, x, imgPath) {
+                return function(data,status,headers,config) {
+                  sectionDetails.subsections[i].form[x].helpvalue = "<img src='"+data+"'/>";
+                  // download the image data into a variable so the request goes through the auth filter
+                  $scope.fileUploadObj = {
+                    field: sectionDetails.subsections[i].form[x].modelVar,
+                    model: sectionDetails.subsections[i].model,
+                    form: sectionDetails.subsections[i].form[x],
+                    subsection: sectionDetails.subsections[i],
+                    imgPath: imgPath
+                  };
+                }
               };
+              $http.get(imgPath).success(successFn(i, x, imgPath));
             }
           }
           sectionDetails.subsections[i].form.splice(0, 0, {type:"help", helpvalue:"<div class='alert alert-info'>"+

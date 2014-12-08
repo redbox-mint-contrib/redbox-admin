@@ -49,9 +49,7 @@ module.exports.policies = {
 		// feed : ['isNiceToAnimals', 'hasRabbitFood']
 	// }
   ConfigController: {
-    '*': ['isLoggedIn', 'isAdmin', 'noCache'],
-    getRawFile: ['noCache'],
-    putRawFile: ['noCache']
+    '*': ['isLoggedIn', 'isAdmin', 'noCache']
   },
   FileharvestController: {
     '*': ['isLoggedIn', 'isAdmin', 'noCache']
