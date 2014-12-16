@@ -6,7 +6,7 @@ This application administers a ReDBox/Mint instance.
 
 Run the ff. commands from the cloned directory:
 
-`$ npm install
+`$ npm install`
 `$ sails lift`
 
 Application will be available at http://localhost:1337/redbox-admin
