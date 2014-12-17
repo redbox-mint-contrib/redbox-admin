@@ -8,7 +8,7 @@
   </div>
   <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
     <div class="jumbotron">
-      <h2>List of form configuration files</h2>
+      <h2>List of form configuration files <small class="text-info">(if you believe there are some missing, check if they pass JSON validation.)</small></h2>
       <ul class="list-group">
         <li class="list-group-item" ng-repeat="conf in confs">
            <a ng-href="#/formBuilder/{{ conf }}">{{ conf }}</a>

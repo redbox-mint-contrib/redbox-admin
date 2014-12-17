@@ -36,6 +36,8 @@ angular.module('redboxAdmin.controllers').controller('FormBuilderCtrl', ['$scope
   var conf = $routeParams.formConf;
   var stage = $routeParams.stage;
 
+  $scope.loaded = false;
+
   var supportedComponents; //Used for conditional display
   function prepareCTypes(field) {
     // prepare configs for component types in form, called when form is being bulit
@@ -77,6 +79,7 @@ angular.module('redboxAdmin.controllers').controller('FormBuilderCtrl', ['$scope
 
     supportedComponents = formDetails.supportedComponents;
     $scope.form[0]['items'][1]['items'] = prepareCTypes($scope.form[0]['items'][1]['items']);
+    $scope.loaded = true;
   });
 
   var regActiveTabIndexIndex = /.+(\d)/;
