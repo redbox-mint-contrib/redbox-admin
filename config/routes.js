@@ -71,4 +71,10 @@ module.exports.routes = {
   'GET /redbox-admin/logview/harvester/summary/:procEvt/:qryType/:hrid' : 'logviewController.harvesterSummary',
   'GET /redbox-admin/logview/harvester/summary/:procEvt/:qryType/:hrid/:from' : 'logviewController.harvesterSummary',
   'GET /redbox-admin/logview/harvester/summary/totalrecs/:hrid' : 'logviewController.harvesterTotalRecords',
+  'GET /redbox-admin/formBuilder': 'formBuilder.get',
+  'GET /redbox-admin/formBuilder/:fileName': 'formBuilder.getStageList',
+  'GET /redbox-admin/formBuilder/:fileName/:stage': 'FormTabConfigController.get',
+  'POST /redbox-admin/formBuilder/:fileName/:stage': 'FormTabConfigController.write',
+  'PUT /redbox-admin/formBuilder/:fileName/:stage': 'formBuilderController.addStage',
+  'DELETE /redbox-admin/formBuilder/:fileName/:stage': 'formBuilderController.removeStage',
 };

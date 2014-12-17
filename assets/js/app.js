@@ -22,6 +22,9 @@ angular.module('redboxAdmin', [
   $routeProvider.when('/logview', {templateUrl: 'partials/logview.html', controller: 'LogviewCtrl'});
   $routeProvider.when('/harvester/list', {templateUrl: 'partials/harvest.html', controller: 'HarvesterListCtrl'});
   $routeProvider.when('/harvester/summary/:hrid', {templateUrl: 'partials/harvestSummary.html', controller: 'HarvesterSummaryCtrl'});
+  $routeProvider.when('/formBuilder', {templateUrl: 'partials/formConfs.html', controller: 'FormBuilderCtrl'});
+  $routeProvider.when('/formBuilder/:formConf', {templateUrl: 'partials/formBuilder.html', controller: 'FormBuilderStagesCtrl'});
+  $routeProvider.when('/formBuilder/:formConf/:stage', {templateUrl: 'partials/formTabConfig.html', controller: 'FormBuilderStageSecCtrl'});
   $routeProvider.otherwise({redirectTo: '/'});
 }])
 .config(['$httpProvider', function($httpProvider) {

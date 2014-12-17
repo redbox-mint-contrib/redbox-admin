@@ -14,7 +14,7 @@
 //
 // (if you're using LESS with the built-in default config, you'll want
 //  to change `assets/styles/importer.less` instead.)
-var cssFilesToInject = [  
+var cssFilesToInject = [
   'redbox-admin/styles/bootstrap.css',
   'redbox-admin/styles/bootstrap-theme.css',
   'redbox-admin/styles/spectrum.css',
@@ -25,11 +25,11 @@ var cssFilesToInject = [
 
 // Client-side javascript files to inject in order
 // (uses Grunt-style wildcard/glob/splat expressions)
-var jsFilesToInject = [  
+var jsFilesToInject = [
   'redbox-admin/js/dependencies/jquery.js',
   'redbox-admin/js/dependencies/bootstrap.min.js',
   'redbox-admin/js/dependencies/sails.io.js',
-  'redbox-admin/js/dependencies/angular-file-upload-shim.min.js',    
+  'redbox-admin/js/dependencies/angular-file-upload-shim.min.js',
   'redbox-admin/js/dependencies/tv4.js', // angular-schema-form
   'redbox-admin/js/dependencies/angular.js',
   'redbox-admin/js/dependencies/angular-route.js',
@@ -53,6 +53,7 @@ var jsFilesToInject = [
   'redbox-admin/js/config.js',
   'redbox-admin/js/services.js',
   'redbox-admin/js/controllers.js',
+  'redbox-admin/js/formbuilder-controllers.js',
   'redbox-admin/js/filters.js',
   'redbox-admin/js/directives.js'
 ];
