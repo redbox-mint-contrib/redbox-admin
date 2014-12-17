@@ -1,4 +1,5 @@
 module.exports = {
+  gfs: require('fs'),
   formConfsPath : sails.config.instance['redbox'].installPath + "home/form-configuration/",
   componentConfsPath : sails.config.instance['redbox'].installPath + '/portal/default/default/form-components/field-elements/',
   formSchema : "form-schema_stage.json",
@@ -12,7 +13,11 @@ module.exports = {
     var confName = req.param("fileName");
     var stage = req.param("stage");
 //    console.log("loading " + confName + " " + stage);
-    loaded.model = module.exports.loadStage(confName,stage);
+    loaded.model = module.exports.extractStage(confName,stage);
+    if ('config-file' in loaded.model) {
+      //if stages have config-file, load that file
+      loaded.model = module.exports.loadStage('../' + loaded.model['config-file']);
+    }
 //    console.log("schema path: " + module.exports.formConfsPath + module.exports.formSchema);
     loaded.schema = module.exports.loadSchema(module.exports.formConfsPath + module.exports.formSchema);
     var components = module.exports.findComponents();
@@ -22,10 +27,23 @@ module.exports = {
     for (var k in components['confs']) {
       loaded.supportedComponents.push(k);
     }
-
     res.send(loaded);
   },
-  loadStage: function(confName, stage) {
+  // load nested files: in this file, if divs have config-file, load them
+  // Saving back will be a problem, so this is just a learning process.
+  loadStage: function(confName) {
+    console.log("Loading " + confName);
+    var stage = JSON.parse(module.exports.gfs.readFileSync(module.exports.formConfsPath + confName));
+    var divs = [], divConf = null;
+    for (var i=0; i<stage.divs.length; i++) {
+      divConf = '../' + stage.divs[i]['config-file'];
+      divs[i] = JSON.parse(module.exports.gfs.readFileSync(module.exports.formConfsPath + divConf));
+    }
+    stage.divs = divs;
+    return stage;
+  },
+  extractStage: function(confName, stage) {
+    console.log("Loading " + confName);
     var fs = require('fs');
     var obj = JSON.parse(fs.readFileSync(module.exports.formConfsPath + confName));
 
