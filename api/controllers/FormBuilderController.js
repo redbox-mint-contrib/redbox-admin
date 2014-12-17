@@ -6,6 +6,7 @@
  */
 
 module.exports = {
+  gfs: require('fs'),
   formConfsPath : sails.config.instance['redbox'].installPath + "home/form-configuration/",
   /**
    * `List conf files from formConfsPath`
@@ -13,17 +14,33 @@ module.exports = {
   get: function (req, res) {
     var fl = [];
     if (module.exports.formConfsPath) {
-      var fs = require('fs');
-      fl = fs.readdirSync(module.exports.formConfsPath);
+      var fs = module.exports.gfs;
+      var tfl = fs.readdirSync(module.exports.formConfsPath);
+      tfl.forEach(function(f) {
+        if((! fs.statSync(module.exports.formConfsPath + f).isDirectory()) && module.exports.isFormDef(f)) {
+          fl.push(f);
+        }
+      });
     } else {
       sails.log.error("No path is specified.");
     };
     res.json({ flist: fl });
   },
+  isFormDef: function(f) {
+    var fs = module.exports.gfs;
+    var obj = {};
+    try {
+      obj = JSON.parse(fs.readFileSync(module.exports.formConfsPath + f));
+    } catch (e) {
+      sails.log.warn('Cannot parse JSON file: ' + module.exports.formConfsPath + f);
+      sails.log.warn(e);
+    }
+    return 'stages' in obj;
+  },
   getStageList:function (req, res) {
     var confName = req.param("fileName");
     if (confName) {
-      var fs = require('fs');
+      var fs = module.exports.gfs;
       var obj = JSON.parse(fs.readFileSync(module.exports.formConfsPath + confName));
       var stageArray = [];
       for(stage in obj.stages) {
@@ -37,7 +54,7 @@ module.exports = {
     var stageName = req.param("stage");
 
     if (confName) {
-      var fs = require('fs');
+      var fs = module.exports.gfs;
       var obj = JSON.parse(fs.readFileSync(module.exports.formConfsPath + confName));
       if (!(stageName in obj.stages)) {
         obj.stages[stageName] = {};
@@ -57,7 +74,7 @@ module.exports = {
     var stageName = req.param("stage");
 
     if (confName) {
-      var fs = require('fs');
+      var fs = module.exports.gfs;
       var obj = JSON.parse(fs.readFileSync(module.exports.formConfsPath + confName));
       if (stageName in obj.stages) {
         delete obj.stages[stageName];
@@ -76,7 +93,7 @@ module.exports = {
     var backup = module.exports.formConfsPath + 'backup_' + confName;
     confName = module.exports.formConfsPath + confName
 
-    var fs = require('fs');
+    var fs = module.exports.gfs;
     // backup first
     fs.renameSync(confName, backup);
 
@@ -87,4 +104,3 @@ module.exports = {
     }
   }
 };
-

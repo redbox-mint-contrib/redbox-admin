@@ -2,7 +2,7 @@
 
 angular.module('redboxAdmin.controllers').controller('FormBuilderCtrl', ['$scope', '$resource', function($scope, $resource) {
   var formBuilderController = $resource('/redbox-admin/formBuilder');
-  var list = formBuilderController.get({}, function(){
+  formBuilderController.get({}, function(list){
     $scope.confs = list.flist;
   });
 }])
