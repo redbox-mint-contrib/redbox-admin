@@ -12,20 +12,36 @@ module.exports = {
 
     var confName = req.param("fileName");
     var stage = req.param("stage");
-//    console.log("loading " + confName + " " + stage);
-    loaded.model = module.exports.extractStage(confName,stage);
-    if ('config-file' in loaded.model) {
+    var section = req.param("section"); // individual div (section)?
+    var list = req.query['list'] // should only list structure?
+    var model = module.exports.extractStage(confName,stage);
+    if ('config-file' in model) {
       //if stages have config-file, load that file
-      loaded.model = module.exports.loadStage('../' + loaded.model['config-file']);
+      model = module.exports.loadStage('../' + model['config-file']);
     }
 //    console.log("schema path: " + module.exports.formConfsPath + module.exports.formSchema);
-    loaded.schema = module.exports.loadSchema(module.exports.formConfsPath + module.exports.formSchema);
-    var components = module.exports.findComponents();
-    loaded.schema['properties']['divs']['items']['properties']['fields']['items']['properties']['component-confs']['properties'] = components['confs'];
-    loaded.schema['properties']['divs']['items']['properties']['fields']['items']['properties']['component-type']['enum'] = components['types'].sort();
-    // Use for building conditions in a convenient and light-weight way in terms of client
-    for (var k in components['confs']) {
-      loaded.supportedComponents.push(k);
+    if (list) {
+      // only list structure, filter them on server
+      loaded.model.divs = [];
+      for(var i = 0; i < model.divs.length; i++) {
+        loaded.model.divs.push(model.divs[i]['heading']);
+      }
+    } else {
+      if (section) {
+        loaded.model['divs'] = [];
+        loaded.model.divs.push(model.divs[section]);
+      } else {
+        loaded.model = model;
+      }
+
+      loaded.schema = module.exports.loadSchema(module.exports.formConfsPath + module.exports.formSchema);
+      var components = module.exports.findComponents();
+      loaded.schema['properties']['divs']['items']['properties']['fields']['items']['properties']['component-confs']['properties'] = components['confs'];
+      loaded.schema['properties']['divs']['items']['properties']['fields']['items']['properties']['component-type']['enum'] = components['types'].sort();
+      // Use for building conditions in a convenient and light-weight way in terms of client
+      for (var k in components['confs']) {
+        loaded.supportedComponents.push(k);
+      }
     }
     res.send(loaded);
   },

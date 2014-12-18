@@ -5,14 +5,14 @@
 angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap', 'redboxAdmin.config','angularModalService'])
 .factory('authService', ['localStorageService','redboxConfig', function(localStorageService, redboxConfig) {
     var loginHandlers = [];
-	var AuthService = {
-		isLoggedIn: function(expiryThreshold) {
+    var AuthService = {
+        isLoggedIn: function(expiryThreshold) {
             if(redboxConfig.authMethod != 'jws') {
               return true;
             }
             var admin_jws_payload = localStorageService.get('admin_jws_payload');
-			var errMsg = "";
-			if (admin_jws_payload != null) {
+            var errMsg = "";
+            if (admin_jws_payload != null) {
               // check the times...
               var now = new Date();
               var nowInSecs = now.getTime() / 1000;
@@ -24,7 +24,7 @@ angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap', 'r
               // iat must be in the past
               if (admin_jws_payload.iat > nowInSecs) {
                   errMsg = "IAT Invalid.";
-              } else 
+              } else
               // nbf must be in the past
               if (admin_jws_payload.nbf >= nowInSecs) {
                   errMsg = "NBF Invalid.";
@@ -34,23 +34,23 @@ angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap', 'r
               } else {
                   return true;
               }
-			}
-			return false;
-		},
-		saveAuth: function(jws, payload) {
+            }
+            return false;
+        },
+        saveAuth: function(jws, payload) {
           console.log("Saving: " + payload);
           localStorageService.set('admin_jws',jws);
           localStorageService.set('admin_jws_payload', payload);
-		},
-		deleteAuth: function() {
+        },
+        deleteAuth: function() {
           localStorageService.remove('admin_jws');
           localStorageService.remove('admin_jws_payload');
-		},
+        },
         getJws: function() {
           return localStorageService.get('admin_jws');
         }
-	};
-  
+    };
+
     AuthService.login =  function() {
       var cancelLogin = false;
       var handlerCnt = 0;
@@ -60,7 +60,7 @@ angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap', 'r
           window.location.href = redboxConfig.authUrl;
         }
       };
-      
+
       angular.forEach(loginHandlers, function(loginHandler) {
         console.log("Calling login handler:"+loginHandler.id);
         cancelLogin = loginHandler.fn(function(stat) {
@@ -73,11 +73,11 @@ angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap', 'r
           }
           loginFn();
         });
-        
+
       });
-      
+
     };
-  
+
     AuthService.addLoginHandler = function(id, loginHandler) {
       var newHandler = {id:id, fn:loginHandler};
       angular.forEach(loginHandlers, function(loginHandler) {
@@ -91,7 +91,7 @@ angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap', 'r
         loginHandlers.push(newHandler);
       }
     };
-  
+
     return AuthService;
 }])
 .factory('authInterceptor', ['$q', 'authService', 'redboxConfig', function($q, authService, redboxConfig) {
@@ -110,7 +110,7 @@ angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap', 'r
         authService.login();
       }
       var jws = authService.getJws();
-     
+
       if (jws) {
         config.headers.JWS = jws;
       }
@@ -161,7 +161,7 @@ angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap', 'r
           modalDiag.showModal(authWatcher.diag_rbUnavailable, 'static');
         }
       });
-    }, 
+    },
     loginExpiryChecker: function() {
       console.log("Login expiry check running.");
       if (!authService.isLoggedIn(redboxConfig.authExpiryThreshold)) {
@@ -181,7 +181,7 @@ angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap', 'r
       }
     }
   };
-  
+
   authWatcher.addExpiryChecker = function($scope) {
     authWatcher.scope = $scope;
     if (angular.isDefined(authWatcher.scope.sessionExpiryPromise)) {
@@ -196,76 +196,79 @@ angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap', 'r
         });
     }
   };
-  
+
   authWatcher.removeExpiryChecker = function() {
     if (angular.isDefined(authWatcher.scope.sessionExpiryPromise)) {
       $interval.cancel(authWatcher.scope.sessionExpiryPromise);
       authWatcher.scope.sessionExpiryPromise = undefined;
     }
   };
-  
+
   authService.addLoginHandler('authWatcher', authWatcher.loginInterceptor);
   return authWatcher;
 }])
 .factory('paginator', [function(){
-	
-	var counts = {
-	logCount: 0,
-	logFrom: 0,
-	LOG_SIZE: 20};
-	
-	return {
-		doPage: function(action){
-		  action = action || "first";
-		  switch(action){
-		   case "first":
-			   counts.logFrom = 0;
-			   break;
-		   case "next":
-			   this.incrFrom();
-			   break;
-		   case "prev":
-			   this.decrFrom();
-			   break;
-		   case "last":
-			   this.lastFrom();
-			   break;
-		   default: counts.logFrom = 0;
-		  }
-	  },
-	  
-	  getLogFrom: function(){
-		  return counts.logFrom;
-	  },
-	  
-	  setLogFrom: function(lf){
-		  counts.logFrom = lf;
-	  },
-	  
-	  getLogCount: function(){
-		  return counts.logCount;
-	  },
-	  
-	  setLogCount: function(lc){
-		  counts.logCount = lc;
-	  },
-	  
-	  incrFrom: function(){
-		  if(counts.logFrom < (counts.logCount - counts.LOG_SIZE)){
-			  counts.logFrom += counts.LOG_SIZE;
-		  }
-	  },
-	  
-	  decrFrom: function(){
-		  if(counts.logFrom >= counts.LOG_SIZE){
-			  counts.logFrom -= counts.LOG_SIZE;
-		  }
-	  },
-	  
-	  lastFrom: function(){
-		  //TODO - if to ensure pager does not spill past the end of the recordset.
-		  counts.logFrom = counts.logCount - counts.LOG_SIZE; 
-	  }
-	}
+
+    var counts = {
+    logCount: 0,
+    logFrom: 0,
+    LOG_SIZE: 20};
+
+    return {
+        doPage: function(action){
+          action = action || "first";
+          switch(action){
+           case "first":
+               counts.logFrom = 0;
+               break;
+           case "next":
+               this.incrFrom();
+               break;
+           case "prev":
+               this.decrFrom();
+               break;
+           case "last":
+               this.lastFrom();
+               break;
+           default: counts.logFrom = 0;
+          }
+      },
+
+      getLogFrom: function(){
+          return counts.logFrom;
+      },
+
+      setLogFrom: function(lf){
+          counts.logFrom = lf;
+      },
+
+      getLogCount: function(){
+          return counts.logCount;
+      },
+
+      setLogCount: function(lc){
+          counts.logCount = lc;
+      },
+
+      incrFrom: function(){
+          if(counts.logFrom < (counts.logCount - counts.LOG_SIZE)){
+              counts.logFrom += counts.LOG_SIZE;
+          }
+      },
+
+      decrFrom: function(){
+          if(counts.logFrom >= counts.LOG_SIZE){
+              counts.logFrom -= counts.LOG_SIZE;
+          }
+      },
+
+      lastFrom: function(){
+          //TODO - if to ensure pager does not spill past the end of the recordset.
+          counts.logFrom = counts.logCount - counts.LOG_SIZE;
+      }
+    }
+}])
+.factory('Workflow', ['$resource', function($resource) {
+    return $resource('/redbox-admin/formBuilder/:formConf/:stage/:section');
 }])
 ;

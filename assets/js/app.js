@@ -25,6 +25,7 @@ angular.module('redboxAdmin', [
   $routeProvider.when('/workflow', {templateUrl: 'partials/workflows.html', controller: 'WorkflowsCtrl'});
   $routeProvider.when('/workflow/:formConf', {templateUrl: 'partials/workflowStages.html', controller: 'WorkflowStagesCtrl'});
   $routeProvider.when('/workflow/:formConf/:stage', {templateUrl: 'partials/workflowStageSecs.html', controller: 'StageSecsCtrl'});
+  $routeProvider.when('/workflow/:formConf/:stage/:section', {templateUrl: 'partials/workflowStageSecs.html', controller: 'StageSecsCtrl'});
   $routeProvider.otherwise({redirectTo: '/'});
 }])
 .config(['$httpProvider', function($httpProvider) {

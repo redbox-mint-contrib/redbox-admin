@@ -4,18 +4,26 @@
     <div class="jumbotron">
       <h2>Please select a stage to view/edit</h2>
       <ul class="list-group">
-        <li class="list-group-item" ng-repeat="stage in stages" ng-model="q" >
+        <li class="list-group-item" ng-repeat="stage in stages">
             <a class="col-sm-5 col-md-2" ng-href="#/workflow/{{formConf}}/{{stage}}">{{ stage }}</a>
-           &nbsp;<button ng-click="removeStage(stage);" class="btn btn-danger active">Remove</button>
+           &nbsp;<button ng-click="removeStage(stage);" class="btn btn-danger">Remove</button>
+          &nbsp;<button ng-click="showSections(stage);" class="btn btn-primary">Show sections</button>
         </li>
       </ul>
 
-      <button class="btn btn-primary active" ng-click="showAdd = !showAdd">Add a new stage</button>
+      <button class="btn btn-primary" ng-click="showAdd = !showAdd">Add a new stage</button>
       <div ng-show="showAdd">
             <label>Name of new stage</label><input ng-model="newStage">
             <button ng-click="addStage(newStage);">Add</button>
       </div>
 
+    </div>
+    <div class="jumbotron" ng-show="sections">
+      <ul class="list-group">
+        <li class="list-group-item" ng-repeat="sec in sections">
+          <a ng-href="#/workflow/{{formConf}}/{{selectedStage}}/{{$index}}">{{ sec }}</a>
+        </li>
+      </ul>
     </div>
   </div>
   <script type="text/ng-template" id="confirm.html">
