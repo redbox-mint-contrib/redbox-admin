@@ -4,16 +4,10 @@
   </div>
 </div>
 <div class="row">
-    <div class="col-sm-3 col-md-2 sidebar">
-        <ul class="nav nav-sidebar">
-            <li><a href="#/">Home</a></li>
-            <li><a href="#/config">Configuration</a></li>
-            <li class="active" style="margin-left:1em"><a href="#/formBuilder">Configure Forms</a></li>
-        </ul>
-    </div>
-    <div class="panel panel-primary" ng-show="loaded">
+    <div class="col-sm-3 col-md-2 sidebar" ng-include="'partials/nav.html'"></div>
+    <div class="panel" ng-show="loaded">
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-            <h1 class="page-header">Edit stages of <a ng-href="#/formBuilder/{{formConf}}">{{formConf}}</a></h1>
+            <h1 class="page-header">Edit stages of <a ng-href="#/workflow/{{formConf}}">{{formConf | removeExt}}</a></h1>
             <p>divs are building blocks. They can be turned into tabs or other display types.</p>
 
             <form name="formBuilder" sf-schema="schema" sf-form="form" sf-model="model" ng-submit="onSubmit(formBuilder)"></form>

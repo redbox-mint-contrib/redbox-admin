@@ -1,12 +1,12 @@
 'use strict';
 
-angular.module('redboxAdmin.controllers').controller('FormBuilderCtrl', ['$scope', '$resource', function($scope, $resource) {
+angular.module('redboxAdmin.controllers').controller('WorkflowsCtrl', ['$scope', '$resource', function($scope, $resource) {
   var formBuilderController = $resource('/redbox-admin/formBuilder');
   formBuilderController.get({}, function(list){
     $scope.confs = list.flist;
   });
 }])
-.controller('FormBuilderStagesCtrl', ['$scope', '$resource', '$routeParams', 'modalDiag', function($scope, $resource, $routeParams, modalDiag) {
+.controller('WorkflowStagesCtrl', ['$scope', '$resource', '$routeParams', 'modalDiag', function($scope, $resource, $routeParams, modalDiag) {
   var conf = $routeParams.formConf;
   var formBuilderController = $resource('/redbox-admin/formBuilder/:formConf');
   var list = formBuilderController.get({formConf:conf}, function(){
@@ -32,7 +32,7 @@ angular.module('redboxAdmin.controllers').controller('FormBuilderCtrl', ['$scope
     });
   };
 }])
-.controller('FormBuilderStageSecCtrl', ['$scope', '$resource', '$routeParams', 'modalDiag', function ($scope, $resource, $routeParams, modalDiag) {
+.controller('StageSecsCtrl', ['$scope', '$resource', '$routeParams', 'modalDiag', function ($scope, $resource, $routeParams, modalDiag) {
   var conf = $routeParams.formConf;
   var stage = $routeParams.stage;
 

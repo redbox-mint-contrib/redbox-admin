@@ -53,7 +53,7 @@ var jsFilesToInject = [
   'redbox-admin/js/config.js',
   'redbox-admin/js/services.js',
   'redbox-admin/js/controllers.js',
-  'redbox-admin/js/formbuilder-controllers.js',
+  'redbox-admin/js/workflow-controllers.js',
   'redbox-admin/js/filters.js',
   'redbox-admin/js/directives.js'
 ];

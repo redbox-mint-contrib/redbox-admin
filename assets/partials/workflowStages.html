@@ -1,17 +1,11 @@
 <div class="row">
-  <div class="col-sm-3 col-md-2 sidebar">
-    <ul class="nav nav-sidebar">
-      <li><a href="#/">Home</a></li>
-      <li><a href="#/config">Configuration</a></li>
-      <li class="active" style="margin-left:1em"><a href="#/formBuilder">Configure Forms</a></li>
-    </ul>
-  </div>
+  <div class="col-sm-3 col-md-2 sidebar" ng-include="'partials/nav.html'"></div>
   <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
     <div class="jumbotron">
       <h2>Please select a stage to view/edit</h2>
       <ul class="list-group">
         <li class="list-group-item" ng-repeat="stage in stages" ng-model="q" >
-            <a class="col-sm-5 col-md-2" ng-href="#/formBuilder/{{formConf}}/{{stage}}">{{ stage }}</a>
+            <a class="col-sm-5 col-md-2" ng-href="#/workflow/{{formConf}}/{{stage}}">{{ stage }}</a>
            &nbsp;<button ng-click="removeStage(stage);" class="btn btn-danger active">Remove</button>
         </li>
       </ul>
