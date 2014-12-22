@@ -18,7 +18,7 @@
       </div>
 
     </div>
-    <div class="jumbotron" ng-show="sections">
+    <div class="jumbotron" ng-show="sections.length > 0">
       <ul class="list-group">
         <li class="list-group-item" ng-repeat="sec in sections">
           <a ng-href="#/workflow/{{formConf}}/{{selectedStage}}/{{$index}}">{{ sec }}</a>
