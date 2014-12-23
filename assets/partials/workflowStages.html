@@ -14,7 +14,8 @@
       <button class="btn btn-primary" ng-click="showAdd = !showAdd">Add a new stage</button>
       <div ng-show="showAdd">
             <label>Name of new stage</label><input ng-model="newStage">
-            <button ng-click="addStage(newStage);">Add</button>
+            <button ng-click="addStage(newStage);" class="btn btn-primary">Add</button>
+            <span class="label label-danger" ng-show="stageExist">Stage exists. Choose another one.</span>
       </div>
 
     </div>
