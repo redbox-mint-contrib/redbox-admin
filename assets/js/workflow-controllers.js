@@ -8,6 +8,7 @@ angular.module('redboxAdmin.controllers').controller('WorkflowsCtrl', ['$scope',
 }])
 .controller('WorkflowStagesCtrl', ['$scope', '$resource', '$routeParams', 'modalDiag', 'Workflow', function($scope, $resource, $routeParams, modalDiag, Workflow) {
   var conf = $routeParams.formConf;
+  $scope.stageExist = false;
   var formBuilderController = $resource('/redbox-admin/formBuilder/:formConf');
   var list = formBuilderController.get({formConf:conf}, function(){
     $scope.formConf = conf;
@@ -16,11 +17,16 @@ angular.module('redboxAdmin.controllers').controller('WorkflowsCtrl', ['$scope',
 
   var stageController = $resource('/redbox-admin/formBuilder/:file/:stage',null,{addStage:{method: 'PUT'}});
   $scope.addStage = function(newStage) {
-    stageController.addStage({file:conf,stage:newStage},null,function(updated) {
-      $scope.stages = updated.stages;
-      $scope.showAdd = false;
-      $scope.newStage = "";
-    });
+    if ($scope.stages.indexOf(newStage) == -1) {
+      stageController.addStage({file:conf,stage:newStage},null,function(updated) {
+        $scope.stages = updated.stages;
+        $scope.showAdd = false;
+        $scope.newStage = "";
+        $scope.stageExist = false;
+      });
+    } else {
+      $scope.stageExist = true;
+    }
   };
   $scope.removeStage = function(stage) {
     modalDiag.showModal('confirm.html', 'static', function(choice) {
@@ -117,6 +123,12 @@ angular.module('redboxAdmin.controllers').controller('WorkflowsCtrl', ['$scope',
   };
 
   $scope.onSubmit = function(form) {
+    console.log("Can we get section? " + section);
+    var updateParams = {fileName: conf, stage: stage}
+    if(angular.isDefined(section)) {
+      console.log("We should update a section only");
+      updateParams['section'] = section;
+    }
     modalDiag.showModal('confirm.html', 'static', function(choice) {
       if (choice == 'Yes') {
         var model = JSON.parse(JSON.stringify($scope.model));
@@ -135,8 +147,10 @@ angular.module('redboxAdmin.controllers').controller('WorkflowsCtrl', ['$scope',
             model.divs[divIndex].fields[fieldIndex] = field;
           }
         }
-        var stageController = $resource('/redbox-admin/formBuilder/:fileName/:stage');
-        stageController.save({fileName: conf, stage: stage}, model, function (res) { alert("Saved successfully."); });
+//        var stageController = $resource('/redbox-admin/formBuilder/:fileName/:stage');
+//        stageController.save({fileName: conf, stage: stage}, model, function (res) { alert("Saved successfully."); });
+        var stageController = $resource('/redbox-admin/formBuilder/:fileName/:stage', null, {update:{method: 'PUT'}});
+        stageController.update(updateParams, model, function (res) { alert("Saved successfully."); });
 
         //  Above code does not validate form, if it is needed,
         // First we broadcast an event so all fields validate themselves
