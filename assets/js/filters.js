@@ -11,6 +11,17 @@ angular.module('redboxAdmin.filters', [])
               }
           }
   }])
+  .filter('oneBased', [function () {
+      return function (index) {
+          var i = parseInt(index);
+          if (i >= 0) {
+              return ++i;
+          } else {
+              return index;
+          }
+        }
+      }
+  ])
   .filter('interpolate', ['version', function(version) {
     return function(text) {
       return String(text).replace(/\%VERSION\%/mg, version);
