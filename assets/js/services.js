@@ -269,6 +269,6 @@ angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap', 'r
     }
 }])
 .factory('Workflow', ['$resource', function($resource) {
-    return $resource('/redbox-admin/formBuilder/:formConf/:stage/:section');
+    return $resource('/redbox-admin/formBuilder/:formConf/:stage/:section', null, {update:{method: 'PUT'}});
 }])
 ;

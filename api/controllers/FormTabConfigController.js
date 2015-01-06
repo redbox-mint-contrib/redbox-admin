@@ -106,27 +106,44 @@ module.exports = {
     }
     return {confs: components, types: types};
   },
-  write:function(req, res) {
-//    posted req.body is a stage
+  update:function(req, res) {
+//    posted/put req.body is a stage or a section in it
+//    TODO: currently only all configurations are in the same file works
     var confName = req.param("fileName");
     var stage = req.param("stage");
+    var section = req.param("section"); // if section is specified
 
-    var backup = module.exports.formConfsPath + 'backup_' + confName;
-    confName = module.exports.formConfsPath + confName;
-
-    var fs = require('fs');
-    // backup first
-    fs.renameSync(confName, backup);
-
-    var conf = JSON.parse(fs.readFileSync(backup));
-    conf['stages'][stage] = req.body;
-
-    fs.writeFile(confName, JSON.stringify(conf), function (err) {
-        if (err) {
-            console.error("Faile to save form definition file");
-            res.send(400, "Failed to save.");
-        } else { res.send(200); }
-    });
+    var fs = module.exports.gfs;
+    var conf = JSON.parse(fs.readFileSync(module.exports.formConfsPath + confName));
+    var status;
+    if (Object.keys(req.body).length === 0) {
+//      console.log('Add an empty stage.');
+      if (!(stage in conf.stages)) {
+        conf.stages[stage] = {};
+        module.exports.saveConf(confName, conf);
+      }
+      var stageArray = [];
+      for(stage in conf.stages) {
+        stageArray.push(stage);
+      }
+      res.json({ stages: stageArray });
+    } else {
+//      console.log('Update form definition.');
+//      console.log(JSON.stringify(req.body));
+      if (section) {
+//        console.log("  ----update section " + section + " of " + confName);
+//        console.log(JSON.stringify(req.body['divs'][0]));
+        // {divs:[], form-layout: {}}
+        // so only pick up divs and there is should only one
+        conf['stages'][stage]['divs'][section] = req.body['divs'][0];
+      } else {
+//        console.log("  ----update whole file of " + confName);
+        conf['stages'][stage] = req.body;
+      }
+//      res.json({status:200}); // for debug purpose
+      status = module.exports.saveConf(confName, conf);
+      res.json(status);
+    }
   },
   findComponents: function() {
     var fs = require('fs');
@@ -154,5 +171,23 @@ module.exports = {
       }
     }
     return components;
+  },
+  saveConf:function(confName, newConf) {
+    var backup = module.exports.formConfsPath + 'backup_' + confName;
+    confName = module.exports.formConfsPath + confName
+
+    var fs = module.exports.gfs;
+    // backup first
+    fs.renameSync(confName, backup);
+
+    var status = {code:200};
+    try {
+      fs.writeFileSync(confName, JSON.stringify(newConf));
+    } catch (e) {
+      console.log("File: " + confName + " has not been updated. Reason: " + e);
+      status['code'] = 400;
+      status['message'] = "Failed to save.";
+    }
+    return status;
   }
 };
