@@ -60,6 +60,7 @@ module.exports.routes = {
   'POST /redbox-admin/config/field/:sysType/:key': 'configController.write',
   'GET /redbox-admin/config/section/:sysType': 'configController.getSection',
   'GET /redbox-admin/config/section/:sysType/:key': 'configController.getSection',
+  'GET /redbox-admin/config/client': 'configController.getClientConfig',
   'POST /redbox-admin/config/section/:sysType/:key': 'configController.setSection',
   'GET /redbox-admin/config/raw/:sysType/*': 'configController.getRawFile',
   'PUT /redbox-admin/config/raw/:sysType/*': 'configController.putRawFile',

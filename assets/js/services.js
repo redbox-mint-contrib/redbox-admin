@@ -2,12 +2,12 @@
 
 /* Services */
 
-angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap', 'redboxAdmin.config','angularModalService'])
-.factory('authService', ['localStorageService','redboxConfig', function(localStorageService, redboxConfig) {
+angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap','redboxAdmin.config', 'angularModalService'])
+.factory('authService', ['localStorageService','redboxConfig', '$log', '$window', function(localStorageService, redboxConfig, $log, $window) {
     var loginHandlers = [];
 	var AuthService = {
 		isLoggedIn: function(expiryThreshold) {
-            if(redboxConfig.authMethod != 'jws') {
+            if (redboxConfig.auth.method != 'jws') {
               return true;
             }
             var admin_jws_payload = localStorageService.get('admin_jws_payload');
@@ -30,7 +30,7 @@ angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap', 'r
                   errMsg = "NBF Invalid.";
               }
               if (errMsg) {
-                  console.log("Not authenticated:" + errMsg);
+                  $log.error("Not authenticated:" + errMsg);
               } else {
                   return true;
               }
@@ -38,7 +38,7 @@ angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap', 'r
 			return false;
 		},
 		saveAuth: function(jws, payload) {
-          console.log("Saving: " + payload);
+          $log.debug("Saving: " + payload);
           localStorageService.set('admin_jws',jws);
           localStorageService.set('admin_jws_payload', payload);
 		},
@@ -48,6 +48,9 @@ angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap', 'r
 		},
         getJws: function() {
           return localStorageService.get('admin_jws');
+        },
+        redirect: function(url) {
+          $window.location.replace(url);
         }
 	};
   
@@ -56,25 +59,29 @@ angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap', 'r
       var handlerCnt = 0;
       var loginFn = function() {
         if (!cancelLogin && handlerCnt == loginHandlers.length) {
-          console.log("Login not cancelled, proceeding with redirect.");
-          window.location.href = redboxConfig.authUrl;
+          $log.debug("Login not cancelled, proceeding with redirect.");
+          AuthService.redirect(redboxConfig.auth.url);
         }
       };
       
-      angular.forEach(loginHandlers, function(loginHandler) {
-        console.log("Calling login handler:"+loginHandler.id);
-        cancelLogin = loginHandler.fn(function(stat) {
-          console.log("Stat is:" + stat);
-          cancelLogin = stat;
-          handlerCnt++;
-          if (cancelLogin) {
-            console.log("Login was cancelled by:" + loginHandler.id);
-            handlerCnt = loginHandler.length;
-          }
-          loginFn();
+      if (loginHandlers.length > 0) {
+        angular.forEach(loginHandlers, function(loginHandler) {
+          $log.debug("Calling login handler:"+loginHandler.id);
+          cancelLogin = loginHandler.fn(function(stat) {
+            $log.debug("Stat is:" + stat);
+            cancelLogin = stat;
+            handlerCnt++;
+            if (cancelLogin) {
+              $log.debug("Login was cancelled by:" + loginHandler.id);
+              handlerCnt = loginHandler.length;
+            }
+            loginFn();
+          });
+
         });
-        
-      });
+      } else {
+        loginFn();
+      }
       
     };
   
@@ -82,49 +89,91 @@ angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap', 'r
       var newHandler = {id:id, fn:loginHandler};
       angular.forEach(loginHandlers, function(loginHandler) {
         if (loginHandler.id == id) {
-          console.log("Handler already added:"+id);
+          $log.debug("Handler already added:"+id);
           newHandler = null;
         }
       });
       if (newHandler) {
-        console.log("Handler added:"+id);
+        $log.debug("Handler added:"+id);
         loginHandlers.push(newHandler);
+      }
+    };
+  
+    AuthService.removeLoginHandler = function(id) {
+      var idx = -1;
+      if (id) {
+        angular.forEach(loginHandlers, function(loginHandler, index) {
+          if (loginHandler.id == id) {
+            idx = index;
+          }
+        });
+        if (idx != -1) {
+          loginHandlers.splice(idx, 1);
+        }
+      } else {
+        loginHandlers.splice(0, loginHandlers.length);
       }
     };
   
     return AuthService;
 }])
-.factory('authInterceptor', ['$q', 'authService', 'redboxConfig', function($q, authService, redboxConfig) {
+.factory('authInterceptor', ['$q', '$injector', '$log', '$rootScope', function($q, $injector, $log, $rootScope) {
   var authInterceptor = {
     request: function(config) {
-      for (var i=0; i<authInterceptor.execeptionList.length; i++) {
-        var exceptionUrl = authInterceptor.execeptionList[i];
-        if (exceptionUrl == config.url || config.url.indexOf("partials") >=0) {
-          console.log("URL intercept exempted:"+config.url);
+      return $injector.invoke(['$http', 'redboxConfig', 'authService', function($http, redboxConfig, authService) {
+        if (config.url.lastIndexOf('config/client') > 0 || config.url.indexOf('.html') > 0) {
+          $log.debug("URL exempted by convention: " + config.url);
           return config;
         }
-      }
-      var loginStat = authService.isLoggedIn(redboxConfig.authExpiryThreshold); // service shoudln't expire soon
-      if (!loginStat) {
-        authService.deleteAuth();
-        authService.login();
-      }
-      var jws = authService.getJws();
-     
-      if (jws) {
-        config.headers.JWS = jws;
-      }
-      return config;
+        var defUrlCheck = $q.defer();
+        var resolveFn = function(config) {
+          return function(event, redboxConfig) {
+            console.log("At authINterceptor");
+            console.log(config.url);
+            console.log(redboxConfig);
+
+            authInterceptor.execeptionList = [redboxConfig.auth.url];
+            for (var i=0; i<authInterceptor.execeptionList.length; i++) {
+              var exceptionUrl = authInterceptor.execeptionList[i];
+              if (exceptionUrl == config.url) {
+                $log.debug("URL intercept exempted by config:"+config.url);
+                defUrlCheck.resolve(config);
+                return config;
+              }
+            }
+            var loginStat = authService.isLoggedIn(redboxConfig.auth.expiryThreshold); // service shoudln't expire soon
+            if (!loginStat) {
+              authService.deleteAuth();
+              authService.login();
+            }
+            var jws = authService.getJws();
+            if (jws) {
+              config.headers.JWS = jws;
+            }
+            defUrlCheck.resolve(config);
+            return config;
+          };
+        };
+        if (redboxConfig.auth == undefined) {
+          console.log("At interceptor, waiting for config to load:" + config.url);
+          $rootScope.$on('configLoaded', resolveFn(config));
+        } else {
+          console.log("At interceptor, config already loaded");
+          return resolveFn(config)({}, redboxConfig);
+        }
+        return defUrlCheck.promise;
+      }]);
     },
     responseError: function(response) {
-      if (response.status === 401 || response.status === 403) {
-        authService.deleteAuth();
-        authService.login();
-      }
-      return $q.reject(response);
+      return $injector.invoke(['$http', 'redboxConfig', function($http, redboxConfig) {
+        if (response.status === 401 || response.status === 403) {
+          authService.deleteAuth();
+          authService.login();
+        }
+        return $q.reject(response);
+      }]);
     }
   };
-  authInterceptor.execeptionList = [redboxConfig.authUrl];
   return authInterceptor;
 }])
 .factory('modalDiag', [ 'ModalService', function(ModalService) {
@@ -145,13 +194,14 @@ angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap', 'r
     }
   };
 }])
-.factory('authWatcher', [ 'modalDiag', '$http', 'redboxConfig', 'authService', '$interval', function(modalDiag, $http, redboxConfig, authService, $interval) {
+.factory('authWatcher', [ 'modalDiag', '$http', 'redboxConfig', 'authService', '$interval', '$log', '$rootScope', function(modalDiag, $http, redboxConfig, authService, $interval, $log, $rootScope) {
   var authWatcher = {
+    redboxConfig:redboxConfig,
     curDiag: null,
     diag_rbUnavailable:'rbUnavailable.html',
     diag_loginExpiry:'loginExpiry.html',
     loginInterceptor: function(cb) {
-      $http.head(redboxConfig.authUrl).success(function(data){
+      $http.head(redboxConfig.auth.url).success(function(data){
         cb(false);
       }).error(function(data, status, headers, config){
         cb(true);
@@ -163,8 +213,8 @@ angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap', 'r
       });
     }, 
     loginExpiryChecker: function() {
-      console.log("Login expiry check running.");
-      if (!authService.isLoggedIn(redboxConfig.authExpiryThreshold)) {
+      $log.debug("Login expiry check running.");
+      if (!authService.isLoggedIn(redboxConfig.auth.expiryThreshold)) {
         authService.deleteAuth();
         if (authWatcher.curDiag === null) {
           authWatcher.curDiag = authWatcher.diag_loginExpiry;
@@ -174,7 +224,7 @@ angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap', 'r
           });
         } else {
           if (authWatcher.curDiag === authWatcher.diag_rbUnavailable) {
-            console.log("ReDBox is unavailable, removing login expiry watcher");
+            $log.debug("ReDBox is unavailable, removing login expiry watcher");
             authWatcher.removeExpiryChecker();
           }
         }
@@ -185,15 +235,30 @@ angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap', 'r
   authWatcher.addExpiryChecker = function($scope) {
     authWatcher.scope = $scope;
     if (angular.isDefined(authWatcher.scope.sessionExpiryPromise)) {
-      console.log("Session Expiry checker already created.");
+      $log.debug("Session Expiry checker already created.");
     } else {
-        authWatcher.scope.sessionExpiryPromise = $interval(authWatcher.loginExpiryChecker, redboxConfig.authExpiryCheckInterval);
+      var addFn = function() {
+        console.log("At services");
+        console.log(redboxConfig);
+        authWatcher.scope.sessionExpiryPromise = $interval(authWatcher.loginExpiryChecker, authWatcher.redboxConfig.auth.expiryCheckInterval);
         authWatcher.scope.$on('$destroy', function() {
           if (angular.isDefined(authWatcher.scope.sessionExpiryPromise)) {
             $interval.cancel(authWatcher.scope.sessionExpiryPromise);
             authWatcher.scope.sessionExpiryPromise = undefined;
           }
         });
+        authWatcher.loginExpiryChecker();
+      };
+      // check if the config is loaded, otherwise wait for it...
+      if (authWatcher.redboxConfig.auth == undefined) {
+        console.log("Waiting for config to load");
+        $rootScope.$on('configLoaded', function (event, redboxConfig) {
+          authWatcher.redboxConfig = redboxConfig
+          addFn();
+        });
+      } else {
+        addFn();
+      }
     }
   };
   

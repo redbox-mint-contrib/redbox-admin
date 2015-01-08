@@ -117,5 +117,6 @@ npm-debug.log
 nbproject
 .idea
 .node_history
+.test_output
 ## App specific
 .fileHarvest

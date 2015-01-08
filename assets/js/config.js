@@ -1,22 +1,18 @@
 'use strict';
 
-angular.module('redboxAdmin.config',[]).provider('redboxConfig', function() {
+angular.module('redboxAdmin.config',[]).factory('redboxConfig', ['$http', '$rootScope', function($http, $rootScope) {
   var values = {
-    authUrl:'http://127.0.0.1:9000/redbox/default/jws/admin/jws.script/redboxAdmin',
-    authOutUrl:"http://127.0.0.1:9000/redbox/default/authentication.ajax",
-    authMethod:"none",
-    instance: {
-      refreshInterval:30000
-    },
-    authExpiryCheckInterval:10000,
-    authExpiryThreshold:10
   };
-  return {
-    set: function (constants) {
-        angular.extend(values, constants);
-    },
-    $get: function () {
-      return values;
+  $http.get('/redbox-admin/config/client').success( function(data,status,headers,config) {
+    for (var fld in data) {
+      values[fld] = data[fld];
     }
-  };
-});
+    console.log("At config");
+    console.log(values);
+    $rootScope.$emit('configLoaded', values);
+  }).error(function(err) {
+    console.log("Error access client-side configuration");
+    console.log(err);
+  });  
+  return values;
+}]);

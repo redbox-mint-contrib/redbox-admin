@@ -6,7 +6,7 @@
 // author: Shilo Banihit
 // -----------------------------------------------------------
 
-angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','redboxAdmin.config','schemaForm', 'ngRoute', 'angularModalService'])
+angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','schemaForm', 'ngRoute', 'angularModalService'])
 // -----------------------------------------------------------
 // IndexCtrl 
 //  - does nothing but an index, for now
@@ -120,7 +120,7 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
 // -----------------------------------------------------------
 .controller('LogoutCtrl', ['$scope', '$routeParams', '$location', 'authService','$http','redboxConfig', function($scope, $routeParams, $location, authService, $http, redboxConfig)   {
   	authService.deleteAuth();
-    $http.post(redboxConfig.authOutUrl, 'verb=logout', {headers:{'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8'}}).success(function() {console.log("Logged out."); $location.path("/").replace();});
+    $http.post(redboxConfig.auth.outUrl, 'verb=logout', {headers:{'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8'}}).success(function() {console.log("Logged out."); $location.path("/").replace();});
   }])
 // -----------------------------------------------------------
 // MintCsvCtrl
@@ -379,7 +379,8 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
     };
   
   }])
-  .controller('LogviewCtrl',  [ '$scope', '$http', '$upload', '$resource', 'redboxConfig','authService', '$route', 'modalDiag', 'paginator', '$location', function($scope, $http, $upload, $resource, redboxConfig, authService, $route, modalDiag, paginator, $location ) {
+  .controller('LogviewCtrl',  [ '$scope', '$http', '$upload', '$resource', 'redboxConfig','authService', '$route', 'modalDiag', 'paginator', '$location', 'authWatcher', function($scope, $http, $upload, $resource, redboxConfig, authService, $route, modalDiag, paginator, $location, authWatcher ) {
+      authWatcher.addExpiryChecker($scope);
 	  var self = this;
 	  self.logtype = "redbox-main";
 	  self.logevt = "*";
@@ -405,7 +406,8 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
 	  self.getData();
 	  
   }])
-  .controller('HarvesterListCtrl',  [ '$scope', '$http', '$upload', '$resource', 'redboxConfig','authService', '$route', 'modalDiag', 'paginator', '$location', function($scope, $http, $upload, $resource, redboxConfig, authService, $route, modalDiag, paginator, $location ) {
+  .controller('HarvesterListCtrl',  [ '$scope', '$http', '$upload', '$resource', 'redboxConfig','authService', '$route', 'modalDiag', 'paginator', '$location', 'authWatcher', function($scope, $http, $upload, $resource, redboxConfig, authService, $route, modalDiag, paginator, $location, $authWatcher ) {
+      authWatcher.addExpiryChecker($scope);
 	  var self = this;
 	  self.harvestRuns = {};
 	  self.logCount = 0;
@@ -424,7 +426,8 @@ angular.module('redboxAdmin.controllers', ['angularFileUpload','ui.bootstrap','r
 	  self.getHarvesterList();
 	  
   }])
-    .controller('HarvesterSummaryCtrl',  [ '$scope', '$http', '$upload', '$resource', 'redboxConfig','authService', '$route', 'modalDiag', 'paginator', '$location', function($scope, $http, $upload, $resource, redboxConfig, authService, $route, modalDiag, paginator, $location ) {
+    .controller('HarvesterSummaryCtrl',  [ '$scope', '$http', '$upload', '$resource', 'redboxConfig','authService', '$route', 'modalDiag', 'paginator', '$location', 'authWatcher', function($scope, $http, $upload, $resource, redboxConfig, authService, $route, modalDiag, paginator, $location, $authWatcher ) {
+      authWatcher.addExpiryChecker($scope);
       var hrid = $route.current.params.hrid;
 	  var self = this;
 	  self.harvestFailedEvents = {};

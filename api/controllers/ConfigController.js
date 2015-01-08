@@ -324,7 +324,7 @@ module.exports = {
         });
       } else if (ext == ".png") {
         parse = false;
-        setData({imgPath:sails.config.contextName+"config/raw/"+target.sysType+"/"+path.replace(sails.config.instance[target.sysType].installPath, "")});
+        setData({imgPath:sails.config.instance.redbox.contextName+"config/raw/"+target.sysType+"/"+path.replace(sails.config.instance[target.sysType].installPath, "")});
       } else {
         sails.log.debug("Unsupported, unknown file extenstion: " + ext);
         // Unsupported file, do nothing, callers can deal with it.
@@ -556,7 +556,9 @@ module.exports = {
       }
     }
   },
-  
+  /**
+  * Returns a file from the instance.
+  */
   getRawFile: function(req, res) {
     var sysType = req.param('sysType');
     var filePath = req.params[0];
@@ -611,6 +613,17 @@ module.exports = {
         files: files
       });
     });
+  },
+  
+  getClientConfig: function(req, res) {
+    var clientConfig = sails.config.clientConfig;
+    // generate the Auth URL dynamically if undefined
+    if (clientConfig.auth['url'] == undefined) {
+      var rbUrl = req.protocol + "://" + req.host + (req.port ? ":"+req.port: "") + sails.config.instance.redbox.contextName;
+      clientConfig.auth.url =  rbUrl + sails.config.auth.loginPath;
+      clientConfig.auth.outUrl = rbUrl + sails.config.auth.authScript;
+    }
+    return res.json(clientConfig);
   }
 };
 

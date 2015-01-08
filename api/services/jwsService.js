@@ -9,11 +9,11 @@ module.exports = {
     isInvalid: function(jwsStr) {
         var jws = require('jws');
         var errMsg = "";
-        var authMethod = sails.config.authMethod;
+        var authMethod = sails.config.auth.method;
         if (authMethod == 'jws') {
             if (jwsStr != "" && jwsStr != null) {
                 // signature check
-                if (jws.verify(jwsStr, sails.config.jwsSecret)) {
+                if (jws.verify(jwsStr, sails.config.auth.jwsSecret)) {
                     var decodedObj = jws.decode(jwsStr);
                     var payload = JSON.parse(decodedObj.payload);
                     // date and time checking...

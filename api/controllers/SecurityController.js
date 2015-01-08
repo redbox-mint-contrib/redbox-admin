@@ -12,19 +12,20 @@ module.exports = {
      *  Receives a form field named 'jws' and verifies it.
      */
     login: function(req, res) {
-        var authMethod = sails.config.authMethod;
-        if (authMethod == 'jws') {
-            var jwsStr = req.body.jws;
-            var payload = jwsService.getPayload(jwsStr);
-            var view = 'savejws';
-            // check if we have a valid login
-            if (jwsService.isInvalid(jwsStr) || JSON.parse(payload).typ.indexOf('admin') == -1) {
-                view = 'invalidjws';
-            }
-        }
-        return res.view(view, {
+      var authMethod = sails.config.auth.method;
+      if (authMethod == 'jws') {
+          var jwsStr = req.body.jws;
+          var payload = jwsService.getPayload(jwsStr);
+          var view = 'savejws';
+          // check if we have a valid login
+          if (jwsService.isInvalid(jwsStr) || JSON.parse(payload).typ.indexOf('admin') == -1) {
+              view = 'invalidjws';
+          }
+          return res.view(view, {
             jws: jwsStr,
             payload: payload
         });
+      }
+      return res.redirect(sails.config.instance.redbox.contextName);
     }
 };

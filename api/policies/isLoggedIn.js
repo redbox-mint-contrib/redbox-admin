@@ -7,7 +7,7 @@
  *
  */
 module.exports = function(req, res, next) {
-    var authMethod = sails.config.authMethod;
+    var authMethod = sails.config.auth.method;
     if (authMethod == 'jws') {
       // read the JWS from the header
       var jwsStr = req.get('JWS');

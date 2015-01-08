@@ -10,7 +10,7 @@
  *
  */
 
-module.exports = {
+var config = {
 
   /***************************************************************************
    * Set the default database connection for models in the production        *
@@ -34,9 +34,16 @@ module.exports = {
   // log: {
   //   level: "silent"
   // }
-    authMethod: "none",
-    jwsSecret: "Please Change Key - This is very insecure.",
-    contextName:"/redbox-admin/",
+    auth: {
+      url:'http://127.0.0.1:9000/redbox/default/jws/admin/jws.script/redboxAdmin',
+      outUrl:"http://127.0.0.1:9000/redbox/default/authentication.ajax",
+      method: "none",
+      expiryCheckInterval:10000,
+      expiryThreshold:10,
+      loginPath: 'default/jws/admin/jws.script/redboxAdmin',
+      authScript: 'default/authentication.ajax',
+      jwsSecret: "Please Change Key - This is very insecure."
+    },
     // Configuration for the FileharvestController, must have absolute paths
     fileHarvest : {
         mint: {
@@ -47,6 +54,7 @@ module.exports = {
     },
     instance: {
       redbox: {
+        contextName:"/redbox-admin/",
         installPath:"/opt/redbox/",
         statusCmd:"server/tf.sh status", 
         restartCmd:"server/tf.sh restart", 
@@ -163,3 +171,13 @@ module.exports = {
     }
 
 };
+
+// Configuration that will be made available to the client, intentionally limiting but not repeating configuration.
+config.clientConfig = {
+  auth: config.auth,
+  instance: {
+    refreshInterval:30000
+  }
+};
+
+module.exports = config;
