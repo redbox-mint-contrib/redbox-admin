@@ -48,7 +48,7 @@ module.exports = {
   // load nested files: in this file, if divs have config-file, load them
   // Saving back will be a problem, so this is just a learning process.
   loadStage: function(confName) {
-    console.log("Loading " + confName);
+    console.log("Loading workflow JSON file: " + confName);
     var stage = JSON.parse(module.exports.gfs.readFileSync(module.exports.formConfsPath + confName));
     var divs = [], divConf = null;
     for (var i=0; i<stage.divs.length; i++) {
@@ -59,7 +59,7 @@ module.exports = {
     return stage;
   },
   extractStage: function(confName, stage) {
-    console.log("Loading " + confName);
+    console.log("Loading workflow JSON file: " + confName);
     var fs = require('fs');
     var obj = JSON.parse(fs.readFileSync(module.exports.formConfsPath + confName));
 
@@ -82,6 +82,9 @@ module.exports = {
     }
   },
   loadComponentSchemas: function(componentConfsPath) {
+    /* Look for *.schema.json for as the component conf
+       Look for *.vm as component types
+    */
 //    console.log("Sending list of component shcemas");
     var components = {}, types = []; // types = ['debug'];
     var fs = require('fs');
@@ -92,7 +95,7 @@ module.exports = {
       var parts = filePath.split(".");
       var l = parts.length;
       if (parts.length >= 3 && parts[l-2] == 'schema' && parts[l-1] == 'json') {
-        console.log(parts[l-2] + "." + parts[l-1]);
+        console.log("Found component schema file: " + filePath);
         var cSchema = module.exports.loadSchema(module.exports.componentConfsPath + filePath);
 //                console.log(cSchema);
         components[parts[0]] = { "type": "object", "properties": null};
@@ -170,6 +173,9 @@ module.exports = {
         }
       }
     }
+    // Special treat for group element
+    components['confs']['group'] = {"$schema":"http://json-schema.org/draft-04/schema#","type":"object","properties":{"template":{"type":"string"},"fields":{"type":"array","title":"Non-disclosure fields","readonly": true,"items":{"type":"object"}}}};
+    components['types'].push("group");
     return components;
   },
   saveConf:function(confName, newConf) {
