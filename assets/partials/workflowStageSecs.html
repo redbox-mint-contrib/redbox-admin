@@ -5,11 +5,13 @@
 </div>
 <div class="row">
     <div class="col-sm-3 col-md-2 sidebar" ng-include="'partials/nav.html'"></div>
-    <div class="panel" ng-show="loaded">
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+    <div class="panel">
+        <p class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main alert-danger" ng-show="err">{{ err }}</p>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main" ng-hide="err">
             <h1 class="page-header" ng-hide='section'>Edit sections of {{ stage }} in <a ng-href="#/workflow/{{formConf}}">{{formConf | removeExt}}</a></h1>
-            <p ng-hide='section'>divs are building blocks. They can be turned into tabs or other display types.</p>
-            <h1 class="page-header" ng-show='section'>Edit section {{ section | oneBased }} of {{ stage }} in <a ng-href="#/workflow/{{formConf}}">{{formConf | removeExt}}</a></h1>
+            <p ng-hide="section">divs are building blocks. They can be turned into tabs or other display types.</p>
+            <h1 ng-show="section" class="page-header">Edit section {{ section | oneBased }} of {{ stage }} in <a ng-href="#/workflow/{{formConf}}">{{formConf | removeExt}}</a></h1>
+            <h4 class="alert alert-info" ng-show="loaded">Schema path: {{ schema_path }}</h4>
 
             <form name="formBuilder" sf-schema="schema" sf-form="form" sf-model="model" ng-submit="onSubmit(formBuilder)"></form>
 

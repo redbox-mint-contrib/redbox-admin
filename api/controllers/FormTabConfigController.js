@@ -15,33 +15,52 @@ module.exports = {
     var section = req.param("section"); // individual div (section)?
     var list = req.query['list'] // should only list structure?
     var model = module.exports.extractStage(confName,stage);
+
     if ('config-file' in model) {
       //if stages have config-file, load that file
       model = module.exports.loadStage('../' + model['config-file']);
     }
-//    console.log("schema path: " + module.exports.formConfsPath + module.exports.formSchema);
-    if (list) {
-      // only list structure, filter them on server
-      loaded.model.divs = [];
-      for(var i = 0; i < model.divs.length; i++) {
-        loaded.model.divs.push(model.divs[i]['heading']);
-      }
-    } else {
-      if (section) {
-        loaded.model['divs'] = [];
-        loaded.model.divs.push(model.divs[section]);
+    try {
+      if (list) {
+        // only list structure, filter them on server
+        loaded.model.divs = [];
+        for(var i = 0; i < model.divs.length; i++) {
+          loaded.model.divs.push(model.divs[i]['heading']);
+        }
       } else {
-        loaded.model = model;
-      }
+        var schema_path = module.exports.formConfsPath + module.exports.formSchema;
+        var fs = module.exports.gfs;
+        if (fs.existsSync(schema_path)) {
+          loaded.schema = module.exports.loadSchema(schema_path);
+        } else {
+          // If cannot load schema file from instance, try default
+          var path = require('path')
+          schema_path = path.resolve(sails.config.appPath, 'assets/extras/', module.exports.formSchema);
+          if (fs.existsSync(schema_path)) {
+            loaded.schema = module.exports.loadSchema(schema_path);
+          }
+        }
+        // console.log("Schema path: " + schema_path);
+        loaded['schema_path'] = schema_path;
 
-      loaded.schema = module.exports.loadSchema(module.exports.formConfsPath + module.exports.formSchema);
-      var components = module.exports.findComponents();
-      loaded.schema['properties']['divs']['items']['properties']['fields']['items']['properties']['component-confs']['properties'] = components['confs'];
-      loaded.schema['properties']['divs']['items']['properties']['fields']['items']['properties']['component-type']['enum'] = components['types'].sort();
-      // Use for building conditions in a convenient and light-weight way in terms of client
-      for (var k in components['confs']) {
-        loaded.supportedComponents.push(k);
+        if (section) {
+          loaded.model['divs'] = [];
+          loaded.model.divs.push(model.divs[section]);
+        } else {
+          loaded.model = model;
+        }
+        var components = module.exports.findComponents();
+        loaded.schema['properties']['divs']['items']['properties']['fields']['items']['properties']['component-confs']['properties'] = components['confs'];
+        loaded.schema['properties']['divs']['items']['properties']['fields']['items']['properties']['component-type']['enum'] = components['types'].sort();
+        // Use for building conditions in a convenient and light-weight way in terms of client
+        for (var k in components['confs']) {
+          loaded.supportedComponents.push(k);
+        }
       }
+    }
+    catch(e) {
+      loaded['message'] = e.message;
+      console.error(e.message);
     }
     res.send(loaded);
   },
@@ -71,14 +90,14 @@ module.exports = {
     }
   },
   loadSchema: function(fName) {
-    var fs = require('fs');
+    var fs = module.exports.gfs;
     try {
-        var obj = JSON.parse(fs.readFileSync(fName));
-        return obj;
+      var obj = JSON.parse(fs.readFileSync(fName));
+      return obj;
     } catch (e) {
-        console.error("Failed to load schema file: " + fName + ". More:");
-        console.error(e);
-        return {};
+      console.error("Failed to load schema file: " + fName + ". More:");
+      console.error(e);
+      throw new Error("Cannot load schema file:</br> " + e.message);
     }
   },
   loadComponentSchemas: function(componentConfsPath) {

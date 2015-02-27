@@ -243,9 +243,16 @@ angular.module('redboxAdmin.controllers').factory('ConfSaver', ['modalDiag', 'Wo
 
   return function(params, scope) {
     Workflow.get(params, function (formDetails) {
+      if (angular.isDefined(formDetails.message)) {
+        console.log("Has error when loading: "  + formDetails.message)
+        scope.err = formDetails.message;
+        scope.loaded = true;
+        return;
+      }
       scope.formConf = params.formConf;
       scope.stage = params.stage;
       scope.schema = formDetails.schema;
+      scope.schema_path = formDetails.schema_path;
       if (angular.isDefined(params.section)) {
         scope.section = params.section;
       }
