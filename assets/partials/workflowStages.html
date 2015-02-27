@@ -1,0 +1,49 @@
+<div class="row">
+  <div class="col-sm-3 col-md-2 sidebar" ng-include="'partials/nav.html'"></div>
+  <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+    <div class="jumbotron">
+      <h2>Please select a stage to view/edit</h2>
+      <ul class="list-group">
+        <li class="list-group-item" ng-repeat="stage in stages">
+            <a class="col-sm-5 col-md-2" ng-href="#/workflow/{{formConf}}/{{stage}}">{{ stage }}</a>
+           &nbsp;<button ng-click="removeStage(stage);" class="btn btn-danger">Remove</button>
+          &nbsp;<button ng-click="showSections(stage);" class="btn btn-primary">Show sections</button>
+        </li>
+      </ul>
+
+      <button class="btn btn-primary" ng-click="showAdd = !showAdd">Add a new stage</button>
+      <div ng-show="showAdd">
+            <label>Name of new stage</label><input ng-model="newStage">
+            <button ng-click="addStage(newStage);" class="btn btn-primary">Add</button>
+            <span class="label label-danger" ng-show="stageExist">Stage exists. Choose another one.</span>
+      </div>
+
+    </div>
+    <div class="jumbotron" ng-show="sections.length > 0">
+      <ul class="list-group">
+        <li class="list-group-item" ng-repeat="sec in sections">
+          <a ng-href="#/workflow/{{formConf}}/{{selectedStage}}/{{$index}}">{{ sec }}</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <script type="text/ng-template" id="confirm.html">
+     <div class="modal fade">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" ng-click="close('Cancel')" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title">Confirmation for deleting a stage</h4>
+          </div>
+          <div class="modal-body">
+            <p>Form definition is going to be overwritten. Do you want to continue?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" ng-click="close('Cancel')" class="btn btn-default" data-dismiss="modal">No</button>
+            <button type="button" ng-click="close('Yes')" class="btn btn-primary" data-dismiss="modal">Yes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </script>
+</div>

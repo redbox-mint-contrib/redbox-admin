@@ -2,7 +2,7 @@
 
 This application administers a ReDBox/Mint instance.
 
-## Development 
+## Development
 
 Run the ff. commands from the cloned directory:
 
