@@ -305,7 +305,7 @@ module.exports = {
         },
         "fields": {
           "type": "array",
-          "title": "Non-disclosure fields",
+          "title": "Child fields of group component type",
           "readonly": true,
           "items": {
             "type": "object"
