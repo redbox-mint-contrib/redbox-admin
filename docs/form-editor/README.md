@@ -194,9 +194,9 @@ component from file system. They should be named as `component-name.schema.json`
 A tool to create a valid schema can be found [here](http://jsonschema.net/#/#top).
 
 ##Where the editor gets components and schema files
-*  `formConfsPath` : workflow definition files, instance_installation_path + "home/form-configuration/",
-*  `componentConfsPath` : components and their schemas to be scanned from, instance_installation_path + '/portal/default/default/form-components/field-elements/',
-*  `formSchema` : schema of a workflow stage form, `formConfsPath` + "a named file (e.g. `form-schema_stage.json`)"
+*  `formConfsPath` : directory where to find workflow definition files, set as `instance_installation_path` + "home/form-configuration/". *Note*: backups (`backup_xxx.json`) and non-json files are exclued.
+*  `componentConfsPath` : components and their schemas to be scanned from, set as `instance_installation_path` + '/portal/default/default/form-components/field-elements/',
+*  `formSchema` : name of the schema of a workflow stage form being edited, set as `form-schema_stage.json`. The editor first try to find it from `formConfsPath`; if it cannot be found, it uses the defalut one come with the editor located in `assets/extras/`.
 
 ##Currently defined schemas of component
 0. [checkbox](checkbox.schema.json)
