@@ -13,7 +13,7 @@
             <h1 ng-show="section" class="page-header">Edit section {{ section | oneBased }} of {{ stage }} in <a ng-href="#/workflow/{{formConf}}">{{formConf | removeExt}}</a></h1>
             <h4 class="alert alert-info" ng-show="loaded">Schema path: {{ schema_path }}</h4>
 
-            <form name="formBuilder" sf-schema="schema" sf-form="form" sf-model="model" ng-submit="onSubmit(formBuilder)"></form>
+            <form name="formEditor" sf-schema="schema" sf-form="form" sf-model="model" ng-submit="onSubmit(formEditor)"></form>
 
         </div>
     </div>

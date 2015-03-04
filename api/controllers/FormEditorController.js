@@ -1,9 +1,103 @@
+/**
+ * FormEditorController
+ *
+ * @description :: Server-side logic for editing ReDBox work flow configuration file
+ */
+
 module.exports = {
   gfs: require('fs'),
   formConfsPath : sails.config.instance['redbox'].installPath + "home/form-configuration/",
   componentConfsPath : sails.config.instance['redbox'].installPath + '/portal/default/default/form-components/field-elements/',
   formSchema : "form-schema_stage.json", //Default name of schema
-  get: function(req, res) {
+  getForms: function (req, res) {
+  /**
+   * List conf files from formConfsPath
+   */
+    var fl = [];
+    if (module.exports.formConfsPath) {
+      var fs = module.exports.gfs;
+      var tfl = fs.readdirSync(module.exports.formConfsPath);
+      tfl.forEach(function(f) {
+        if((! fs.statSync(module.exports.formConfsPath + f).isDirectory()) && module.exports.isFormDef(f)) {
+          // TODO: filter backups
+          fl.push(f);
+        }
+      });
+    } else {
+      sails.log.error("No path is specified.");
+    };
+    res.json({ flist: fl });
+  },
+  isFormDef: function(f) {
+    var fs = module.exports.gfs;
+    var obj = {};
+    try {
+      obj = JSON.parse(fs.readFileSync(module.exports.formConfsPath + f));
+    } catch (e) {
+      sails.log.warn('Cannot parse JSON file: ' + module.exports.formConfsPath + f);
+      sails.log.warn(e);
+    }
+    return 'stages' in obj;
+  },
+  getStagesList:function (req, res) {
+  /**
+   * List stages of a conf file
+   */
+    var confName = req.param("fileName");
+    if (confName) {
+      var fs = module.exports.gfs;
+      var obj = JSON.parse(fs.readFileSync(module.exports.formConfsPath + confName));
+      var stageArray = [];
+      for(stage in obj.stages) {
+        stageArray.push(stage);
+      }
+      res.json({stages: stageArray});
+    }
+  },
+  addStage:function (req, res) {
+    var confName = req.param("fileName");
+    var stageName = req.param("stage");
+
+    if (confName) {
+      var fs = module.exports.gfs;
+      var obj = JSON.parse(fs.readFileSync(module.exports.formConfsPath + confName));
+      if (!(stageName in obj.stages)) {
+        obj.stages[stageName] = {};
+      }
+      var stageArray = [];
+      for(stage in obj.stages) {
+        stageArray.push(stage);
+      }
+      EditorService.saveConf(confName, obj);
+      res.json({ stages: stageArray });
+    } else {
+      res.json({ stages: [] });
+    }
+  },
+  removeStage:function (req, res) {
+    var confName = req.param("fileName");
+    var stageName = req.param("stage");
+
+    if (confName) {
+      var fs = module.exports.gfs;
+      var obj = JSON.parse(fs.readFileSync(module.exports.formConfsPath + confName));
+      if (stageName in obj.stages) {
+        delete obj.stages[stageName];
+      }
+      var stageArray = [];
+      for(stage in obj.stages) {
+        stageArray.push(stage);
+      }
+      EditorService.saveConf(confName, obj);
+      res.json({ stages: stageArray });
+    } else {
+        res.json({ stages: [] });
+    }
+  },
+  getStage: function(req, res) {
+  /**
+   * Get configuration of a stage
+   */
     var loaded = {
       schema: {},
       model: {},
@@ -128,7 +222,7 @@ module.exports = {
     }
     return {confs: components, types: types};
   },
-  update:function(req, res) {
+  updateStage:function(req, res) {
 //    posted/put req.body is a stage or a section in it
 //    TODO: currently only all configurations are in the same file works
     var confName = req.param("fileName");
@@ -193,7 +287,23 @@ module.exports = {
       }
     }
     // Special treat for group element
-    components['confs']['group'] = {"$schema":"http://json-schema.org/draft-04/schema#","type":"object","properties":{"template":{"type":"string"},"fields":{"type":"array","title":"Non-disclosure fields","readonly": true,"items":{"type":"object"}}}};
+    components['confs']['group'] = {
+      "$schema": "http://json-schema.org/draft-04/schema#",
+      "type": "object",
+      "properties": {
+        "template": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "array",
+          "title": "Non-disclosure fields",
+          "readonly": true,
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    };
     components['types'].push("group");
     return components;
   }

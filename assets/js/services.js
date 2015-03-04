@@ -5,8 +5,8 @@
 angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap','redboxAdmin.config', 'angularModalService'])
 .factory('authService', ['localStorageService','redboxConfig', '$log', '$window', function(localStorageService, redboxConfig, $log, $window) {
     var loginHandlers = [];
-	var AuthService = {
-		isLoggedIn: function(expiryThreshold) {
+  var AuthService = {
+    isLoggedIn: function(expiryThreshold) {
             if (redboxConfig.auth.method != 'jws') {
               return true;
             }
@@ -34,10 +34,10 @@ angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap','re
               } else {
                   return true;
               }
-			}
-			return false;
-		},
-		saveAuth: function(jws, payload) {
+      }
+      return false;
+    },
+    saveAuth: function(jws, payload) {
           $log.debug("Saving: " + payload);
           localStorageService.set('admin_jws',jws);
           localStorageService.set('admin_jws_payload', payload);
@@ -334,6 +334,6 @@ angular.module('redboxAdmin.services', ['LocalStorageModule', 'ui.bootstrap','re
     }
 }])
 .factory('Workflow', ['$resource', function($resource) {
-    return $resource('/redbox-admin/formBuilder/:formConf/:stage/:section', null, {update:{method: 'PUT'}});
+    return $resource('/redbox-admin/formEditor/:formConf/:stage/:section', null, {update:{method: 'PUT'}});
 }])
 ;

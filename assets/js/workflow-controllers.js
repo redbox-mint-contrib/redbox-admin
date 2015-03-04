@@ -1,21 +1,21 @@
 'use strict';
 
 angular.module('redboxAdmin.controllers').controller('WorkflowsCtrl', ['$scope', '$resource', function($scope, $resource) {
-  var formBuilderController = $resource('/redbox-admin/formBuilder');
-  formBuilderController.get({}, function(list){
+  var formEditorCtrl = $resource('/redbox-admin/formEditor');
+  formEditorCtrl.get({}, function(list){
     $scope.confs = list.flist;
   });
 }])
 .controller('WorkflowStagesCtrl', ['$scope', '$resource', '$routeParams', 'modalDiag', 'Workflow', function($scope, $resource, $routeParams, modalDiag, Workflow) {
   var conf = $routeParams.formConf;
   $scope.stageExist = false;
-  var formBuilderController = $resource('/redbox-admin/formBuilder/:formConf');
-  var list = formBuilderController.get({formConf:conf}, function(){
+  var formEditorCtrl = $resource('/redbox-admin/formEditor/:formConf');
+  var list = formEditorCtrl.get({formConf:conf}, function(){
     $scope.formConf = conf;
     $scope.stages = list.stages;
   });
 
-  var stageController = $resource('/redbox-admin/formBuilder/:file/:stage',null,{addStage:{method: 'PUT'}});
+  var stageController = $resource('/redbox-admin/formEditor/:file/:stage',null,{addStage:{method: 'PUT'}});
   $scope.addStage = function(newStage) {
     if ($scope.stages.indexOf(newStage) == -1 && /^[A-Za-z]+[-_][A-Za-z0-9]+$/.test(newStage)) {
       stageController.addStage({file:conf,stage:newStage},null,function(updated) {
@@ -201,9 +201,9 @@ angular.module('redboxAdmin.controllers').factory('ConfSaver', ['modalDiag', 'Wo
             model.divs[divIndex].fields[fieldIndex] = field;
           }
         }
-//        var stageController = $resource('/redbox-admin/formBuilder/:fileName/:stage');
+//        var stageController = $resource('/redbox-admin/formEditor/:fileName/:stage');
 //        stageController.save({fileName: conf, stage: stage}, model, function (res) { alert("Saved successfully."); });
-//        var stageController = $resource('/redbox-admin/formBuilder/:fileName/:stage', null, {update:{method: 'PUT'}});
+//        var stageController = $resource('/redbox-admin/formEditor/:fileName/:stage', null, {update:{method: 'PUT'}});
 //        stageController.update(updateParams, model, function (res) { alert("Saved successfully."); });
         Workflow.update(updateParams, model, function (res) { alert("Saved successfully."); });
 
