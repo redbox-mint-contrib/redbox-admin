@@ -2,7 +2,7 @@ module.exports = {
   gfs: require('fs'),
   formConfsPath : sails.config.instance['redbox'].installPath + "home/form-configuration/",
   componentConfsPath : sails.config.instance['redbox'].installPath + '/portal/default/default/form-components/field-elements/',
-  formSchema : "form-schema_stage.json",
+  formSchema : "form-schema_stage.json", //Default name of schema
   get: function(req, res) {
     var loaded = {
       schema: {},
@@ -142,7 +142,7 @@ module.exports = {
 //      console.log('Add an empty stage.');
       if (!(stage in conf.stages)) {
         conf.stages[stage] = {};
-        module.exports.saveConf(confName, conf);
+        EditorService.saveConf(confName, conf);
       }
       var stageArray = [];
       for(stage in conf.stages) {
@@ -163,7 +163,7 @@ module.exports = {
         conf['stages'][stage] = req.body;
       }
 //      res.json({status:200}); // for debug purpose
-      status = module.exports.saveConf(confName, conf);
+      status = EditorService.saveConf(confName, conf);
       res.json(status);
     }
   },
@@ -196,23 +196,5 @@ module.exports = {
     components['confs']['group'] = {"$schema":"http://json-schema.org/draft-04/schema#","type":"object","properties":{"template":{"type":"string"},"fields":{"type":"array","title":"Non-disclosure fields","readonly": true,"items":{"type":"object"}}}};
     components['types'].push("group");
     return components;
-  },
-  saveConf:function(confName, newConf) {
-    var backup = module.exports.formConfsPath + 'backup_' + confName;
-    confName = module.exports.formConfsPath + confName
-
-    var fs = module.exports.gfs;
-    // backup first
-    fs.renameSync(confName, backup);
-
-    var status = {code:200};
-    try {
-      fs.writeFileSync(confName, JSON.stringify(newConf));
-    } catch (e) {
-      console.log("File: " + confName + " has not been updated. Reason: " + e);
-      status['code'] = 400;
-      status['message'] = "Failed to save.";
-    }
-    return status;
   }
 };

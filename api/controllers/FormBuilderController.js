@@ -18,6 +18,7 @@ module.exports = {
       var tfl = fs.readdirSync(module.exports.formConfsPath);
       tfl.forEach(function(f) {
         if((! fs.statSync(module.exports.formConfsPath + f).isDirectory()) && module.exports.isFormDef(f)) {
+          // TODO: filter backups
           fl.push(f);
         }
       });
@@ -63,7 +64,7 @@ module.exports = {
       for(stage in obj.stages) {
         stageArray.push(stage);
       }
-      module.exports.saveConf(confName, obj);
+      EditorService.saveConf(confName, obj);
       res.json({ stages: stageArray });
     } else {
       res.json({ stages: [] });
@@ -83,24 +84,10 @@ module.exports = {
       for(stage in obj.stages) {
         stageArray.push(stage);
       }
-      module.exports.saveConf(confName, obj);
+      EditorService.saveConf(confName, obj);
       res.json({ stages: stageArray });
     } else {
         res.json({ stages: [] });
-    }
-  },
-  saveConf:function(confName, newConf) {
-    var backup = module.exports.formConfsPath + 'backup_' + confName;
-    confName = module.exports.formConfsPath + confName
-
-    var fs = module.exports.gfs;
-    // backup first
-    fs.renameSync(confName, backup);
-
-    try {
-      fs.writeFileSync(confName, JSON.stringify(newConf));
-    } catch (e) {
-      console.log("File: " + confName + " has not been updated. Reason: " + e);
     }
   }
 };
