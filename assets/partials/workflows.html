@@ -3,7 +3,7 @@
   <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
     <div class="jumbotron">
       <h2>List of workflows on this instance</h2>
-      <p class="text-info">If you believe there are some missing, check if they pass JSON validation.</p>
+      <p class="text-info">If you believe there are some files missing, check if they pass JSON validation.</p>
       <ul class="list-group">
         <li class="list-group-item" ng-repeat="conf in confs">
            <a ng-href="#/workflow/{{ conf }}">{{ conf | removeExt }}</a>

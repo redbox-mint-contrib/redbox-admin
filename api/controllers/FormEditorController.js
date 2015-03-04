@@ -18,8 +18,7 @@ module.exports = {
       var fs = module.exports.gfs;
       var tfl = fs.readdirSync(module.exports.formConfsPath);
       tfl.forEach(function(f) {
-        if((! fs.statSync(module.exports.formConfsPath + f).isDirectory()) && module.exports.isFormDef(f)) {
-          // TODO: filter backups
+        if (module.exports.isFormDef(f)) {
           fl.push(f);
         }
       });
@@ -30,11 +29,21 @@ module.exports = {
   },
   isFormDef: function(f) {
     var fs = module.exports.gfs;
+    var fPath = module.exports.formConfsPath + f;
+    if (fs.statSync(fPath).isDirectory()) {
+      return false;
+    }
+    var path = require('path');
+    var bn = path.basename(f, '.json');
+    // if file name has no .json as ext or has backup at the beginning, the file is not qualified
+    if (bn == f || bn.indexOf('backup') == 0) {
+      return false;
+    }
     var obj = {};
     try {
-      obj = JSON.parse(fs.readFileSync(module.exports.formConfsPath + f));
+      obj = JSON.parse(fs.readFileSync(fPath));
     } catch (e) {
-      sails.log.warn('Cannot parse JSON file: ' + module.exports.formConfsPath + f);
+      sails.log.warn(fPath + ' was not parsed successfully by JSON, it says:');
       sails.log.warn(e);
     }
     return 'stages' in obj;
