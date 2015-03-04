@@ -17,15 +17,15 @@ angular.module('redboxAdmin.controllers').controller('WorkflowsCtrl', ['$scope',
 
   var stageController = $resource('/redbox-admin/formBuilder/:file/:stage',null,{addStage:{method: 'PUT'}});
   $scope.addStage = function(newStage) {
-    if ($scope.stages.indexOf(newStage) == -1) {
+    if ($scope.stages.indexOf(newStage) == -1 && /^[A-Za-z]+[-_][A-Za-z0-9]+$/.test(newStage)) {
       stageController.addStage({file:conf,stage:newStage},null,function(updated) {
         $scope.stages = updated.stages;
         $scope.showAdd = false;
         $scope.newStage = "";
-        $scope.stageExist = false;
+        $scope.error = false;
       });
     } else {
-      $scope.stageExist = true;
+      $scope.error = true;
     }
   };
   $scope.removeStage = function(stage) {
