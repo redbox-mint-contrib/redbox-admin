@@ -1,9 +1,10 @@
-#Editing a form definition
+#Visualising and editing a form definition
 
 ##Basic structure of definition file of workflow's forms
 
-A workflow can have multiple stages. Each stage has a form which contains multiple sections letting a user puts in information. Forms can be defined in a file or spread in files with certain hierarchical structures. The workflow form editor allows a user to view stages and form definitions. It also allow editing a selected stage at a time. Currently only definitions are in a single file can be saved even stages in multiple files can be viewed. The basic structure, when stages are in a single file, is:
+A workflow can have multiple stages. Each stage has a form which contains multiple sections (as tabs in UI or divs in HTML) letting a user puts in information. Forms can be defined in a file (all-in-one type) or nested in files  with certain hierarchical structures (nested type). The workflow form editor allows a user to view stages and form definitions. User can add a new stage to an all-in-one type configuration file. It also allow editing a selected stage at a time with [limitations](#Limitations). So when editing, PLEASE USE IT WITH CAUTION even the editor creates backups in the directory which the file is saved with `backup_` as the prefix.
 
+The basic structure, when stages are in a single file (all-in-one type), is:
 
 ```javascript
 {
@@ -39,7 +40,56 @@ A workflow can have multiple stages. Each stage has a form which contains multip
       }
 }
 ```
+When it is a nested type, each stage is a simple JSON object with stage name as a key:
+```javascript
+"arms-draft": {
+  "config-file": "path_to_stages/named.json"
+}
+```
 
+Each stage has sections (tabs in terms of UI, divs in terms of HTML):
+```javascript
+{
+  "divs": [
+  {
+    "config-file": "path_to_stages/path/path_to_divs/named.json"
+  }
+  ...
+  {
+    "config-file": "path_to_stages/path/path_to_divs/named.json"
+  }
+  ],
+  "buttons": [],
+  "form-footer": "armsform-footer",
+  "form-layout": {
+    "component-type": "tabbed-wizard",
+    "tabHeaderIdentifier": "armsTabHeader",
+    "wizardDefPath": "wizard-definitions/arms-review.json"
+    },
+    "validation-function": {
+      "component-type": "active-tab",
+      "tabHeaderIdentifier": "armsTabHeader"
+    }
+}
+```
+
+And the configuration of each `config-file` element in `divs` array is a JSON object:
+
+```javascript
+{
+  "heading": "Overview",
+  "fields": [
+    {
+      "component-type": "typeA"
+    }
+    ...
+    {
+      "component-type": "typeB"
+    }
+  ]
+}
+```
+##Structure of schema of form
 The structure of the form of a stage can be described as a schema like this:
 
 ```javascript
@@ -209,6 +259,10 @@ A tool to create a valid schema can be found [here](http://jsonschema.net/#/#top
 0. [standard-button](standard-button.schema.json)
 0. [text-input](text-input.schema.json)
 
+##Limitations
+0. Mixed types in a configuration is not supported. That is to say if the top level has `config-file` to include other configurations, all levels should keep in this type. ReDBox forms are defined in all-in-one type, e.g. [dmptform.json](https://github.com/redbox-mint/redbox/blob/master/config/src/main/config/home/form-configuration/dmptform.json). ARMS has forms are nested type, e.g. [armsform.json](https://github.com/qcif/rdsi-arms/blob/master/src/main/config/home/form-configuration/armsform.json).
+0. If a new workflow stage is to be added to a configuration of nested type, it has to be done manually because it needs to have a hierarchical directory structure like (this)[https://github.com/qcif/rdsi-arms/tree/master/src/main/config/home/form-configuration/arms-steps] which has `arms-steps` and `arms-tabs`.
+0. Re-order of tabs (divs) is not supported.
 
 ##References
 * [angular-schema-form](https://github.com/Textalk/angular-schema-form/blob/master/docs/index.md)
