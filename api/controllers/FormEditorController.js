@@ -6,18 +6,18 @@
 
 module.exports = {
   gfs: require('fs'),
-  formConfsPath : sails.config.instance['redbox'].installPath + "home/form-configuration/",
-  componentConfsPath : sails.config.instance['redbox'].installPath + '/portal/default/default/form-components/field-elements/',
-  formSchema : "form-schema_stage.json", //Default name of schema
+  formConfsPath: sails.config.instance['redbox'].installPath + "home/form-configuration/",
+  componentConfsPath: sails.config.instance['redbox'].installPath + '/portal/default/default/form-components/field-elements/',
+  formSchema: "form-schema_stage.json", //Default name of schema
   getForms: function (req, res) {
-  /**
-   * List conf files from formConfsPath
-   */
+    /**
+     * List conf files from formConfsPath
+     */
     var fl = [];
     if (module.exports.formConfsPath) {
       var fs = module.exports.gfs;
       var tfl = fs.readdirSync(module.exports.formConfsPath);
-      tfl.forEach(function(f) {
+      tfl.forEach(function (f) {
         if (module.exports.isFormDef(f)) {
           fl.push(f);
         }
@@ -25,27 +25,31 @@ module.exports = {
     } else {
       sails.log.error("No path is specified.");
     };
-    res.json({ flist: fl });
+    res.json({
+      flist: fl
+    });
   },
-  getStagesList:function (req, res) {
-  /**
-   * List stages of a conf file
-   */
+  getStagesList: function (req, res) {
+    /**
+     * List stages of a conf file
+     */
     var confName = req.param("fileName");
     if (confName) {
       var fs = module.exports.gfs;
       var obj = JSON.parse(fs.readFileSync(module.exports.formConfsPath + confName));
       var stageArray = [];
-      for(stage in obj.stages) {
+      for (stage in obj.stages) {
         stageArray.push(stage);
       }
-      res.json({stages: stageArray});
+      res.json({
+        stages: stageArray
+      });
     }
   },
-  getStage: function(req, res) {
-  /**
-   * Get configuration of a stage
-   */
+  getStage: function (req, res) {
+    /**
+     * Get configuration of a stage
+     */
     var loaded = {
       schema: {},
       model: {},
@@ -54,9 +58,9 @@ module.exports = {
 
     var confName = req.param("fileName");
     var stage = req.param("stage");
-    var section = req.param("section"); // individual div (section)?
-    var list = req.query['list'] // should only list structure?
-    var model = module.exports.extractStage(confName,stage);
+    var section = req.param("section"); // if set, individual div (section)
+    var list = req.query['list'] // if set, should only list structure
+    var model = module.exports.extractStage(confName, stage);
 
     if ('config-file' in model) {
       //if stages have config-file, load that file
@@ -66,7 +70,7 @@ module.exports = {
       if (list) {
         // only list structure, filter them on server
         loaded.model.divs = [];
-        for(var i = 0; i < model.divs.length; i++) {
+        for (var i = 0; i < model.divs.length; i++) {
           loaded.model.divs.push(model.divs[i]['heading']);
         }
       } else {
@@ -102,14 +106,13 @@ module.exports = {
           loaded.supportedComponents.push(k);
         }
       }
-    }
-    catch(e) {
+    } catch (e) {
       loaded['message'] = e.message;
-      console.error(e.message);
+      sails.log.error(e.message);
     }
     res.send(loaded);
   },
-  removeStage:function (req, res) {
+  removeStage: function (req, res) {
     var confName = req.param("fileName");
     var stageName = req.param("stage");
 
@@ -120,24 +123,30 @@ module.exports = {
         delete obj.stages[stageName];
       }
       var stageArray = [];
-      for(stage in obj.stages) {
+      for (stage in obj.stages) {
         stageArray.push(stage);
       }
       EditorService.saveConf(confName, obj);
-      res.json({ stages: stageArray });
+      res.json({
+        stages: stageArray
+      });
     } else {
-        res.json({ stages: [] });
+      res.json({
+        stages: []
+      });
     }
   },
-  updateStage:function(req, res) {
+  updateStage: function (req, res) {
     var confName = req.param("fileName");
     var stageName = req.param("stage");
-    var section = req.param("section"); // if section is specified
+    var section = req.param("section"); // optional
 
     var fs = module.exports.gfs;
     var conf = JSON.parse(fs.readFileSync(module.exports.formConfsPath + confName));
     var stages_path = module.exports.isNestedConf(conf['stages']);
-    var status = { code: 200 };
+    var status = {
+      code: 200
+    };
     if (Object.keys(req.body).length === 0) {
       // add a new stage
       if (stages_path) {
@@ -152,82 +161,47 @@ module.exports = {
       } else {
         status = module.exports.addStage(confName, stages_path, conf, stageName)
       }
-////      console.log('Add an empty stage.');
-//      if (!(stageName in conf.stages)) {
-//        if (stages_path) {
-//          status['message'] = "Cannot create new stages in a nested configuration file.";
-////          console.log("Smart pant is needed");
-////          var json_file = stages_path + '/' + stageName + '.json';
-////          conf.stages[stageName] = {'config-file': json_file};
-////          // create a new empty stage file.
-////          // new stage file will not nest divs as I do not want to create sub-dirs like $stages_path/tabs:
-////          // {"divs": [{'config-file': $stages_path/tabs/tab_name.json}]}
-////          // so do not mix two types together
-////          EditorService.saveConf('../' + json_file, JSON.stringify({"divs": []}));
-//        } else {
-//          conf.stages[stageName] = {divs:[]};
-//        }
-//        EditorService.saveConf(confName, conf);
-//      }
-//      var stageArray = [];
-//      for(stageName in conf.stages) {
-//        stageArray.push(stageName);
-//      }
-//      status['stages'] = stageArray;
     } else {
       // update stage configuration json
-//      console.log('Update form definition.');
-//      console.log(JSON.stringify(req.body));
+      //      console.log('Update form definition using below:');
+      //      console.log(JSON.stringify(req.body));
       if (stages_path) {
         if ('config-file' in conf['stages'][stageName]) {
-          //if stages have config-file, load that file
+          //if stage has config-file, load that file
           stageConf = module.exports.readStageConf('../' + conf['stages'][stageName]['config-file']);
           var divs_path = module.exports.isNestedConf(stageConf['divs']);
           if (divs_path) {
-          // stages are nested, make sure stage's divs are nested
+            // stages are nested, make sure stage's divs are nested
             console.log("Deeply nested as expected, smartness is needed to update " + stageName);
             status = module.exports.updateNestedDivsConf(stageConf['divs'], req.body, section);
             console.log(JSON.stringify(status));
           } else {
-            status['code']= 400;
+            status['code'] = 400;
             status['message'] = "Definition file of divs in a workflow stage has to be also in seprated files.";
           }
         } else {
-            status['code']= 400;
-            status['message'] = "Key config-file was not found.";
+          status['code'] = 400;
+          status['message'] = "Key config-file was not found.";
         }
       } else {
         //console.log("Update all-in-one conf file");
         if (section) {
-  //        console.log("  ----update section " + section + " of " + confName);
-  //        console.log(JSON.stringify(req.body['divs'][0]));
+          //        console.log("  ----update section " + section + " of " + confName);
+          //        console.log(JSON.stringify(req.body['divs'][0]));
           // {divs:[], form-layout: {}}
-          // so only pick up divs and there is should only one
+          // so only pick up divs
           conf['stages'][stage]['divs'][section] = req.body['divs'][0];
         } else {
-            conf['stages'][stage] = req.body;
+          conf['stages'][stage] = req.body;
         }
         status = EditorService.saveConf(confName, conf);
         //res.json(status);
       }
     }
-//      if (section) {
-////        console.log("  ----update section " + section + " of " + confName);
-////        console.log(JSON.stringify(req.body['divs'][0]));
-//        // {divs:[], form-layout: {}}
-//        // so only pick up divs and there is should only one
-//        conf['stages'][stage]['divs'][section] = req.body['divs'][0];
-//      } else {
-////        console.log("  ----update whole file of " + confName);
-//        conf['stages'][stage] = req.body;
-//      }
-//      status = EditorService.saveConf(confName, conf);
-//      //res.json(status);
-//    }
     res.json(status);
   },
   // below are internal functions
-  isFormDef: function(f) {
+  isFormDef: function (f) {
     var fs = module.exports.gfs;
     var fPath = module.exports.formConfsPath + f;
     if (fs.statSync(fPath).isDirectory()) {
@@ -248,42 +222,42 @@ module.exports = {
     }
     return 'stages' in obj;
   },
-  isNestedConf: function(confObj) {
-    /* Check if this is a nested version like used in ARMS, if yes, return path to the next level
-    * Caller has to send in an object for checking:
-    * Mostly there are only two levels:
-    * 1. top level conf['stages']
-    * 2. second level, aka stage lever, stage['divs'] - array
-    */
-    console.log('Checking if nested conf');
-    console.log(JSON.stringify(confObj));
+  isNestedConf: function (confObj) {
+    /* Check if this is a nested version like those used in ARMS, if yes, return path to the next level
+     * Caller has to send in an object for checking:
+     * Mostly there are only two levels:
+     * 1. top level conf['stages']
+     * 2. second level, aka stage lever, stage['divs'] - array
+     */
+    //    console.log('Checking if nested conf');
+    //    console.log(JSON.stringify(confObj));
     if (Array.isArray(confObj)) {
       for (var i = 0; i < confObj.length; i++) {
         if ('config-file' in confObj[i]) {
-          console.log("array path, first hit: " + JSON.stringify(confObj[i]));
+          //          console.log("array path, first hit: " + JSON.stringify(confObj[i]));
           return require('path').dirname(confObj[i]['config-file']);
         }
       }
     } else {
       for (var k in confObj) {
         if ('config-file' in confObj[k]) {
-          console.log("key path, first hit: " + JSON.stringify(confObj[k]));
+          //          console.log("key path, first hit: " + JSON.stringify(confObj[k]));
           return require('path').dirname(confObj[k]['config-file']);
         }
       }
     }
     return false;
   },
-  readStageConf: function(confName, deep) {
-    /* Load a stage conf file and its nested config-files
-    *  returns a combined stage -- all its divs are inlcuded
-    */
-    console.log("Loading stage conf JSON file: " + confName);
+  readStageConf: function (confName, deep) {
+    // Load a stage conf file and its nested config-files
+    //  returns a combined stage -- all its divs are inlcuded
+    //    console.log("Loading stage conf JSON file: " + confName);
     var stage = JSON.parse(module.exports.gfs.readFileSync(module.exports.formConfsPath + confName));
     if (deep) {
-      console.log("deep scan and send back merged");
-      var divs = [], divConf = null;
-      for (var i=0; i<stage.divs.length; i++) {
+      //      console.log("deep scan and send back merged");
+      var divs = [],
+        divConf = null;
+      for (var i = 0; i < stage.divs.length; i++) {
         divConf = '../' + stage.divs[i]['config-file'];
         divs[i] = JSON.parse(module.exports.gfs.readFileSync(module.exports.formConfsPath + divConf));
       }
@@ -291,50 +265,55 @@ module.exports = {
     }
     return stage;
   },
-  extractStage: function(confName, stageName) {
+  extractStage: function (confName, stageName) {
     console.log("Loading workflow JSON file: " + confName);
     var fs = module.exports.gfs;
     var obj = JSON.parse(fs.readFileSync(module.exports.formConfsPath + confName));
 
     if (stageName in obj.stages) {
-        return obj.stages[stageName];
+      return obj.stages[stageName];
     } else {
-        console.error("Stage " + stageName + " is not in the conf file.");
-        return {};
+      sails.log.error("Stage " + stageName + " is not in the conf file.");
+      return {};
     }
   },
-  addStage:function (confName, conf, stageName) {
+  addStage: function (confName, conf, stageName) {
     // Add an empty stage into an all-in-one configruation file.
     // Return stage names to caller
-    var status = { code: 200 };
+    var status = {
+      code: 200
+    };
     if (!(stageName in conf.stages)) {
-      conf.stages[stageName] = {divs:[]};
+      conf.stages[stageName] = {
+        divs: []
+      };
       EditorService.saveConf(confName, conf);
     }
     var stageArray = [];
-    for(stageName in conf.stages) {
+    for (stageName in conf.stages) {
       stageArray.push(stageName);
     }
     status['stages'] = stageArray;
     return status;
   },
-  loadSchema: function(fName) {
+  loadSchema: function (fName) {
     var fs = module.exports.gfs;
     try {
       var obj = JSON.parse(fs.readFileSync(fName));
       return obj;
     } catch (e) {
-      console.error("Failed to load schema file: " + fName + ". More:");
-      console.error(e);
+      sails.log.error("Failed to load schema file: " + fName + ". More:");
+      sails.log.error(e);
       throw new Error("Cannot load schema file:</br> " + e.message);
     }
   },
-  loadComponentSchemas: function(componentConfsPath) {
+  loadComponentSchemas: function (componentConfsPath) {
     /* Look for *.schema.json for as the component conf
        Look for *.vm as component types
     */
-//    console.log("Sending list of component shcemas");
-    var components = {}, types = []; // types = ['debug'];
+    //    console.log("Sending list of component shcemas");
+    var components = {},
+      types = []; // types = ['debug'];
     var fs = require('fs');
     var schemaFiles = fs.readdirSync(componentConfsPath);
     schemaFiles.sort();
@@ -342,35 +321,44 @@ module.exports = {
       var filePath = schemaFiles[i];
       var parts = filePath.split(".");
       var l = parts.length;
-      if (parts.length >= 3 && parts[l-2] == 'schema' && parts[l-1] == 'json') {
+      if (parts.length >= 3 && parts[l - 2] == 'schema' && parts[l - 1] == 'json') {
         console.log("Found component schema file: " + filePath);
         var cSchema = module.exports.loadSchema(module.exports.componentConfsPath + filePath);
-//                console.log(cSchema);
-        components[parts[0]] = { "type": "object", "properties": null};
-        components[parts[0]]["properties"] = cSchema.properties ;
-//                console.log(JSON.stringify(components[parts[0]]["properties"]));
-      } else if (parts[l-1] == 'vm') {
+        //                console.log(cSchema);
+        components[parts[0]] = {
+          "type": "object",
+          "properties": null
+        };
+        components[parts[0]]["properties"] = cSchema.properties;
+        //                console.log(JSON.stringify(components[parts[0]]["properties"]));
+      } else if (parts[l - 1] == 'vm') {
         types.push(parts[0]);
-//                console.log("File: " + filePath + " is vm, does it have a schema file?");
+        //                console.log("File: " + filePath + " is vm, does it have a schema file?");
       }
-//      components['debug'] = {"type": "object", "properties": { content: { type: 'string'} } };
+      //      components['debug'] = {"type": "object", "properties": { content: { type: 'string'} } };
     }
-    return {confs: components, types: types};
+    return {
+      confs: components,
+      types: types
+    };
   },
-  findComponents: function() {
+  findComponents: function () {
     var fs = require('fs');
     var rootPath = sails.config.instance['redbox'].installPath + 'portal/';
     var portalDirs = fs.readdirSync(rootPath);
 
-    var components = {confs:{}, types: []};
+    var components = {
+      confs: {},
+      types: []
+    };
 
-    for(var i = 0; i < portalDirs.length; i++) {
+    for (var i = 0; i < portalDirs.length; i++) {
       var dirName = rootPath + portalDirs[i];
-      if(fs.statSync(dirName).isDirectory()) {
+      if (fs.statSync(dirName).isDirectory()) {
         var subPortalDirs = fs.readdirSync(dirName);
-        for(var j=0; j < subPortalDirs.length; j++) {
+        for (var j = 0; j < subPortalDirs.length; j++) {
           var subDirName = dirName + '/' + subPortalDirs[j];
-          if(fs.statSync(subDirName).isDirectory()) {
+          if (fs.statSync(subDirName).isDirectory()) {
             if (fs.existsSync(subDirName + '/form-components/field-elements')) {
               var cLists = module.exports.loadComponentSchemas(subDirName + '/form-components/field-elements');
               for (var k in cLists['confs']) {
@@ -403,7 +391,7 @@ module.exports = {
     components['types'].push("group");
     return components;
   },
-  updateNestedDivsConf: function(parentNode, newContent, section) {
+  updateNestedDivsConf: function (parentNode, newContent, section) {
     var status;
     if (section) {
       status = EditorService.saveConf(parentNode[section]['config-file'], newContent['divs'][0]);
