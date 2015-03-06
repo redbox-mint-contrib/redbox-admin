@@ -15,7 +15,7 @@
       <div ng-show="showAdd">
             <label>Name of new stage</label><input ng-model="newStage">
             <button ng-click="addStage(newStage);" class="btn btn-primary">Add</button>
-            <span class="label label-danger" ng-show="error">Stage name has to be unique and a single word</span>
+            <span class="label label-danger" ng-show="error">{{ msg }}</span>
       </div>
 
     </div>

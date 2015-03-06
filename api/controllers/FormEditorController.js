@@ -75,16 +75,18 @@ module.exports = {
         var fs = module.exports.gfs;
         if (fs.existsSync(schema_path)) {
           loaded.schema = module.exports.loadSchema(schema_path);
+          loaded['schema_path'] = 'instance';
         } else {
           // If cannot load schema file from instance, try default
           var path = require('path')
           schema_path = path.resolve(sails.config.appPath, 'assets/extras/', module.exports.formSchema);
           if (fs.existsSync(schema_path)) {
             loaded.schema = module.exports.loadSchema(schema_path);
+            loaded['schema_path'] = 'editor';
           }
         }
         // console.log("Schema path: " + schema_path);
-        loaded['schema_path'] = schema_path;
+        loaded['schema_path'] += "'s [" + schema_path + ']';
 
         if (section) {
           loaded.model['divs'] = [];

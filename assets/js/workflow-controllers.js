@@ -17,15 +17,21 @@ angular.module('redboxAdmin.controllers').controller('WorkflowsCtrl', ['$scope',
 
   var stageController = $resource('/redbox-admin/formEditor/:file/:stage',null,{addStage:{method: 'PUT'}});
   $scope.addStage = function(newStage) {
-    if ($scope.stages.indexOf(newStage) == -1 && /^[A-Za-z]+[-_][A-Za-z0-9]+$/.test(newStage)) {
+    if ($scope.stages.indexOf(newStage) == -1 && /^[A-Za-z]+[-_]?[A-Za-z0-9]+$/.test(newStage)) {
       stageController.addStage({file:conf,stage:newStage},null,function(updated) {
         $scope.stages = updated.stages;
-        $scope.showAdd = false;
         $scope.newStage = "";
-        $scope.error = false;
+        if (angular.isDefined(updated.message)) {
+          $scope.error = true;
+          $scope.msg = updated.message;
+        } else {
+          $scope.error = false;
+          $scope.showAdd = false;
+        }
       });
     } else {
       $scope.error = true;
+      $scope.msg = 'Stage name has to be unique and a single word';
     }
   };
   $scope.removeStage = function(stage) {
@@ -205,7 +211,13 @@ angular.module('redboxAdmin.controllers').factory('ConfSaver', ['modalDiag', 'Wo
 //        stageController.save({fileName: conf, stage: stage}, model, function (res) { alert("Saved successfully."); });
 //        var stageController = $resource('/redbox-admin/formEditor/:fileName/:stage', null, {update:{method: 'PUT'}});
 //        stageController.update(updateParams, model, function (res) { alert("Saved successfully."); });
-        Workflow.update(updateParams, model, function (res) { alert("Saved successfully."); });
+        Workflow.update(updateParams, model, function (res) {
+          if (res.code == 200) {
+            alert("Saved successfully.");
+          } else {
+            alert(res.message);
+          }
+        });
 
         //  Above code does not validate form, if it is needed,
         // First we broadcast an event so all fields validate themselves
