@@ -23,6 +23,7 @@ angular.module('redboxAdmin', [
   $routeProvider.when('/harvester/list', {templateUrl: 'partials/harvest.html', controller: 'HarvesterListCtrl'});
   $routeProvider.when('/harvester/summary/:hrid', {templateUrl: 'partials/harvestSummary.html', controller: 'HarvesterSummaryCtrl'});
   $routeProvider.when('/workflow', {templateUrl: 'partials/workflows.html', controller: 'WorkflowsCtrl'});
+  $routeProvider.when('/workflow-def', {templateUrl: 'partials/workflow-def.html', controller: 'WorkflowDefCtrl'});
   $routeProvider.when('/workflow/:formConf', {templateUrl: 'partials/workflowStages.html', controller: 'WorkflowStagesCtrl'});
   $routeProvider.when('/workflow/:formConf/:stage', {templateUrl: 'partials/workflowStageSecs.html', controller: 'StageSecsCtrl'});
   $routeProvider.when('/workflow/:formConf/:stage/:section', {templateUrl: 'partials/workflowStageSecs.html', controller: 'StageSecsCtrlInd'});
