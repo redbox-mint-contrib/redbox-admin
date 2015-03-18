@@ -304,7 +304,7 @@ module.exports = {
     } catch (e) {
       sails.log.error("Failed to load schema file: " + fName + ". More:");
       sails.log.error(e);
-      throw new Error("Cannot load schema file:</br> " + e.message);
+      throw new Error("Cannot load schema file: " + e.message);
     }
   },
   loadComponentSchemas: function (componentConfsPath) {
@@ -323,7 +323,7 @@ module.exports = {
       var l = parts.length;
       if (parts.length >= 3 && parts[l - 2] == 'schema' && parts[l - 1] == 'json') {
         console.log("Found component schema file: " + filePath);
-        var cSchema = module.exports.loadSchema(module.exports.componentConfsPath + filePath);
+        var cSchema = module.exports.loadSchema(componentConfsPath + filePath);
         //                console.log(cSchema);
         components[parts[0]] = {
           "type": "object",
@@ -351,6 +351,18 @@ module.exports = {
       confs: {},
       types: []
     };
+    /* first load the editor's default component schema which likely to be the only ones
+     * If later same key has been found somewhere in the istance, it will be replaced.
+     */
+    var path = require('path')
+    // TODO: move from docs/form-editor to assets direcotry ?
+    schema_path = path.resolve(sails.config.appPath, 'docs/form-editor/') + '/'; // add forward slash at the end to be consistent with other paths used here
+
+    var cLists = module.exports.loadComponentSchemas(schema_path);
+    for (var k in cLists['confs']) {
+      console.log("Loading editor's default component schema - " + k);
+      components['confs'][k] = cLists['confs'][k];
+    }
 
     for (var i = 0; i < portalDirs.length; i++) {
       var dirName = rootPath + portalDirs[i];

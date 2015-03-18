@@ -246,6 +246,7 @@ A tool to create a valid schema can be found [here](http://jsonschema.net/#/#top
 ##Where the editor gets components and schema files
 *  `formConfsPath` : directory where to find workflow definition files, set as `instance_installation_path` + "home/form-configuration/". *Note*: backups (`backup_xxx.json`) and non-json files are exclued.
 *  `componentConfsPath` : components and their schemas to be scanned from, set as `instance_installation_path` + '/portal/default/default/form-components/field-elements/',
+*  its own component schema path: currently under `docs/form-editor` which will be replaced when the instance has such schema,
 *  `formSchema` : name of the schema of a workflow stage form being edited, set as `form-schema_stage.json`. The editor first try to find it from `formConfsPath`; if it cannot be found, it uses the defalut one come with the editor located in `assets/extras/`.
 
 ##Currently defined schemas of component
@@ -258,6 +259,8 @@ A tool to create a valid schema can be found [here](http://jsonschema.net/#/#top
 0. [text-block](text-block.schema.json)
 0. [standard-button](standard-button.schema.json)
 0. [text-input](text-input.schema.json)
+### Note
+For historical reason, some components were created to replace some other components, e.g. `text-block` replaces `pargraph`, but not in all form definitions such updates have been done. Also components with special purposes cannot be configured by this editor.
 
 ##Limitations
 0. Mixed types in a configuration is not supported. That is to say if the top level has `config-file` to include other configurations, all levels should keep in this type. ReDBox forms are defined in all-in-one type, e.g. [dmptform.json](https://github.com/redbox-mint/redbox/blob/master/config/src/main/config/home/form-configuration/dmptform.json). ARMS has forms are nested type, e.g. [armsform.json](https://github.com/qcif/rdsi-arms/blob/master/src/main/config/home/form-configuration/armsform.json).
