@@ -2,6 +2,11 @@
     <div class="col-sm-3 col-md-2 sidebar" ng-include="'partials/nav.html'"></div>
     <div class="panel">
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main" ng-hide="err">
+            <ul class="list-group">
+              <li class="list-group-item" ng-repeat="dt in datatypes">
+                 <a ng-href="#/workflow-def/{{ dt }}">{{ dt | removeExt }}</a>
+              </li>
+            </ul>
             <form name="formEditor" sf-schema="schema" sf-form="form" sf-model="model"></form>
         </div>
     </div>

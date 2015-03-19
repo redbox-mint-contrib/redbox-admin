@@ -1,6 +1,16 @@
 'use strict';
 
-angular.module('redboxAdmin.controllers').controller('WorkflowDefCtrl', ['$scope', '$resource', function($scope, $resource) {
+angular.module('redboxAdmin.controllers').controller('WorkflowTypesCtrl', ['$scope', '$resource', function($scope, $resource) {
+  var resource = $resource('/redbox-admin/workflowdef');
+  resource.get({}, function(list){
+    $scope.datatypes = list.flist;
+  });
+}])
+.controller('WorkflowDefCtrl', ['$scope', '$resource', '$routeParams', function($scope, $resource, $routeParams) {
+  var resource = $resource('/redbox-admin/workflowdef/:datatype');
+  var r = resource.get({datatype:$routeParams.datatype}, function(res){
+    $scope.model = r.content;
+  });
   $scope.schema = {
     type: "object",
     properties: {
@@ -107,7 +117,17 @@ angular.module('redboxAdmin.controllers').controller('WorkflowDefCtrl', ['$scope
               "type": "array",
               "items": { "type": "string" }
             },
-            "template": { "type": "string" }
+            "template": { "type": "string" },
+            "actions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "action-name": { "type": "string" },
+                  "target-step": { "type": "string" }
+                }
+              }
+            }
           }
         }
       }
@@ -117,144 +137,4 @@ angular.module('redboxAdmin.controllers').controller('WorkflowDefCtrl', ['$scope
   $scope.form = [
     "stages"
   ];
-
-  $scope.model = {
-  "presentation-settings": {
-    "hide-funding-body-label": "false",
-    "use-embargoes": "true",
-    "use-technical-metadata": "true"
-  },
-  "harvester": {
-    "type": "workflow-harvester",
-    "workflow-harvester": {
-      "force-storage": "true"
-    }
-  },
-  "transformer": {
-    "curation": [
-      "local"
-    ],
-    "metadata": [
-      "jsonVelocity",
-      "selfSubtoDataset",
-      "basicVersioning"
-    ]
-  },
-  "curation": {
-    "neverPublish": false,
-    "alreadyCurated": false,
-    "curation-state": "live",
-    "requiredIdentifiers": [
-      "local"
-    ],
-    "identifierDataMapping": {
-      "general": {
-        "title": "${title}",
-        "type": "dataset"
-      }
-    }
-  },
-  "transformerOverrides": {
-    "local": {
-      "template": "${server.url.base}published/detail/[[OID]]"
-    }
-  },
-  "indexer": {
-    "script": {
-      "type": "python",
-      "rules": "dataset-rules.py"
-    },
-    "params": {
-      "repository.name": "ReDBox",
-      "repository.type": "Metadata Registry"
-    }
-  },
-  "stages": [
-    {
-      "name": "inbox",
-      "label": "Inbox",
-      "description": "Potential records for investigation.",
-      "security": [
-        "guest"
-      ],
-      "visibility": [
-        "librarian",
-        "reviewer",
-        "admin"
-      ]
-    },
-    {
-      "name": "investigation",
-      "label": "Investigation",
-      "description": "Records under investigation.",
-      "security": [
-        "librarian",
-        "reviewer",
-        "admin"
-      ],
-      "visibility": [
-        "librarian",
-        "reviewer",
-        "admin"
-      ],
-      "template": "workflows/inbox"
-    },
-    {
-      "name": "metadata-review",
-      "label": "Metadata Review",
-      "description": "Records to be reviewed by a data librarian.",
-      "security": [
-        "librarian",
-        "reviewer",
-        "admin"
-      ],
-      "visibility": [
-        "librarian",
-        "reviewer",
-        "admin"
-      ],
-      "template": "workflows/dataset"
-    },
-    {
-      "name": "final-review",
-      "label": "Final Review",
-      "description": "Completed records ready for publication and approval into the repository.",
-      "security": [
-        "reviewer",
-        "admin"
-      ],
-      "visibility": [
-        "librarian",
-        "reviewer",
-        "admin"
-      ],
-      "template": "workflows/dataset"
-    },
-    {
-      "name": "live",
-      "description": "Records already published in the repository.",
-      "label": "Published",
-      "security": [
-        "reviewer",
-        "admin"
-      ],
-      "visibility": [
-        "guest"
-      ],
-      "template": "workflows/dataset"
-    },
-    {
-      "name": "retired",
-      "description": "Records that have been retired.",
-      "label": "Retired",
-      "security": [
-        "admin"
-      ],
-      "visibility": [
-        "guest"
-      ],
-      "template": "workflows/dataset"
-    }
-  ]
-};
 }]);

@@ -72,6 +72,8 @@ module.exports.routes = {
   'GET /redbox-admin/logview/harvester/summary/:procEvt/:qryType/:hrid' : 'logviewController.harvesterSummary',
   'GET /redbox-admin/logview/harvester/summary/:procEvt/:qryType/:hrid/:from' : 'logviewController.harvesterSummary',
   'GET /redbox-admin/logview/harvester/summary/totalrecs/:hrid' : 'logviewController.harvesterTotalRecords',
+  'GET /redbox-admin/workflowdef': 'WorkflowDef.getDataTypes',
+  'GET /redbox-admin/workflowdef/:dataType': 'WorkflowDef.getDef',
   'GET /redbox-admin/formEditor': 'formEditor.getForms',
   'GET /redbox-admin/formEditor/:fileName': 'formEditor.getStagesList',
   'GET /redbox-admin/formEditor/:fileName/:stage': 'formEditor.getStage',
