@@ -56,20 +56,23 @@ var config = {
       redbox: {
         contextName:"/redbox-admin/",
         installPath:"/opt/redbox/",
-        statusCmd:"server/tf.sh status", 
-        restartCmd:"server/tf.sh restart", 
-        stopCmd:"server/tf.sh stop", 
+        statusCmd:"server/tf.sh status",
+        restartCmd:"server/tf.sh restart",
+        stopCmd:"server/tf.sh stop",
         startCmd:"server/tf.sh start",
         urlCheck:"http://localhost:9000/redbox/default/home",
       },
       mint: {
         installPath:"/opt/mint/",
-        statusCmd:"server/tf.sh status", 
-        restartCmd:"server/tf.sh restart", 
-        stopCmd:"server/tf.sh stop", 
+        statusCmd:"server/tf.sh status",
+        restartCmd:"server/tf.sh restart",
+        stopCmd:"server/tf.sh stop",
         startCmd:"server/tf.sh start",
         urlCheck:"http://localhost:9001/mint/default/home",
       }
+    },
+    harvesters: {
+      url: "http://localhost:8080/json-harvester-manager/harvester/"
     },
     sysconfig: {
       redbox: {
@@ -93,47 +96,47 @@ var config = {
           server_url: {
             source: "env",
             key: "export SERVER_URL="
-          } 
+          }
         },
         // Each entry in the section will be displayed as a link in the configuration page.
         // The section is composed of subsections. A subsection is composed of a source and an optional angular-schema-form form definition.
-        // The value of the subsection's 'source' key must match an entry in the ReDBox's sources. 
+        // The value of the subsection's 'source' key must match an entry in the ReDBox's sources.
         // An optional 'form' subsection property controls what the 'angular-schema-form' form definition.
         section: {
           branding: {
             title:"Branding",
             subsections:[{source:"mainColours", title:"Main Colours", form:[
               {
-                key:"@banner-background-colour", 
+                key:"@banner-background-colour",
                 title:"Banner Background Colour",
-                colorFormat:'hex', 
+                colorFormat:'hex',
                 spectrumOptions:{
-                chooseText:"Select", 
-                cancelText:"Cancel",  
+                chooseText:"Select",
+                cancelText:"Cancel",
                 showInitial: true,
                 showPalette: true,
                 showSelectionPalette: true,
                 showInput:true,
                }
               },
-              { key:"@title-background-colour", 
+              { key:"@title-background-colour",
                 title:"Title Bar Background Colour",
-                colorFormat:'hex', 
+                colorFormat:'hex',
                 spectrumOptions:{
-                chooseText:"Select", 
-                cancelText:"Cancel",  
+                chooseText:"Select",
+                cancelText:"Cancel",
                 showInitial: true,
                 showPalette: true,
                 showSelectionPalette: true,
                 showInput:true,
                }
               },
-              { key:"@menu-background-colour", 
+              { key:"@menu-background-colour",
                 title:"Dropdown Menu Background Colour",
-                colorFormat:'hex', 
+                colorFormat:'hex',
                 spectrumOptions:{
-                chooseText:"Select", 
-                cancelText:"Cancel",  
+                chooseText:"Select",
+                cancelText:"Cancel",
                 showInitial: true,
                 showPalette: true,
                 showSelectionPalette: true,
@@ -153,7 +156,7 @@ var config = {
           authentication: {
             title:"Authentication",
             subsections: [{source:"authentication", title:"authentication.json"}, {source:"sso", title:"sso.json"}, {source:"rapidaaf",title:"rapidaaf.json"}]
-          }, 
+          },
           languageFiles: {
             title:"Language Files",
             subsections: [{source:"languageFiles"}]
