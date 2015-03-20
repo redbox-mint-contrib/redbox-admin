@@ -13,7 +13,7 @@
   </div>
   <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
     <h1>Installed Harvesters</h1>
-    <label class="alert alert-danger" ng-show="status!=200">Server failed to return data. Please contact administrator.</label>
+    <label class="alert alert-danger" ng-show="status!=200">Unable to contact the harvester manager at the moment. If this is persitent, please check server and logs.</label>
 
     <table class="table table-hover" ng-show="status=='200'">
       <thead>
@@ -21,12 +21,13 @@
       </thead>
       <tbody>
         <tr ng-repeat="h in harvesters">
-          <td>{{ h }}</td>
-          <td>running/stoped</td>
+          <td>{{ h.name }}</td>
+
+          <td><span class="text-success" ng-show="h.status" aria-hidden="true"><span class="glyphicon glyphicon-ok-circle"></span> Running</span><span class="text-danger" ng-show="!h.status" aria-hidden="true"><span class="glyphicon glyphicon-remove-circle"></span> Stopped</span></td>
           <td>
-            <button type="button" class="btn btn-default">Start</button>
-            <button type="button" class="btn btn-default">Stop</button>
-            <button type="button" class="btn btn-default">Remove</button></td>
+            <button class="btn btn-success" type="button"  ng-click="act('start', h)"><span aria-hidden="true" class="glyphicon glyphicon-play"></span> Start</button>
+            <button class="btn btn-danger" type="button"  ng-click="act('stop', h)"><span aria-hidden="true" class="glyphicon glyphicon-stop"></span> Stop</button>
+            <button class="btn btn-danger" type="button"><span aria-hidden="true" class="glyphicon glyphicon-remove"></span> Remove</button>
       </tr>
       </tbody>
     </table>

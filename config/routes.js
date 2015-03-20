@@ -82,4 +82,5 @@ module.exports.routes = {
   'PUT /redbox-admin/formEditor/:fileName/:stage/:section': 'formEditor.updateStage',
   'DELETE /redbox-admin/formEditor/:fileName/:stage': 'formEditor.removeStage',
   'GET /redbox-admin/harvesters': 'Harvesters.get',
+  'GET /redbox-admin/harvesters/:action': 'Harvesters.act',
 };
