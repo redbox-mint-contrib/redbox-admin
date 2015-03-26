@@ -12,8 +12,12 @@
     </ul>
   </div>
   <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-    <h1>Installed Harvesters</h1>
-    <label class="alert alert-danger" ng-show="status!=200">Unable to contact the harvester manager at the moment. If this is persitent, please check server and logs.</label>
+    <h1>Harvester Manager</h1>
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title">Control Panel</h3>
+      </div>
+    <label class="alert alert-danger" ng-show="status!=200">Unable to contact the harvester manager at the moment. If this problem persists, please check server and logs.</label>
 
     <table class="table table-hover" ng-show="status=='200'">
       <thead>
@@ -25,10 +29,32 @@
 
           <td><span class="text-success" ng-show="h.status" aria-hidden="true"><span class="glyphicon glyphicon-ok-circle"></span> Running</span><span class="text-danger" ng-show="!h.status" aria-hidden="true"><span class="glyphicon glyphicon-remove-circle"></span> Stopped</span></td>
           <td>
-            <button class="btn btn-success" type="button"  ng-click="act('start', h)"><span aria-hidden="true" class="glyphicon glyphicon-play"></span> Start</button>
-            <button class="btn btn-danger" type="button"  ng-click="act('stop', h)"><span aria-hidden="true" class="glyphicon glyphicon-stop"></span> Stop</button>
-            <button class="btn btn-danger" type="button"><span aria-hidden="true" class="glyphicon glyphicon-remove"></span> Remove</button>
+            <button class="btn btn-success" type="button" ng-click="act('start', h)"><span aria-hidden="true" class="glyphicon glyphicon-play"></span> Start</button>
+            <button class="btn btn-danger" type="button" ng-click="act('stop', h)"><span aria-hidden="true" class="glyphicon glyphicon-stop"></span> Stop</button>
+            <button class="btn btn-danger" type="button" ng-click="act('remove', h)"><span aria-hidden="true" class="glyphicon glyphicon-remove"></span> Remove</button>
       </tr>
       </tbody>
     </table>
+    </div>
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title">Upload a harvest configuration package</h3>
+      </div>
+      <p class="well well-sm">Insert informative text with a link to doco here</p>
+      <form name="uploadForm" novalidate>
+        <div class="form-group" ng-class="{'has-error': MissHarvesterName }">
+          <label class="control-label" for="newHarvester">Name of new harvester</label>
+          <span ng-show="MissHarvesterName" class="has-error"> {{ MissHarvesterName }}</span>
+          <input name="newHarvester" type="text" required ng-pattern='/^[\w-_]+$/' class="form-control" id="newHarvester" ng-model="newHarvester" placeholder="one word name">
+          <i ng-show="uploadForm.newHarvester.$error.required">*Required</i>
+          <i ng-show="uploadForm.newHarvester.$error.pattern">Single word only</i>
+        </div>
+        <div class="form-group">
+          <label>New harvester package file</label>
+          <input name="packagefile" id="packagefile" type="file" accept="application/zip" ng-file-select="uploadharvester($files)">
+          <p class="help-block">*Required. Zip file only.</p>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>

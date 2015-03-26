@@ -50,6 +50,9 @@ var config = {
           targetDir: "/opt/harvester/.json-harvester-manager-production/harvest/mint-csvjdbc/input",
           owner: "tomcat",
           group: "tomcat",
+        },
+        harvestermanager: {
+          targetDir: "/tmp"
         }
     },
     instance: {
@@ -179,6 +182,9 @@ var config = {
 config.clientConfig = {
   auth: config.auth,
   instance: {
+    refreshInterval:30000
+  },
+  harvestermanager: {
     refreshInterval:30000
   }
 };
