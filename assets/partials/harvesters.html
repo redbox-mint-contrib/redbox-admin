@@ -42,16 +42,15 @@
       </div>
       <p class="well well-sm">Insert informative text with a link to doco here</p>
       <form name="uploadForm" novalidate>
-        <div class="form-group" ng-class="{'has-error': MissHarvesterName }">
+        <div class="form-group">
           <label class="control-label" for="newHarvester">Name of new harvester</label>
-          <span ng-show="MissHarvesterName" class="has-error"> {{ MissHarvesterName }}</span>
-          <input name="newHarvester" type="text" required ng-pattern='/^[\w-_]+$/' class="form-control" id="newHarvester" ng-model="newHarvester" placeholder="one word name">
+          <input name="newHarvester" type="text" required ng-pattern="reg_harvester_name" class="form-control" id="newHarvester" ng-model="newHarvester" placeholder="one word name">
           <i ng-show="uploadForm.newHarvester.$error.required">*Required</i>
-          <i ng-show="uploadForm.newHarvester.$error.pattern">Single word only</i>
+          <i ng-show="uploadForm.newHarvester.$error.pattern">Single word only. Can have - or _ inside.</i>
         </div>
         <div class="form-group">
           <label>New harvester package file</label>
-          <input name="packagefile" id="packagefile" type="file" accept="application/zip" ng-file-select="uploadharvester($files)">
+          <input name="packagefile" id="packagefile" type="file" accept="application/zip" ng-file-select="uploadharvester($files)" ng-disabled="!newHarvester">
           <p class="help-block">*Required. Zip file only.</p>
         </div>
       </form>

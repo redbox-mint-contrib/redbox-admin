@@ -1,5 +1,6 @@
 'use strict';
 angular.module('redboxAdmin.controllers').controller('HarvestersCtrl', ['$scope', '$resource', '$interval', '$upload', 'redboxConfig', function ($scope, $resource, $interval, $upload, redboxConfig) {
+  $scope.reg_harvester_name = /^[a-zA-Z][a-zA-Z0-9-_]+[a-zA-Z0-9]$/;
   var resource = $resource('/redbox-admin/harvesters');
   function init() {
     resource.get({}, function(res){
@@ -24,7 +25,6 @@ angular.module('redboxAdmin.controllers').controller('HarvestersCtrl', ['$scope'
       }
     });
   }
-console.log(redboxConfig.harvestermanager.refreshInterval);
   $interval(function(){
     if ($scope.harvesters) {
       for (var i = 0; i < $scope.harvesters.length; i++) {
@@ -63,24 +63,22 @@ console.log(redboxConfig.harvestermanager.refreshInterval);
     });
   };
   $scope.uploadharvester = function($files) {
+    // Below two tests are not necessary if angularjs did it work correctly
     var err_harvester_name = "Please provide a name for the new harvester: it has to be one word. Once fixed, select file again.";
     if (angular.isUndefined($scope.newHarvester)) {
-      $scope.MissHarvesterName = err_harvester_name;
+      alert(err_harvester_name);
       return;
     }
-    if (! /^[\w-_]+$/.test($scope.newHarvester)) {
-      $scope.MissHarvesterName = err_harvester_name;
+    if (! $scope.reg_harvester_name.test($scope.newHarvester)) {
+      alert(err_harvester_name);
       return;
     }
-    function rest() {
+    function reset() {
       $scope.newHarvester = "";
       document.getElementById('packagefile').value = null;
     }
-    $scope.MissHarvesterName = "";
-    console.log("Will upload and install it as " + $scope.newHarvester);
     for (var i = 0; i < $files.length; i++) {
       var file = $files[i];
-      console.log(file);
       $scope.upload = $upload.upload({
         url: '/redbox-admin/fileHarvest/harvestermanager/'+file.name,
         method: 'PUT',
@@ -92,9 +90,9 @@ console.log(redboxConfig.harvestermanager.refreshInterval);
       .success(function() {
         alert("Uploaded to server, will install it");
         $scope.act('upload', {name: $scope.newHarvester, fileName: file.name });
-        rest();
+        reset();
       })
-      .error(function(e) { alert("Failed to upload\n" + e); rest() });
+      .error(function(e) { alert("Failed to upload\n" + e); reset() });
     }
   };
 }]);
